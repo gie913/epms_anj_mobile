@@ -1,0 +1,34 @@
+class LaporanRestantEntity {
+  static String ophId = "oph_id";
+  static String ophCardId = "oph_card_id";
+  static String ophHarvestingType = "oph_harvesting_type";
+  static String ophHarvestingMethod = "oph_harvesting_method";
+  static String ophEstateCode = "oph_estate_code";
+  static String ophDivisionCode = "oph_division_code";
+  static String ophBlockCode = "oph_block_code";
+  static String ophTphCode = "oph_tph_code";
+  static String mandorEmployeeCode = "mandor_employee_code";
+  static String mandorEmployeeName = "mandor_employee_name";
+  static String employeeCode = "employee_code";
+  static String employeeName = "employee_name";
+  static String keraniPanenEmployeeCode = "kerani_panen_employee_code";
+  static String keraniPanenEmployeeName = "kerani_panen_employee_name";
+  static String isRestantPermanent = "is_restant_permanent";
+  static String ophPickupDate = "oph_pickup_date";
+  static String createdDate = "created_date";
+  static String createdTime = "created_time";
+  static String ophPickupTime = "oph_pickup_time";
+  static String bunchesRipe = "bunches_ripe";
+  static String bunchesOverripe = "bunches_overripe";
+  static String bunchesHalfripe = "bunches_halfripe";
+  static String bunchesUnripe = "bunches_unripe";
+  static String bunchesAbnormal = "bunches_abnormal";
+  static String bunchesEmpty = "bunches_empty";
+  static String looseFruits = "loose_fruits";
+  static String bunchesTotal = "bunches_total";
+  static String bunchesNotSent = "bunches_not_sent";
+  static String ophEstimateTonnage = "oph_estimate_tonnage";
+  static String ophNotes = "oph_notes";
+  static String ophCustomerCode = "oph_customer_code";
+  static String isPlanned = "is_planned";
+}

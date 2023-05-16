@@ -1,0 +1,11 @@
+class MVendorEntity {
+  static String vendorId = "vendor_id";
+  static String vendorCode = "vendor_code";
+  static String vendorName = "vendor_name";
+  static String createdBy = "created_by";
+  static String createdDate = "created_date";
+  static String createdTime = "created_time";
+  static String updatedBy = "updated_by";
+  static String updatedDate = "updated_date";
+  static String updatedTime = "updated_time";
+}
