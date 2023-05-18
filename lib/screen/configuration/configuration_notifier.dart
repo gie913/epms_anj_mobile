@@ -37,7 +37,8 @@ class ConfigurationNotifier extends ChangeNotifier {
     try {
       StorageManager.saveData("apiServer", apiServer);
       _navigationService.pop();
-      FlushBarManager.showFlushBarSuccess(context, "Konfigurasi server", "Berhasil");
+      FlushBarManager.showFlushBarSuccess(
+          context, "Konfigurasi server", "Berhasil");
     } catch (e) {
       print("Save api server error");
     }

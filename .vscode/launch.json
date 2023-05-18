@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PRODUCTION",
+            "type": "dart",
+            "request": "launch",
+            "program": "C:/projects/epms_anj_mobile/lib/main.dart",
+            "args":[		
+                "--flavor",
+                "prod",
+                "--debug",
+                "--verbose",
+                "--warning-mode all"
+			]
+        },
+        {
+            "name": "DEVELOPMENT",
+            "type": "dart",
+            "request": "launch",
+            "program": "C:/projects/epms_anj_mobile/lib/main_dev.dart",
+            "args":[
+                "--flavor",
+                "dev",
+                "--debug",
+                "--verbose",
+                "--warning-mode all"
+			]
+        }
+    ]
+    
+    // APK
+    // flutter build apk --split-per-abi --flavor dev -t lib/main_dev.dart --release
+    // flutter build apk --split-per-abi --flavor prod -t lib/main.dart --release
+
+    // AppBundle
+    // flutter build appbundle --flavor dev -t lib/main_dev.dart
+    // flutter build appbundle --flavor prod -t lib/main_prod.dart
+}

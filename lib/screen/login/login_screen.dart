@@ -60,7 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
-                                    hintText: "Username", labelText: "Username"),
+                                    hintText: "Username",
+                                    labelText: "Username"),
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return "Username tidak boleh kosong";
@@ -158,8 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     children: [
                                       Text(
                                         "${Constanta.APP_VERSION}",
-                                        style:
-                                            TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(height: 10),
                                       Text("${login.appName}"),

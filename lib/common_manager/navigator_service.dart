@@ -42,9 +42,8 @@ class NavigatorService {
     );
   }
 
-  bool pop() {
-    navigatorKey.currentState!.pop();
-    return true;
+  void pop({dynamic result}) {
+    navigatorKey.currentState!.pop(result);
   }
 
   void popUntil(
