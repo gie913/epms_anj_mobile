@@ -128,7 +128,7 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                               .onClickMenu(index);
                                         },
                                         style: TextButton.styleFrom(
-                                          backgroundColor:
+                                          foregroundColor: Colors.white, backgroundColor:
                                               colorCodesSupervisorSPB[
                                                   index - 2],
                                           minimumSize: Size(
@@ -142,7 +142,6 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                                       colorCodesSupervisorSPB[
                                                           index - 2])),
                                           padding: const EdgeInsets.all(16.0),
-                                          primary: Colors.white,
                                           textStyle: const TextStyle(
                                               fontSize: 20,
                                               color: Colors.white),

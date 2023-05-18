@@ -131,7 +131,7 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                                   )
                                 : TextButton(
                                     style: TextButton.styleFrom(
-                                      backgroundColor:
+                                      foregroundColor: Colors.white, backgroundColor:
                                           colorCodesDelivery[index - 2],
                                       minimumSize: Size(
                                           MediaQuery.of(context).size.width, 50),
@@ -142,7 +142,6 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                                               color:
                                                   colorCodesDelivery[index - 2])),
                                       padding: const EdgeInsets.all(16.0),
-                                      primary: Colors.white,
                                       textStyle: const TextStyle(
                                           fontSize: 20, color: Colors.white),
                                     ),

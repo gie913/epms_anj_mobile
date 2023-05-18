@@ -120,7 +120,7 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                       )
                                     : TextButton(
                                         style: TextButton.styleFrom(
-                                          backgroundColor:
+                                          foregroundColor: Colors.white, backgroundColor:
                                               colorCodesAdministrationSPB[
                                                   index - 2],
                                           minimumSize: Size(
@@ -134,7 +134,6 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                                       colorCodesAdministrationSPB[
                                                           index - 2])),
                                           padding: const EdgeInsets.all(16.0),
-                                          primary: Colors.white,
                                           textStyle: const TextStyle(
                                               fontSize: 20, color: Colors.white),
                                         ),

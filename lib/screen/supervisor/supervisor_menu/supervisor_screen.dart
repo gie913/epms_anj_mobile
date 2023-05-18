@@ -124,7 +124,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                         )
                                       : TextButton(
                                           style: TextButton.styleFrom(
-                                            backgroundColor:
+                                            foregroundColor: Colors.white, backgroundColor:
                                                 colorCodesSupervisor[index - 2],
                                             minimumSize: Size(
                                                 MediaQuery.of(context).size.width,
@@ -136,7 +136,6 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                                     color: colorCodesSupervisor[
                                                         index - 2])),
                                             padding: const EdgeInsets.all(16.0),
-                                            primary: Colors.white,
                                             textStyle: const TextStyle(
                                                 fontSize: 20,
                                                 color: Colors.white),
