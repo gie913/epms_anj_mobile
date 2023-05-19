@@ -12,7 +12,7 @@ class DatabaseOPHSuperviseAncak {
         ${OPHSuperviseAncakEntity.supervisiAncakEstateCode} TEXT,
         ${OPHSuperviseAncakEntity.supervisiAncakBlockCode} TEXT,
         ${OPHSuperviseAncakEntity.supervisiAncakLat} TEXT,
-        ${OPHSuperviseAncakEntity.supervisiAncakLon} TEXT,
+        ${OPHSuperviseAncakEntity.supervisiAncakLong} TEXT,
         ${OPHSuperviseAncakEntity.supervisiAncakLatEnd} TEXT,
         ${OPHSuperviseAncakEntity.supervisiAncakLongEnd} TEXT,
         ${OPHSuperviseAncakEntity.supervisiAncakMandorEmployeeCode} TEXT,
@@ -49,13 +49,15 @@ class DatabaseOPHSuperviseAncak {
 
   Future<int> insertOPHSuperviseAncak(OPHSuperviseAncak object) async {
     Database db = await DatabaseHelper().database;
-    int saved = await db.insert(tSuperviseAncakPanenSchemaListTable, object.toJson());
+    int saved =
+        await db.insert(tSuperviseAncakPanenSchemaListTable, object.toJson());
     return saved;
   }
 
   Future<List<OPHSuperviseAncak>> selectOPHSuperviseAncak() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(tSuperviseAncakPanenSchemaListTable);
+    var mapList = await db.query(tSuperviseAncakPanenSchemaListTable,
+        groupBy: "${OPHSuperviseAncakEntity.supervisiAncakId}");
     List<OPHSuperviseAncak> list = [];
     for (int i = 0; i < mapList.length; i++) {
       OPHSuperviseAncak oph = OPHSuperviseAncak.fromJson(mapList[i]);
@@ -67,14 +69,17 @@ class DatabaseOPHSuperviseAncak {
   Future<List> selectOPHSuperviseAncakByID(OPHSuperviseAncak oph) async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(tSuperviseAncakPanenSchemaListTable,
-        where: "${OPHSuperviseAncakEntity.supervisiAncakId} = ?", whereArgs: [oph.supervisiAncakId]);
+        where: "${OPHSuperviseAncakEntity.supervisiAncakId} = ?",
+        whereArgs: [oph.supervisiAncakId]);
     return mapList;
   }
 
   Future<int> updateOPHSuperviseAncakByID(OPHSuperviseAncak object) async {
     Database db = await DatabaseHelper().database;
-    int count = await db.update(tSuperviseAncakPanenSchemaListTable, object.toJson(),
-        where: '${OPHSuperviseAncakEntity.supervisiAncakId}=?', whereArgs: [object.supervisiAncakId]);
+    int count = await db.update(
+        tSuperviseAncakPanenSchemaListTable, object.toJson(),
+        where: '${OPHSuperviseAncakEntity.supervisiAncakId}=?',
+        whereArgs: [object.supervisiAncakId]);
     return count;
   }
 

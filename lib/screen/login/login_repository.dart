@@ -6,6 +6,7 @@ import 'package:epms/base/api/api_endpoint.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/model/login_response.dart';
 import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
 
 class LoginRepository extends APIConfiguration {
   LoginRepository() : super();
@@ -31,6 +32,7 @@ class LoginRepository extends APIConfiguration {
       LoginResponse loginResponseRevamp =
           LoginResponse.fromJson(json.decode(response.body));
       if (response.statusCode == 200) {
+        StorageManager.saveData('formType', json.decode(response.body)['form_type']);
         onSuccess(context, loginResponseRevamp);
       } else {
         String jsonString = json.decode(response.body)['message'];

@@ -8,7 +8,9 @@ class DatabaseSPBSupervise {
   void createTableSPB(Database db) async {
     await db.execute('''
       CREATE TABLE $tSPBSuperviseSchemaListTable(
+      ${SPBSuperviseEntity.spbSuperviseId} TEXT NOT NULL,
       ${SPBSuperviseEntity.spbId} TEXT NOT NULL,
+      ${SPBSuperviseEntity.supervisiEstateCode} TEXT,
       ${SPBSuperviseEntity.supervisiSpbEmployeeCode} TEXT,
       ${SPBSuperviseEntity.supervisiSpbEmployeeName} TEXT,
       ${SPBSuperviseEntity.supervisiSpbLat} TEXT,
@@ -17,8 +19,8 @@ class DatabaseSPBSupervise {
       ${SPBSuperviseEntity.supervisiSpbDriverEmployeeName} TEXT,
       ${SPBSuperviseEntity.supervisiSpbDivisionCode} TEXT,
       ${SPBSuperviseEntity.supervisiSpbLicenseNumber} TEXT,
-      ${SPBSuperviseEntity.supervisiSpbType} TEXT,
-      ${SPBSuperviseEntity.supervisiSpbMethod} TEXT,
+      ${SPBSuperviseEntity.supervisiSpbType} INT,
+      ${SPBSuperviseEntity.supervisiSpbMethod} INT,
       ${SPBSuperviseEntity.supervisiSpbPhoto} TEXT,
       ${SPBSuperviseEntity.bunchesRipe} INT,
       ${SPBSuperviseEntity.bunchesOverripe} INT,
@@ -29,6 +31,7 @@ class DatabaseSPBSupervise {
       ${SPBSuperviseEntity.looseFruits} INT,
       ${SPBSuperviseEntity.bunchesTotal} INT,
       ${SPBSuperviseEntity.bunchesTotalNormal} INT,
+      ${SPBSuperviseEntity.bunchesTangkaiPanjang} INT,
       ${SPBSuperviseEntity.bunchesSampah} INT,
       ${SPBSuperviseEntity.bunchesBatu} INT,
       ${SPBSuperviseEntity.catatanBunchesTangkaiPanjang} TEXT,
@@ -52,7 +55,8 @@ class DatabaseSPBSupervise {
 
   Future<List<SPBSupervise>> selectSPBSupervise() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(tSPBSuperviseSchemaListTable);
+    var mapList = await db.query(tSPBSuperviseSchemaListTable,
+        groupBy: "${SPBSuperviseEntity.spbSuperviseId}");
     List<SPBSupervise> list = [];
     for (int i = 0; i < mapList.length; i++) {
       SPBSupervise spb = SPBSupervise.fromJson(mapList[i]);
@@ -61,17 +65,18 @@ class DatabaseSPBSupervise {
     return list.reversed.toList();
   }
 
-  Future<List> selectSPBSuperviseByID(SPBSupervise spb) async {
+  Future<List> selectSPBSuperviseByID(String spbId) async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(tSPBSuperviseSchemaListTable,
-        where: "${SPBSuperviseEntity.spbId} = ?", whereArgs: [spb.spbId]);
+        where: "${SPBSuperviseEntity.spbId} = ?", whereArgs: [spbId]);
     return mapList;
   }
 
   Future<int> updateSPBSuperviseByID(SPBSupervise object) async {
     Database db = await DatabaseHelper().database;
     int count = await db.update(tSPBSuperviseSchemaListTable, object.toJson(),
-        where: '${SPBSuperviseEntity.spbId}=?', whereArgs: [object.spbId]);
+        where: '${SPBSuperviseEntity.spbSuperviseId}=?',
+        whereArgs: [object.spbSuperviseId]);
     return count;
   }
 

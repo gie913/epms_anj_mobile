@@ -16,6 +16,7 @@ class RestanReportScreen extends StatefulWidget {
 }
 
 class _RestanReportScreenState extends State<RestanReportScreen> {
+
   @override
   void initState() {
     context.read<RestanReportNotifier>().getListLaporanRestan();
@@ -44,6 +45,31 @@ class _RestanReportScreenState extends State<RestanReportScreen> {
                         children: [
                           Text("Tanggal:"),
                           Text("${TimeManager.todayWithSlash(DateTime.now())}")
+                        ],
+                      ),
+                      SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Divisi:"),
+                          Flexible(
+                            child: Container(
+                              width: 160,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                value: restanReport.divisionValue,
+                                items: restanReport.listDivision.map((value) {
+                                  return DropdownMenuItem(
+                                    child: Text(value),
+                                    value: value,
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  restanReport.onSetDivisionValue(value!);
+                                },
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(height: 14),
@@ -122,6 +148,9 @@ class _RestanReportScreenState extends State<RestanReportScreen> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
+                                                  "${restanReport.listRestanResult[index].ophDivisionCode}",
+                                                  style: Style.textBold16),
+                                              Text(
                                                   "${restanReport.listRestanResult[index].ophId}",
                                                   style: Style.textBold16),
                                               Text(
@@ -179,6 +208,9 @@ class _RestanReportScreenState extends State<RestanReportScreen> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
+                                                  "${restanReport.listRestan[index].ophDivisionCode}",
+                                                  style: Style.textBold16),
+                                              Text(
                                                   "${restanReport.listRestan[index].ophId}",
                                                   style: Style.textBold16),
                                               Text(
@@ -226,4 +258,11 @@ class _RestanReportScreenState extends State<RestanReportScreen> {
       },
     );
   }
+}
+
+
+class SalesData {
+  SalesData(this.year, this.sales);
+  final String year;
+  final double sales;
 }

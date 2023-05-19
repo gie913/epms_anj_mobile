@@ -21,7 +21,7 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
       return SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(22.0),
+            padding: const EdgeInsets.all(18.0),
             child: Column(children: [
               Table(
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -71,6 +71,8 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
                             ],
                             decoration: InputDecoration(hintText: "0"),
                             onChanged: (value) {
+                              notifier.countLoosesBrondolan(notifier.brondolanTinggal.text, value);
+                              notifier.countLoosesBuahTinggal(notifier.janjangTinggal.text, value);
                             },
                           ),
                         ),
@@ -209,7 +211,7 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
                           width: 110,
                           child: Column(children: [
                             SizedBox(height: 12),
-                            Text("Pelepah Sengkleh"),
+                            Text("Pelepah Sengkleh", textAlign: TextAlign.center,),
                             SizedBox(height: 6),
                           ]),
                         ),
@@ -217,15 +219,16 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
                           width: 110,
                           child: Column(children: [
                             SizedBox(height: 12),
-                            Text("Janjang Tinggal"),
+                            Text("Janjang Tinggal", textAlign: TextAlign.center,),
                             SizedBox(height: 6),
                           ]),
                         ),
                         Container(
                           width: 110,
-                          child: Column(children: [
+                          child: Column(
+                              children: [
                             SizedBox(height: 12),
-                            Text("Brondolan Tinggal"),
+                            Text("Brondolan Tinggal", textAlign: TextAlign.center,),
                             SizedBox(height: 6),
                           ]),
                         ),
@@ -263,6 +266,7 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
                           ],
                           decoration: InputDecoration(hintText: "0"),
                           onChanged: (value) {
+                            notifier.countLoosesBuahTinggal(value, notifier.pokokPanen.text);
                           },
                         ),
                       ),
@@ -280,6 +284,7 @@ class _SupervisorAncakFormFruitState extends State<SupervisorAncakFormFruit> {
                           ],
                           decoration: InputDecoration(hintText: "0"),
                           onChanged: (value) {
+                            notifier.countLoosesBrondolan(value, notifier.pokokPanen.text);
                           },
                         ),
                       ),

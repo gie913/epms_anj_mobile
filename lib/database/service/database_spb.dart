@@ -53,7 +53,8 @@ class DatabaseSPB {
 
   Future<List<SPB>> selectSPB() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(tSPBSchemaListTable);
+    var mapList =
+        await db.query(tSPBSchemaListTable, groupBy: "${SPBEntity.spbId}");
     List<SPB> list = [];
     for (int i = 0; i < mapList.length; i++) {
       SPB spb = SPB.fromJson(mapList[i]);
@@ -74,7 +75,7 @@ class DatabaseSPB {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(tSPBSchemaListTable,
         where: "${SPBEntity.spbId}=?", whereArgs: [spbID]);
-    if(mapList.isNotEmpty) {
+    if (mapList.isNotEmpty) {
       spb = SPB.fromJson(mapList[0]);
     }
     return spb;

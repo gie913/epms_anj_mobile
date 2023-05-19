@@ -1,4 +1,3 @@
-import 'package:epms/base/api/api_endpoint.dart';
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
@@ -72,7 +71,10 @@ class LoginNotifier extends ChangeNotifier {
   TextEditingController get password => _password;
 
   onInitLoginScreen() async {
-    StorageManager.saveData("apiServer", APIEndPoint.BASE_URL);
+    // String? apiServer = await StorageManager.readData('apiServer');
+    // if(apiServer == null) {
+    //   StorageManager.saveData("apiServer", APIEndPoint.BASE_URL);
+    // }
     String? usernameTemp = await StorageManager.readData('userName');
     if (usernameTemp != null) {
       _username.text = usernameTemp;
@@ -84,12 +86,18 @@ class LoginNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  doLogin(BuildContext context) {
-    if (_formKey.currentState!.validate()) {
-      _loading = true;
-      LoginRepository().doPostLogin(context, _username.text, _password.text,
-          onSuccessLogin, onErrorLogin);
-      notifyListeners();
+  doLogin(BuildContext context) async {
+    String? apiServer = await StorageManager.readData('apiServer');
+    if (apiServer != null) {
+      if (_formKey.currentState!.validate()) {
+        _loading = true;
+        LoginRepository().doPostLogin(context, _username.text, _password.text,
+            onSuccessLogin, onErrorLogin);
+        notifyListeners();
+      }
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Server", "Anda belum melakukan konfigurasi server");
     }
   }
 
@@ -112,6 +120,8 @@ class LoginNotifier extends ChangeNotifier {
       LoginResponse loginResponse) async {
     int count = await DatabaseMConfig.insertMConfig(loginResponse);
     if (count > 0) {
+      StorageManager.saveData('millCode', loginResponse.millCode);
+      StorageManager.saveData('userRoles', loginResponse.userRole);
       StorageManager.saveData("userName", username);
       StorageManager.saveData("userToken", loginResponse.userToken);
       FlushBarManager.showFlushBarSuccess(
@@ -152,7 +162,7 @@ class LoginNotifier extends ChangeNotifier {
       DatabaseMVRASchema().deleteMVRASchema();
       DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
       DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
-      DatabaseTABWSchema().deleteUser();
+      DatabaseTABWSchema().deleteTABWSchema();
       DatabaseTHarvestingPlan().deleteTHarvestingPlan();
       DatabaseLaporanRestan().deleteLaporanRestan();
       DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();

@@ -20,12 +20,19 @@ class DatabaseMaterial {
 
   Future<int> insertMaterial(List<Materials> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(tMaterial, object[i].toJson());
-      count = count + saved;
-    }
-    return count;
+    // int count = 0;
+    // for (int i = 0; i < object.length; i++) {
+    //   int saved = await db.insert(tMaterial, object[i].toJson());
+    //   count = count + saved;
+    // }
+    // return count;
+    Batch batch = db.batch();
+    object.forEach((val) {
+      Materials materials =  val;
+      batch.insert(tMaterial, materials.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<Materials>> selectMaterialByWorkPlan(TWorkplanSchema tWorkplanSchema) async {

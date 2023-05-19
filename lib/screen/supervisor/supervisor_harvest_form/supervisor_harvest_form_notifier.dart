@@ -9,6 +9,7 @@ import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/validation_service.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/service/database_m_config.dart';
+import 'package:epms/database/service/database_m_employee.dart';
 import 'package:epms/database/service/database_oph_supervise.dart';
 import 'package:epms/model/m_block_schema.dart';
 import 'package:epms/model/m_config_schema.dart';
@@ -18,7 +19,6 @@ import 'package:epms/model/oph.dart';
 import 'package:epms/model/oph_supervise.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -125,13 +125,13 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
 
   TextEditingController ophID = TextEditingController();
 
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
-
   String? _pickedFile;
 
   String? get pickedFile => _pickedFile;
+
+  List<MEmployeeSchema> _listEmployee = [];
+
+  List<MEmployeeSchema> get listEmployee => _listEmployee;
 
   getLocation() async {
     _position = await LocationService.getGPSLocation();
@@ -150,6 +150,7 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
 
   generateVariable() async {
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
+    _listEmployee = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     DateTime now = DateTime.now();
     NumberFormat formatterNumber = new NumberFormat("000");
     String number = formatterNumber.format(mConfigSchema?.userId);
@@ -187,11 +188,8 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
 
   void tPHNumberCheck(BuildContext context, String tphCodeOph) async {
     if (tphCodeOph.isNotEmpty) {
-      _mtphSchema = await ValidationService.checkMTPHSchema(
-          tphCodeOph, _mConfigSchema!.estateCode!);
-      _mtphSchema ??
-          FlushBarManager.showFlushBarWarning(
-              context, "Kode TPH", "Tidak sesuai");
+      _mtphSchema = await ValidationService.checkMTPHSchema(tphCodeOph, _mConfigSchema!.estateCode!, blockCode.text);
+      _mtphSchema ?? FlushBarManager.showFlushBarWarning(context, "Kode TPH", "Tidak sesuai");
       tphCode.text = _mtphSchema!.tphCode!;
       notifyListeners();
     }
@@ -200,18 +198,16 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
   void blockNumberCheck(BuildContext context, String block) async {
     if (block.isNotEmpty) {
       block.toUpperCase();
-      _mBlockSchema = await ValidationService.checkBlockSchema(
-          block, _mConfigSchema!.estateCode!);
-      _mBlockSchema ??
-          FlushBarManager.showFlushBarWarning(
-              context, "Kode Blok", "Tidak sesuai");
+      _mBlockSchema = await ValidationService.checkBlockSchema(block, _mConfigSchema!.estateCode!);
+      _mBlockSchema ?? FlushBarManager.showFlushBarWarning(context, "Kode Blok", "Tidak sesuai");
       blockCode.text = _mBlockSchema!.blockCode!;
+      blockCode.selection = TextSelection.fromPosition(TextPosition(offset: blockCode.text.length));
       notifyListeners();
     }
   }
 
   getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _pickedFile = picked;
       notifyListeners();
@@ -253,14 +249,15 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
     ophSupervise.supervisiKeraniPanenEmployeeCode = _keraniPanen?.employeeCode;
     ophSupervise.supervisiKeraniPanenEmployeeName = _keraniPanen?.employeeName;
     ophSupervise.supervisiPemanenEmployeeName = _pemanen?.employeeName;
+    ophSupervise.supervisiPemanenEmployeeCode = _pemanen?.employeeCode;
     ophSupervise.supervisiPhoto = _pickedFile;
-    ophSupervise.supervisiDivisionCode = _mtphSchema?.tphDivisionCode;
+    ophSupervise.supervisiDivisionCode = _mBlockSchema?.blockDivisionCode;
     ophSupervise.bunchesRipe = int.parse(_bunchesRipe.text);
     ophSupervise.bunchesOverripe = int.parse(_bunchesOverRipe.text);
     ophSupervise.bunchesHalfripe = int.parse(_bunchesHalfRipe.text);
     ophSupervise.bunchesUnripe = int.parse(_bunchesUnRipe.text);
     ophSupervise.bunchesAbnormal = int.parse(_bunchesAbnormal.text);
-    ophSupervise.bunchesEmpty = int.parse(_bunchesNotSent.text);
+    ophSupervise.bunchesEmpty = int.parse(_bunchesEmpty.text);
     ophSupervise.looseFruits = int.parse(_looseFruits.text);
     ophSupervise.bunchesTotal = int.parse(bunchesTotal.text);
     ophSupervise.bunchesNotSent = int.parse(_bunchesNotSent.text);
@@ -344,14 +341,36 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
   }
 
   onSuccessRead(BuildContext context, OPH oph) {
-    ophID.text = oph.ophId!;
-    blockNumberCheck(context, oph.ophBlockCode!);
-    tPHNumberCheck(context, oph.ophTphCode!);
-    _dialogService.popDialog();
-    notifyListeners();
+    checkOPHExist(context, oph);
+  }
+
+  checkOPHExist(BuildContext context, OPH oph) async {
+    List ophList = await DatabaseOPHSupervise().selectOPHSuperviseByID(oph.ophId!);
+    if(ophList.isEmpty) {
+      ophID.text = oph.ophId!;
+      blockNumberCheck(context, oph.ophBlockCode!);
+      tPHNumberCheck(context, oph.ophTphCode!);
+      setEmployee(oph);
+      _dialogService.popDialog();
+    } else {
+      _dialogService.popDialog();
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!, "Scan OPH", "OPH ini sudah pernah discan");
+    }
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+  }
+
+  setEmployee(OPH oph) {
+    _pemanen = _listEmployee.where((element) => element.employeeCode == oph.employeeCode).last;
+    _kemandoran = _listEmployee.where((element) => element.employeeCode == oph.mandorEmployeeCode).last;
   }
 
   onErrorRead(BuildContext context, String message) {
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
     FlushBarManager.showFlushBarWarning(context, "Gagal Membaca", message);
   }
 

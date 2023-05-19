@@ -1,4 +1,5 @@
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/model/oph_supervise_ancak.dart';
 import 'package:epms/screen/supervisor/detail_supervise_ancak_harvest/detail_supervisor_ancak_fruit.dart';
 import 'package:epms/screen/supervisor/detail_supervise_ancak_harvest/detail_supervisor_ancak_notifier.dart';
@@ -31,30 +32,39 @@ class _DetailSuperviseAncakHarvestScreenState
   Widget build(BuildContext context) {
     return Consumer<DetailSupervisorAncakNotifier>(
         builder: (context, notifier, child) {
-          return DefaultTabController(
-            initialIndex: 0,
-            length: 2,
-            child: MediaQuery(
-              data: Style.mediaQueryText(context),
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text('Detail Laporan Supervisi Ancak Panen'),
-                  bottom: TabBar(
-                    tabs: <Widget>[
-                      Tab(
-                        icon: Text("Form"),
-                      ),
-                      Tab(
-                        icon: Text("Hasil"),
-                      ),
+          return WillPopScope(
+            onWillPop: () async {
+              if (notifier.onEdit) {
+                return NavigatorService().onWillPopForm(context);
+              } else {
+                return true;
+              }
+            },
+            child: DefaultTabController(
+              initialIndex: 0,
+              length: 2,
+              child: MediaQuery(
+                data: Style.mediaQueryText(context),
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text('Detail Laporan Supervisi Ancak Panen'),
+                    bottom: TabBar(
+                      tabs: <Widget>[
+                        Tab(
+                          icon: Text("Form"),
+                        ),
+                        Tab(
+                          icon: Text("Hasil"),
+                        ),
+                      ],
+                    ),
+                  ),
+                  body: TabBarView(
+                    children: <Widget>[
+                      DetailSupervisorAncakTab(),
+                      notifier.onEdit ? EditSupervisorAncakFormFruit() : DetailSupervisorAncakFormFruit()
                     ],
                   ),
-                ),
-                body: TabBarView(
-                  children: <Widget>[
-                    DetailSupervisorAncakTab(),
-                    notifier.onEdit ? EditSupervisorAncakFormFruit() : DetailSupervisorAncakFormFruit()
-                  ],
                 ),
               ),
             ),

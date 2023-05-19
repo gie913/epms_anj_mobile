@@ -7,30 +7,46 @@ import '../helper/database_table.dart';
 
 class DatabaseMVRASchema {
   void createTableMVRASchema(Database db) async {
+    // await db.execute('''
+    //   CREATE TABLE $mVRASchemaTable(
+    //    ${MVRAEntity.vraId} INT NOT NULL,
+    //    ${MVRAEntity.vraLicenseNumber} TEXT,
+    //    ${MVRAEntity.vraMaxCap} REAL,
+    //    ${MVRAEntity.vraValidFrom} TEXT,
+    //    ${MVRAEntity.vraValidTo} TEXT,
+    //    ${MVRAEntity.createdBy} TEXT,
+    //    ${MVRAEntity.createdDate} TEXT,
+    //    ${MVRAEntity.createdTime} TEXT,
+    //    ${MVRAEntity.updatedBy} TEXT,
+    //    ${MVRAEntity.updatedDate} TEXT,
+    //    ${MVRAEntity.updatedTime} TEXT)
+    // ''');
     await db.execute('''
       CREATE TABLE $mVRASchemaTable(
        ${MVRAEntity.vraId} INT NOT NULL,
        ${MVRAEntity.vraLicenseNumber} TEXT,
-       ${MVRAEntity.vraMaxCap} REAL,
-       ${MVRAEntity.vraValidFrom} TEXT,
-       ${MVRAEntity.vraValidTo} TEXT,
-       ${MVRAEntity.createdBy} TEXT,
-       ${MVRAEntity.createdDate} TEXT,
-       ${MVRAEntity.createdTime} TEXT,
-       ${MVRAEntity.updatedBy} TEXT,
-       ${MVRAEntity.updatedDate} TEXT,
-       ${MVRAEntity.updatedTime} TEXT)
+       ${MVRAEntity.vraMaxCap} REAL)
     ''');
   }
 
   Future<int> insertMVRASchema(List<MVRASchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(mVRASchemaTable, object[i].toJson());
-      count = count + saved;
-    }
-    return count;
+    // int count = 0;
+    // List<MVRASchema> listMVRA = await selectMVRASchema();
+    // for (int i = 0; i < object.length; i++) {
+    //   if(!(listMVRA.contains(object[i]))) {
+    //     int saved = await db.insert(mVRASchemaTable, object[i].toJson());
+    //     count = count + saved;
+    //   }
+    // }
+    // return count;
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MVRASchema mvraSchema =  val;
+      batch.insert(mVRASchemaTable, mvraSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MVRASchema>> selectMVRASchema() async {

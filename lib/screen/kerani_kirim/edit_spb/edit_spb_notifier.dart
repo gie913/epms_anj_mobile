@@ -21,7 +21,6 @@ import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
 class EditSPBNotifier extends ChangeNotifier {
@@ -36,10 +35,6 @@ class EditSPBNotifier extends ChangeNotifier {
   DialogService _dialogService = locator<DialogService>();
 
   DialogService get dialogService => _dialogService;
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   bool _otherVendor = false;
 
@@ -79,9 +74,7 @@ class EditSPBNotifier extends ChangeNotifier {
 
   TextEditingController get vendorOther => _vendorOther;
 
-  TextEditingController _vehicleNumber = TextEditingController();
-
-  TextEditingController get vehicleNumber => _vehicleNumber;
+  TextEditingController vehicleNumber = TextEditingController();
 
   List<SPBLoader> _spbLoaderList = [];
 
@@ -274,14 +267,16 @@ class EditSPBNotifier extends ChangeNotifier {
   onInitEdit(BuildContext context, SPB spb, List<SPBDetail> listSPBDetail,
       List<SPBLoader> listSPBLoader) async {
     _globalSPB = spb;
-    _driverNameValue = MEmployeeSchema(
-        employeeCode: spb.spbDriverEmployeeCode,
-        employeeName: spb.spbDriverEmployeeName);
     _typeDeliverValue = ValueService.typeOfFormToText(spb.spbType!)!;
     _driverNameList = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
     checkVehicle(context, spb.spbLicenseNumber!);
-    _vehicleNumber.text = spb.spbLicenseNumber!;
+    if(spb.spbType == 1) {
+      _driverNameValue = MEmployeeSchema(
+          employeeCode: spb.spbDriverEmployeeCode,
+          employeeName: spb.spbDriverEmployeeName);
+    }
+    vehicleNumber.text = spb.spbLicenseNumber!;
     if (_driverNameList.isNotEmpty) {
       _vendorList = await DatabaseMVendorSchema().selectMVendorSchema();
       if (_vendorList.isNotEmpty) {
@@ -418,12 +413,19 @@ class EditSPBNotifier extends ChangeNotifier {
   }
 
   onChangeDriver(MEmployeeSchema mEmployeeSchema) {
-    _driverNameValue = mEmployeeSchema;
-    notifyListeners();
+    if (_driverNameList.contains(mEmployeeSchema)) {
+      _driverNameValue = mEmployeeSchema;
+      notifyListeners();
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Supir Kendaraan",
+          "Pekerja yang dipilih bukan supir");
+    }
   }
 
   Future getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _globalSPB.spbPhoto = picked;
       notifyListeners();
@@ -477,7 +479,7 @@ class EditSPBNotifier extends ChangeNotifier {
     if (typeDeliverValue != "Kontrak") {
       _globalSPB.spbLicenseNumber = _mvraSchema?.vraLicenseNumber;
     } else {
-      _globalSPB.spbLicenseNumber = _vehicleNumber.text;
+      _globalSPB.spbLicenseNumber = vehicleNumber.text;
     }
     _globalSPB.spbType = ValueService.typeOfFormToInt(_typeDeliverValue);
     _globalSPB.spbTotalOph = _listSPBDetail.length;
@@ -490,20 +492,22 @@ class EditSPBNotifier extends ChangeNotifier {
 
   showDialogQuestion(BuildContext context) {
     generateSPB();
-    _dialogService.showOptionDialog(
-        title: "Memakai Kartu",
-        subtitle: "Apakah anda ingin memakai kartu",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: onClickYesCard,
-        onPressNo: onClickNoCard);
+    onClickYesCard();
+    // _dialogService.showOptionDialog(
+    //     title: "Memakai Kartu",
+    //     subtitle: "Apakah anda ingin memakai kartu",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: onClickYesCard,
+    //     onPressNo: onClickNoCard);
   }
 
   onClickYesCard() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     SPBCardManager().writeSPBCard(
         _navigationService.navigatorKey.currentContext!,
         _globalSPB,
+        _listSPBDetail,
         onSuccessWrite,
         onErrorWrite);
     _dialogService.showNFCDialog(
@@ -560,7 +564,7 @@ class EditSPBNotifier extends ChangeNotifier {
   onClickSaveSPB(BuildContext context) {
     checkLoaderExist();
     checkLoaderPercentageValue();
-    checkVehicle(context, _vehicleNumber.text);
+    checkVehicle(context, vehicleNumber.text);
     switch (_typeDeliverValue) {
       case "Internal":
         if (_driverNameValue != null) {

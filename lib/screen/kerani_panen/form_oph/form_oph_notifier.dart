@@ -11,6 +11,7 @@ import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/validation_service.dart';
 import 'package:epms/common_manager/value_service.dart';
+import 'package:epms/database/service/database_harvesting_plan.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
 import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_m_customer_code.dart';
@@ -34,9 +35,9 @@ import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/supervisor.dart';
 import 'package:epms/model/t_abw_schema.dart';
+import 'package:epms/model/t_harvesting_plan_schema.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -86,10 +87,6 @@ class FormOPHNotifier extends ChangeNotifier {
   TextEditingController get blockNumber => _blockNumber;
 
   TextEditingController ophNumber = TextEditingController();
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   String? _pickedFile;
 
@@ -215,6 +212,14 @@ class FormOPHNotifier extends ChangeNotifier {
 
   TABWSchema? get tabwSchema => _tabwSchema;
 
+  OPH? _ophLast;
+
+  OPH? get ophLast => _ophLast;
+
+  List<THarvestingPlanSchema> _listHarvestingPlan = [];
+
+  List<THarvestingPlanSchema> get listHarvestingPlan => _listHarvestingPlan;
+
   generateVariable() async {
     MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
     DateTime now = DateTime.now();
@@ -222,9 +227,7 @@ class FormOPHNotifier extends ChangeNotifier {
     String number = formatterNumber.format(mConfigSchema.userId);
     _date = TimeManager.dateWithDash(now);
     _time = TimeManager.timeWithColon(now);
-    _ophID = "${mConfigSchema.estateCode}" +
-        ValueService.generateIDFromDateTime(now) +
-        "$number" "M";
+    _ophID = "${mConfigSchema.estateCode}" + ValueService.generateIDFromDateTime(now) + "$number" + "M";
     _mConfigSchema = mConfigSchema;
     bunchesRipe.text = "0";
     bunchesOverRipe.text = "0";
@@ -239,21 +242,61 @@ class FormOPHNotifier extends ChangeNotifier {
   }
 
   onInitFormOPH(BuildContext context) async {
-    String? blockDefault = await StorageManager.readData("blockDefault");
     _listEmployee = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
-    _listMandorKontrak =
-        await DatabaseMEmployeeSchema().selectMEmployeeSchema();
+    _listMandorKontrak = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     _listEstate = await DatabaseMEstateSchema().selectMEstateSchema();
     _listVendor = await DatabaseMVendorSchema().selectMVendorSchema();
     _supervisor = await DatabaseSupervisor().selectSupervisor();
-    _listMCustomer =
-        await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
-    if (blockDefault != null) {
-      _blockNumber.text = blockDefault;
-      blockNumberCheck(context, blockDefault);
-      notifyListeners();
-    }
+    _listMCustomer = await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
+    _listHarvestingPlan = await DatabaseTHarvestingPlan().selectTHarvestingPlan();
+    _listEmployee.forEach((element) {
+      if(element.employeeCode == _mConfigSchema?.employeeCode) {
+        ophNumber.text = element.employeeDivisionCode!;
+      }
+    });
+    getOPHLast();
     notifyListeners();
+  }
+
+  getOPHLast() async {
+    _ophLast = await DatabaseOPH().selectOPHLast();
+    if (_ophLast != null) {
+      _employeeType =
+          ValueService.typeOfFormToText(_ophLast!.ophHarvestingType!)!;
+      _valueEmployee = MEmployeeSchema(
+          employeeCode: _ophLast?.employeeCode,
+          employeeName: _ophLast?.employeeName);
+      if (_ophLast!.ophHarvestingType == 3) {
+        _valueMandorKontrak = MEmployeeSchema(
+            employeeCode: _supervisor?.mandorCode,
+            employeeName: _supervisor?.mandorName);
+        _valueVendor = MVendorSchema(
+            vendorCode: _ophLast!.employeeCode,
+            vendorName: ophLast!.employeeName);
+        _mBlockSchema = await ValidationService.checkBlockSchema(
+            _ophLast!.ophBlockCode!, _mConfigSchema!.estateCode!);
+        _mBlockSchema ??
+            FlushBarManager.showFlushBarWarning(
+                _navigationService.navigatorKey.currentContext!,
+                "Kode Blok",
+                "Tidak sesuai dengan estate");
+      } else if (_ophLast!.ophHarvestingType == 2) {
+        for (int i = 0; i < _listMCustomer.length; i++) {
+          if (_listMCustomer[i].customerCode == _ophLast!.ophCustomerCode) {
+            _valueMCustomer = _listMCustomer[i];
+            notifyListeners();
+          }
+        }
+        _mBlockSchema = await ValidationService.checkBlockSchema(
+            _ophLast!.ophBlockCode!,
+            _valueMCustomer!.customerPlantCode!.substring(2));
+        _mBlockSchema ??
+            FlushBarManager.showFlushBarWarning(
+                _navigationService.navigatorKey.currentContext!,
+                "Kode Blok",
+                "Tidak sesuai dengan estate");
+      }
+    }
   }
 
   getLocation() async {
@@ -268,13 +311,25 @@ class FormOPHNotifier extends ChangeNotifier {
 
   getEstimationTonnage() async {
     if (_mBlockSchema != null) {
-      TABWSchema? tabwSchema = await DatabaseTABWSchema()
-          .selectTABWSchemaByBlock(_mBlockSchema!.blockCode!);
-      _ophEstimationWeight =
-          (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
-      _ophEstimationWeight =
-          double.parse(_ophEstimationWeight!.toStringAsFixed(3));
-      notifyListeners();
+      if (_employeeType == "Pinjam") {
+        TABWSchema? tabwSchema = await DatabaseTABWSchema()
+            .selectTABWSchemaByBlock(_mBlockSchema!.blockCode!,
+                _valueMCustomer!.customerPlantCode!.substring(2));
+        _ophEstimationWeight =
+            (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
+        _ophEstimationWeight =
+            double.parse(_ophEstimationWeight!.toStringAsFixed(3));
+        notifyListeners();
+      } else {
+        TABWSchema? tabwSchema = await DatabaseTABWSchema()
+            .selectTABWSchemaByBlock(
+                _mBlockSchema!.blockCode!, _mConfigSchema!.estateCode!);
+        _ophEstimationWeight =
+            (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
+        _ophEstimationWeight =
+            double.parse(_ophEstimationWeight!.toStringAsFixed(3));
+        notifyListeners();
+      }
     }
   }
 
@@ -282,13 +337,15 @@ class FormOPHNotifier extends ChangeNotifier {
     if (tphCode.isNotEmpty) {
       if (_employeeType == "Pinjam") {
         _mtphSchema = await ValidationService.checkMTPHSchema(
-            tphCode, _valueMCustomer!.customerPlantCode!.substring(2));
+            tphCode,
+            _valueMCustomer!.customerPlantCode!.substring(2),
+            _blockNumber.text);
         _mtphSchema ??
             FlushBarManager.showFlushBarWarning(
                 context, "Kode TPH", "Tidak sesuai");
       } else {
         _mtphSchema = await ValidationService.checkMTPHSchema(
-            tphCode, _mConfigSchema!.estateCode!);
+            tphCode, _mConfigSchema!.estateCode!, _blockNumber.text);
         _mtphSchema ??
             FlushBarManager.showFlushBarWarning(
                 context, "Kode TPH", "Tidak sesuai");
@@ -302,7 +359,7 @@ class FormOPHNotifier extends ChangeNotifier {
       if (_employeeType == "Pinjam") {
         block.toUpperCase();
         _mBlockSchema = await ValidationService.checkBlockSchema(
-            block, _valueMCustomer!.customerPlantCode!.substring(2));
+             block, _valueMCustomer!.customerPlantCode!.substring(2));
         _mBlockSchema ??
             FlushBarManager.showFlushBarWarning(
                 context, "Kode Blok", "Tidak sesuai dengan estate");
@@ -332,7 +389,7 @@ class FormOPHNotifier extends ChangeNotifier {
   }
 
   getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _pickedFile = picked;
       notifyListeners();
@@ -362,7 +419,13 @@ class FormOPHNotifier extends ChangeNotifier {
       oph.ophLat = _position?.latitude.toString();
       oph.ophLong = _position?.longitude.toString();
       oph.ophHarvestingType = ValueService.typeOfFormToInt(_employeeType);
-      oph.ophHarvestingMethod = isChecked ? 1 : 2;
+      oph.ophHarvestingMethod = isChecked ? 2 : 1;
+      if (_listHarvestingPlan
+          .any((item) => item.harvestingPlanBlockCode == _blockNumber.text)) {
+        oph.isPlanned = 1;
+      } else {
+        oph.isPlanned = 0;
+      }
       if (_employeeType == "Internal") {
         oph.employeeName = _valueEmployee?.employeeName;
         oph.employeeCode = _valueEmployee?.employeeCode;
@@ -391,6 +454,7 @@ class FormOPHNotifier extends ChangeNotifier {
         oph.keraniPanenEmployeeCode = _supervisor?.keraniPanenCode;
         oph.mandorEmployeeCode = _supervisor?.mandorCode;
         oph.mandorEmployeeName = _supervisor?.mandorName;
+        oph.ophCustomerCode = _valueMCustomer?.customerCode;
       }
       if (_employeeType == "Kontrak") {
         oph.employeeName = _valueEmployee?.employeeName;
@@ -403,9 +467,10 @@ class FormOPHNotifier extends ChangeNotifier {
         oph.keraniKirimEmployeeName = _supervisor?.keraniKirimName;
         oph.keraniPanenEmployeeName = _supervisor?.keraniPanenName;
         oph.keraniPanenEmployeeCode = _supervisor?.keraniPanenCode;
-        oph.mandorEmployeeCode = _supervisor?.mandorCode;
-        oph.mandorEmployeeName = _supervisor?.mandorName;
-        oph.employeeName = _valueVendor?.vendorName;
+        oph.mandorEmployeeCode = _valueMandorKontrak?.employeeCode;
+        oph.mandorEmployeeName = _valueMandorKontrak?.employeeName;
+        oph.employeeName =
+            ValueService.rightTrimVendor(_valueVendor!.vendorName!);
         oph.employeeCode = _valueVendor?.vendorCode;
       }
       oph.ophBlockCode = _mBlockSchema?.blockCode;
@@ -424,9 +489,7 @@ class FormOPHNotifier extends ChangeNotifier {
       oph.bunchesTotal = int.parse(_bunchesTotal.text);
       oph.bunchesNotSent = int.parse(_bunchesNotSent.text);
       oph.isApproved = 0;
-      oph.isPlanned = 0;
       oph.isRestantPermanent = 0;
-      oph.ophCustomerCode = _valueMCustomer?.customerCode;
       oph.ophEstimateTonnage = _ophEstimationWeight;
       oph.createdBy = _mConfigSchema?.employeeCode;
       notifyListeners();
@@ -440,29 +503,42 @@ class FormOPHNotifier extends ChangeNotifier {
   }
 
   showDialogQuestion() {
-    _dialogService.showOptionDialog(
-        title: "Memakai Kartu NFC",
-        subtitle: "Apakah ingin menyimpan data dengan NFC?",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: dialogNFC,
-        onPressNo: saveOPHtoDatabase);
+    dialogNFC();
+    // _dialogService.showOptionDialog(
+    //     title: "Memakai Kartu NFC",
+    //     subtitle: "Apakah ingin menyimpan data dengan NFC?",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: dialogNFC,
+    //     onPressNo: saveOPHtoDatabase);
   }
 
   saveOPHtoDatabase() async {
     int count = await DatabaseOPH().insertOPH(oph);
     if (count > 0) {
-      addLaporanPanenKemarin();
-      _dialogService.popDialog();
-      Future.delayed(Duration(seconds: 2), () {
-        NfcManager.instance.stopSession();
-      });
-      _navigationService.pop();
-      FlushBarManager.showFlushBarSuccess(
+      try {
+        Future.delayed(Duration(seconds: 1), () {
+          NfcManager.instance.stopSession();
+        });
+        // addLaporanPanenKemarin();
+        _dialogService.popDialog();
+        _navigationService.pop();
+        FlushBarManager.showFlushBarSuccess(
+            _navigationService.navigatorKey.currentContext!,
+            "OPH Tersimpan",
+            "Berhasil menyimpan OPH");
+        StorageManager.saveData("blockDefault", oph.ophBlockCode);
+      } catch (e) {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "OPH Tersimpan",
+            "Gagal menyimpan OPH");
+      }
+    } else {
+      FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "OPH Tersimpan",
-          "Berhasil menyimpan OPH");
-      StorageManager.saveData("blockDefault", oph.ophBlockCode);
+          "Gagal menyimpan OPH");
     }
   }
 
@@ -476,7 +552,7 @@ class FormOPHNotifier extends ChangeNotifier {
   }
 
   dialogNFC() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     OPHCardManager().writeOPHCard(
         _navigationService.navigatorKey.currentContext!,
         oph,
@@ -495,7 +571,9 @@ class FormOPHNotifier extends ChangeNotifier {
 
   onErrorWrite(BuildContext context) {
     _dialogService.popDialog();
-    NfcManager.instance.stopSession();
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
     FlushBarManager.showFlushBarWarning(context, "OPH", "Gagal menyimpan OPH");
   }
 
@@ -506,6 +584,13 @@ class FormOPHNotifier extends ChangeNotifier {
 
   onSetEmployeeType(String value) {
     _employeeType = value;
+    _valueEmployee = null;
+    if (_employeeType == "Kontrak") {
+      MEmployeeSchema mandorKontrak = MEmployeeSchema(
+          employeeCode: _supervisor?.mandorCode,
+          employeeName: _supervisor?.mandorName);
+      _valueMandorKontrak = mandorKontrak;
+    }
     notifyListeners();
   }
 
@@ -520,8 +605,15 @@ class FormOPHNotifier extends ChangeNotifier {
   }
 
   onSetEmployee(MEmployeeSchema value) {
-    _valueEmployee = value;
-    notifyListeners();
+    if (_listEmployee.contains(value)) {
+      _valueEmployee = value;
+      notifyListeners();
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Pekerja",
+          "Pekerja yang dipilih diluar kemandoran");
+    }
   }
 
   onSetCustomer(MCustomerCodeSchema value) {
@@ -625,7 +717,7 @@ class FormOPHNotifier extends ChangeNotifier {
       case "Pinjam":
         if (_valueEmployee != null) {
           if (_valueMCustomer != null) {
-            if (_valueMCustomer?.customerPlantCode !=
+            if (_valueMCustomer?.customerPlantCode!.substring(2) !=
                 _mConfigSchema?.estateCode) {
               if (_blockNumber.text.isNotEmpty) {
                 if (_mBlockSchema != null) {

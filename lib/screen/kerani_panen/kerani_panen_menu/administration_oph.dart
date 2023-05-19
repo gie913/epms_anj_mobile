@@ -43,8 +43,7 @@ class _AdministrationOPHScreenState extends State<AdministrationOPHScreen> {
           elevation: 0,
           actions: [
             Consumer<ThemeNotifier>(
-                builder: (context, theme, child) =>
-                    Flexible(
+                builder: (context, theme, child) => Flexible(
                       child: Switch(
                           activeColor: Palette.greenColor,
                           value: theme.status ?? true,
@@ -67,93 +66,93 @@ class _AdministrationOPHScreenState extends State<AdministrationOPHScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: index == 0
                             ? Padding(
-                          padding: EdgeInsets.only(
-                              left: 10, right: 10, bottom: 10),
-                          child: Image.asset(
-                            ImageAssets.ANJ_LOGO,
-                            height: 60,
-                          ),
-                        )
-                            : index == 1
-                            ? Padding(
-                            padding: EdgeInsets.all(6),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  ImageAssets.KERANI_PANEN,
-                                  color: Palette.primaryColorProd,
-                                  height: 45,
+                                padding: EdgeInsets.only(
+                                    left: 10, right: 10, bottom: 10),
+                                child: Image.asset(
+                                  ImageAssets.ANJ_LOGO,
+                                  height: 60,
                                 ),
-                                Text(
-                                  "  KERANI PANEN",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Palette.primaryColorProd,
-                                      fontSize: 18),
-                                )
-                              ],
-                            ))
-                            : index == administrationOPHMenuEntries.length + 2
-                            ? Container(
-                          padding: EdgeInsets.only(top: 16),
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Divider(),
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding:
-                                    const EdgeInsets.all(8.0),
-                                    child: Image.asset(
-                                      ImageAssets.ANJ_LOGO,
-                                      height: 25,
-                                    ),
-                                  ),
-                                  Text("ePMS ANJ Group")
-                                ],
                               )
-                            ],
-                          ),
-                        )
-                            : TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor:
-                            colorCodesAdministrationOPH[
-                            index - 2],
-                            minimumSize: Size(
-                                MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
-                                50),
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(5.0),
-                                side: BorderSide(
-                                    color:
-                                    colorCodesAdministrationOPH[
-                                    index - 2])),
-                            padding: const EdgeInsets.all(16.0),
-                            primary: Colors.white,
-                            textStyle: const TextStyle(
-                                fontSize: 20, color: Colors.white),
-                          ),
-                          onPressed: () {
-                            onClickMenu(index);
-                          },
-                          child: Text(
-                              administrationOPHMenuEntries[
-                              index - 2]
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold)),
-                        ),
+                            : index == 1
+                                ? Padding(
+                                    padding: EdgeInsets.all(6),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          ImageAssets.KERANI_PANEN,
+                                          color: Palette.primaryColorProd,
+                                          height: 45,
+                                        ),
+                                        Text(
+                                          "  KERANI PANEN",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Palette.primaryColorProd,
+                                              fontSize: 18),
+                                        )
+                                      ],
+                                    ))
+                                : index ==
+                                        administrationOPHMenuEntries.length + 2
+                                    ? Container(
+                                        padding: EdgeInsets.only(top: 16),
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Divider(),
+                                            Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Image.asset(
+                                                    ImageAssets.ANJ_LOGO,
+                                                    height: 25,
+                                                  ),
+                                                ),
+                                                Text("ePMS ANJ Group")
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    : TextButton(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor:
+                                              colorCodesAdministrationOPH[
+                                                  index - 2],
+                                          minimumSize: Size(
+                                              MediaQuery.of(context).size.width,
+                                              50),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                              side: BorderSide(
+                                                  color:
+                                                      colorCodesAdministrationOPH[
+                                                          index - 2])),
+                                          padding: const EdgeInsets.all(16.0),
+                                          textStyle: const TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white),
+                                        ),
+                                        onPressed: () {
+                                          onClickMenu(index);
+                                        },
+                                        child: Text(
+                                            administrationOPHMenuEntries[
+                                                    index - 2]
+                                                .toUpperCase(),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
                       );
                     }),
               ),
@@ -165,9 +164,8 @@ class _AdministrationOPHScreenState extends State<AdministrationOPHScreen> {
   }
 
   onClickMenu(int index) {
-    switch (administrationOPHMenuEntries[index - 2]
-        .toUpperCase()) {
-      case "UBAH DATA OPH" :
+    switch (administrationOPHMenuEntries[index - 2].toUpperCase()) {
+      case "UBAH DATA OPH":
         _navigationService.push(Routes.OPH_HISTORY_PAGE, arguments: 'UBAH');
         break;
       case "GANTI OPH HILANG":
@@ -176,7 +174,7 @@ class _AdministrationOPHScreenState extends State<AdministrationOPHScreen> {
       case "BAGI OPH":
         _navigationService.push(Routes.BAGI_OPH);
         break;
-      case "KEMBALI" :
+      case "KEMBALI":
         _navigationService.pop();
         break;
     }

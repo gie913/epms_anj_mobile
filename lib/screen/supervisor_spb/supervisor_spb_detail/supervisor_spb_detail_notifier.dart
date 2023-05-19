@@ -1,21 +1,39 @@
-import 'package:epms/base/ui/palette.dart';
+import 'package:epms/base/common/locator.dart';
+import 'package:epms/base/common/routes.dart';
+import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/common_manager/spb_card_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
 import 'package:epms/model/m_config_schema.dart';
+import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 
 class SupervisorSPBDetailNotifier extends ChangeNotifier {
+  NavigatorService _navigationService = locator<NavigatorService>();
+
+  NavigatorService get navigationService => _navigationService;
+
+  DialogService _dialogService = locator<DialogService>();
+
+  DialogService get dialogService => _dialogService;
+
+  TextEditingController _spbID = TextEditingController();
+
+  TextEditingController get spbID => _spbID;
+
+  bool _activeText = false;
+
+  bool get activeText => _activeText;
 
   SPBSupervise _spbSupervise = SPBSupervise();
 
   SPBSupervise get spbSupervise => _spbSupervise;
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   MConfigSchema _mConfigSchema = MConfigSchema();
 
@@ -67,7 +85,8 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
 
   TextEditingController _noteJanjangTangkaiPanjang = TextEditingController();
 
-  TextEditingController get noteJanjangTangkaiPanjang => _noteJanjangTangkaiPanjang;
+  TextEditingController get noteJanjangTangkaiPanjang =>
+      _noteJanjangTangkaiPanjang;
 
   TextEditingController _sampah = TextEditingController();
 
@@ -81,6 +100,42 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
 
   bool get onEdit => _onEdit;
 
+  dialogNFC(BuildContext context) {
+    SPBCardManager().readSPBCard(context, onSuccessRead, onErrorRead);
+    _dialogService.showNFCDialog(
+        title: "Tempel Kartu SPB",
+        subtitle: "untuk membaca data",
+        buttonText: "Selesai",
+        onPress: onCancelScanSPB);
+  }
+
+  onCancelScanSPB() {
+    _dialogService.popDialog();
+    NfcManager.instance.stopSession();
+  }
+
+  onSuccessRead(BuildContext context, SPB spb) {
+    _dialogService.popDialog();
+    _spbID.text = spb.spbId!;
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+    notifyListeners();
+  }
+
+  onErrorRead(BuildContext context, String response) {
+    _dialogService.popDialog();
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+    FlushBarManager.showFlushBarWarning(context, "Gagal Membaca", response);
+  }
+
+  onChangeActiveText(bool checked) {
+    _activeText = checked;
+    notifyListeners();
+  }
+
   onInit(SPBSupervise spbSupervise) async {
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
     _spbSupervise = spbSupervise;
@@ -93,54 +148,37 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
     _looseFruits.text = spbSupervise.looseFruits.toString();
     _bunchesTotal.text = spbSupervise.bunchesTotal.toString();
     _bunchesNormalTotal.text = spbSupervise.bunchesTotalNormal.toString();
-    _janjangTangkaiPanjang.text = spbSupervise.bunchesTotal.toString();
+    _janjangTangkaiPanjang.text = spbSupervise.bunchesTangkaiPanjang.toString();
     _sampah.text = spbSupervise.bunchesSampah.toString();
     _batu.text = spbSupervise.bunchesBatu.toString();
+    _spbID.text = spbSupervise.spbId!;
+    _noteJanjangTangkaiPanjang.text = spbSupervise.catatanBunchesTangkaiPanjang.toString();
+    _notesOPH.text = spbSupervise.supervisiNotes.toString();
     notifyListeners();
   }
 
-  showDialogQuestion(BuildContext context) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15))),
-            title: Center(
-                child: Text(
-                  "Apakah anda yakin ingin menyimpan?",
-                  textAlign: TextAlign.center,
-                )),
-            actions: <Widget>[
-              OutlinedButton(
-                  child: new Text(
-                    "Ya",
-                    style: TextStyle(
-                        color: Palette.primaryColorProd,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    updateToDatabase(context);
-                  }),
-              OutlinedButton(
-                  child: new Text(
-                    "Tidak",
-                    style: TextStyle(
-                        color: Palette.redColorLight,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  })
-            ],
-          );
-        });
+  onPressYes() {
+    _dialogService.popDialog();
+    updateToDatabase(_navigationService.navigatorKey.currentContext!);
   }
 
+  onPressNo() {
+    _dialogService.popDialog();
+    NfcManager.instance.stopSession();
+  }
 
-  countBunches(
-      BuildContext context, TextEditingController textEditingController) {
+  showDialogQuestion(BuildContext context) {
+    _dialogService.showOptionDialog(
+        title: "Simpan Supervisi",
+        subtitle: "Anda yakin ingin menyimpan supervisi?",
+        buttonTextYes: "Iya",
+        buttonTextNo: "Tidak",
+        onPressYes: onPressYes,
+        onPressNo: onPressNo);
+  }
+
+  countBunches(BuildContext context,
+      TextEditingController textEditingController) {
     if (textEditingController.text.isEmpty ||
         textEditingController.text == "0") {
       textEditingController.value = TextEditingValue(text: "0");
@@ -180,20 +218,12 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-
-  Future getCamera(BuildContext context) async {
-    try {
-      final pickedFile = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 20,
-      );
-      if (pickedFile != null) {
-        this._spbSupervise.supervisiSpbPhoto = pickedFile.path;
-      }
-    } catch (e) {
-      print(e);
+  getCamera(BuildContext context) async {
+    String? picked = await CameraService.getImageByCamera(context);
+    if (picked != null) {
+      this._spbSupervise.supervisiSpbPhoto = picked;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void updateToDatabase(BuildContext context) async {
@@ -201,7 +231,7 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
     _spbSupervise.bunchesRipe = int.parse(_bunchesRipe.text);
     _spbSupervise.bunchesOverripe = int.parse(_bunchesOverRipe.text);
     _spbSupervise.bunchesHalfripe = int.parse(_bunchesHalfRipe.text);
-    _spbSupervise.bunchesUnripe =  int.parse(_bunchesUnRipe.text);
+    _spbSupervise.bunchesUnripe = int.parse(_bunchesUnRipe.text);
     _spbSupervise.bunchesAbnormal = int.parse(_bunchesAbnormal.text);
     _spbSupervise.bunchesEmpty = int.parse(_bunchesEmpty.text);
     _spbSupervise.looseFruits = int.parse(_looseFruits.text);
@@ -209,19 +239,22 @@ class SupervisorSPBDetailNotifier extends ChangeNotifier {
     _spbSupervise.bunchesTotalNormal = int.parse(_bunchesNormalTotal.text);
     _spbSupervise.bunchesSampah = int.parse(_sampah.text);
     _spbSupervise.bunchesBatu = int.parse(_batu.text);
+    _spbSupervise.bunchesTangkaiPanjang = int.parse(_janjangTangkaiPanjang.text);
     _spbSupervise.catatanBunchesTangkaiPanjang = noteJanjangTangkaiPanjang.text;
+    _spbSupervise.spbId = _spbID.text;
     _spbSupervise.supervisiNotes = _notesOPH.text;
     _spbSupervise.updatedBy = _mConfigSchema.employeeName;
     _spbSupervise.updatedDate = TimeManager.dateWithDash(now);
     _spbSupervise.updatedTime = TimeManager.timeWithColon(now);
-    int count = await DatabaseSPBSupervise().updateSPBSuperviseByID(spbSupervise);
-    if(count > 0) {
-      Navigator.pop(context);
-      Navigator.pop(context);
-      // FlushBarManager.showFlushBarSuccess(context, "Berhasil tersimpan");
+    int count =
+    await DatabaseSPBSupervise().updateSPBSuperviseByID(spbSupervise);
+    if (count > 0) {
+      _navigationService.push(Routes.HOME_PAGE);
+      FlushBarManager.showFlushBarSuccess(
+          context, "Simpan Supervisi", "Berhasil menyimpan Supervisi");
     } else {
-      // FlushBarManager.showFlushBarWarning(context, "Gagal tersimpan");
+      FlushBarManager.showFlushBarError(
+          context, "Simpan Supervisi", "Gagal menyimpan Supervisi");
     }
   }
-
 }

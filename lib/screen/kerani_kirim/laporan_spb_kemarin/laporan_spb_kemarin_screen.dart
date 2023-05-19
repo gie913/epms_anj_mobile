@@ -39,7 +39,7 @@ class _LaporanSPBKemarinScreenState extends State<LaporanSPBKemarinScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Tanggal:"),
-                      Text("${TimeManager.todayWithSlash(DateTime.now())}")
+                      Text("${TimeManager.todayWithSlash(DateTime.now().subtract(Duration(days: 1)))}")
                     ],
                   ),
                   SizedBox(height: 8),
@@ -137,15 +137,6 @@ class _LaporanSPBKemarinScreenState extends State<LaporanSPBKemarinScreen> {
                                             Text("Tujuan:"),
                                             Text(
                                                 "${spbKemarin.listLaporanSPBKemarin[index].spbDeliverToCode} ${spbKemarin.listLaporanSPBKemarin[index].spbDeliverToName}")
-                                          ]),
-                                      Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                                "Tanggal: ${TimeManager.dateWithDash(DateTime.now())}"),
-                                            Text(
-                                                "Waktu: ${TimeManager.timeWithColon(DateTime.now())}")
                                           ]),
                                     ]),
                               ),

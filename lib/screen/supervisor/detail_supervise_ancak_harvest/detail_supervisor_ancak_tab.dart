@@ -36,7 +36,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("ID OPH:"),
+                          Text("ID Ancak:"),
                         Text("${notifier.ophSuperviseAncak?.supervisiAncakId}", style: Style.textBold16)
                       ]),
                 ),
@@ -44,7 +44,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text("Tanggal:"), Text("${notifier.ophSuperviseAncak?.createdDate}")],
+                    children: [Text("Tanggal:"), Text("${notifier.ophSuperviseAncak?.createdDate} ${notifier.ophSuperviseAncak?.createdTime}")],
                   ),
                 ),
                 Padding(
@@ -52,7 +52,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Name:"),
+                      Text("Nama:"),
                       Text("${notifier.ophSuperviseAncak?.supervisiAncakEmployeeName}")
                     ],
                   ),
@@ -63,7 +63,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("GPS Geolocation:"),
-                      Text("${notifier.ophSuperviseAncak?.supervisiAncakLat}, ${notifier.ophSuperviseAncak?.supervisiAncakLon}")
+                      Text("${notifier.ophSuperviseAncak?.supervisiAncakLat}, ${notifier.ophSuperviseAncak?.supervisiAncakLong}")
                     ],
                   ),
                 ),
@@ -279,7 +279,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Losses buah tinggal (janjang/pokok):"),
-                      Text("${notifier.janjangTinggal.text}")
+                      Text("${notifier.ophSuperviseAncak?.bunchesTinggalPercentage}")
                     ],
                   ),
                 ),
@@ -289,17 +289,7 @@ class _DetailSupervisorAncakTabState extends State<DetailSupervisorAncakTab> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Losses brondolan (butir/pokok):"),
-                      Text("${notifier.ophSuperviseAncak?.bunchesBrondolanTinggal}")
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Brondolan tinggal persentase:"),
-                      Text("${notifier.ophSuperviseAncak?.bunchesBrondolanTinggalPercentage} %")
+                      Text("${notifier.ophSuperviseAncak?.bunchesBrondolanTinggalPercentage}")
                     ],
                   ),
                 ),

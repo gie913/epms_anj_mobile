@@ -18,7 +18,6 @@ import 'package:epms/model/oph.dart';
 import 'package:epms/model/oph_new.dart';
 import 'package:epms/model/t_abw_schema.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -136,17 +135,9 @@ class BagiOPHNotifier extends ChangeNotifier {
 
   int get bunchesNotSentPrev => _bunchesNotSentPrev;
 
-  ImagePicker _pickerOldOPH = ImagePicker();
-
-  ImagePicker get pickerOldOPH => _pickerOldOPH;
-
   String? _pickedFileOldOPH;
 
   String? get pickedFileOldOPH => _pickedFileOldOPH;
-
-  ImagePicker _pickerNewOPH = ImagePicker();
-
-  ImagePicker get pickerNewOPH => _pickerNewOPH;
 
   String? _pickedFileNewOPH;
 
@@ -222,7 +213,7 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   Future getCameraOldOPH(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _oph.ophPhoto = picked;
       notifyListeners();
@@ -230,7 +221,7 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   Future getCameraNewOPH(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _newOPH.ophPhoto = picked;
       notifyListeners();
@@ -373,8 +364,8 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   getEstimationTonnage() async {
-    TABWSchema? tabwSchema =
-        await DatabaseTABWSchema().selectTABWSchemaByBlock(_oph.ophBlockCode!);
+    TABWSchema? tabwSchema = await DatabaseTABWSchema()
+        .selectTABWSchemaByBlock(_oph.ophBlockCode!, _oph.ophEstateCode!);
     _oph.ophEstimateTonnage = (tabwSchema?.bunchWeight * _bunchesTotalPrev);
     _oph.ophEstimateTonnage =
         double.parse(_oph.ophEstimateTonnage!.toStringAsFixed(3));
@@ -386,13 +377,21 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   showDialogQuestionOld() {
-    _dialogService.showOptionDialog(
-        title: "Save OPH Lama",
-        subtitle: "Apakan anda ingin memakai kartu",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: showDialogNFCOld,
-        onPressNo: saveOldToDatabase);
+    if (_oph.ophPhoto != null) {
+      showDialogNFCOld();
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Foto OPH Lama",
+          "Foto OPH Lama belum ada");
+    }
+    // _dialogService.showOptionDialog(
+    //     title: "Save OPH Lama",
+    //     subtitle: "Apakan anda ingin memakai kartu",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: showDialogNFCOld,
+    //     onPressNo: saveOldToDatabase);
   }
 
   saveOldToDatabase() {
@@ -411,7 +410,7 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   showDialogNFCOld() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     OPH ophOld = OPH();
     ophOld = _oph;
     ophOld.bunchesRipe = _bunchesRipePrev;
@@ -446,7 +445,7 @@ class BagiOPHNotifier extends ChangeNotifier {
 
   onErrorWriteOld() {
     _dialogService.popDialog();
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       NfcManager.instance.stopSession();
     });
     FlushBarManager.showFlushBarWarning(
@@ -459,13 +458,21 @@ class BagiOPHNotifier extends ChangeNotifier {
     if (ophNumber.text.isNotEmpty) {
       if (ophNumber.text != _oph.ophCardId) {
         if (_mcophCardSchema != null) {
-          _dialogService.showOptionDialog(
-              title: "Save OPH Baru",
-              subtitle: "Apakan anda ingin memakai kartu",
-              buttonTextYes: "Ya",
-              buttonTextNo: "Tidak",
-              onPressYes: showDialogNFCNew,
-              onPressNo: onSaveClickedNew);
+          if (_newOPH.ophPhoto != null) {
+            showDialogNFCNew();
+            // _dialogService.showOptionDialog(
+            //     title: "Save OPH Baru",
+            //     subtitle: "Apakan anda ingin memakai kartu",
+            //     buttonTextYes: "Ya",
+            //     buttonTextNo: "Tidak",
+            //     onPressYes: showDialogNFCNew,
+            //     onPressNo: onSaveClickedNew);
+          } else {
+            FlushBarManager.showFlushBarWarning(
+                _navigationService.navigatorKey.currentContext!,
+                "Foto OPH Baru",
+                "Foto OPH Baru belum ada");
+          }
         } else {
           FlushBarManager.showFlushBarWarning(
               _navigationService.navigatorKey.currentContext!,
@@ -487,7 +494,7 @@ class BagiOPHNotifier extends ChangeNotifier {
   }
 
   showDialogNFCNew() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     OPHNew ophNew = OPHNew();
     ophNew = _newOPH;
     ophNew.bunchesRipe = int.parse(bunchesRipe.text);
@@ -521,7 +528,7 @@ class BagiOPHNotifier extends ChangeNotifier {
 
   onErrorWriteNew() {
     _dialogService.popDialog();
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       NfcManager.instance.stopSession();
     });
     FlushBarManager.showFlushBarWarning(
@@ -575,6 +582,10 @@ class BagiOPHNotifier extends ChangeNotifier {
           "Save OPH Baru",
           "Gagal tersimpan");
     }
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+    notifyListeners();
   }
 
   saveOPHOldToDatabase(BuildContext context, OPH oph) async {
@@ -582,9 +593,6 @@ class BagiOPHNotifier extends ChangeNotifier {
     if (countSaved > 0) {
       _dialogService.popDialog();
       _isOldSaved = true;
-      Future.delayed(Duration(seconds: 2), () {
-        NfcManager.instance.stopSession();
-      });
       if (_isNewSaved == true && _isOldSaved == true) {
         _navigationService.pop();
         _navigationService.pop();
@@ -595,14 +603,15 @@ class BagiOPHNotifier extends ChangeNotifier {
           "Berhasil tersimpan");
     } else {
       _dialogService.popDialog();
-      Future.delayed(Duration(seconds: 2), () {
-        NfcManager.instance.stopSession();
-      });
       FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "Save OPH Lama",
           "Gagal tersimpan");
     }
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+    notifyListeners();
   }
 
   updateOPHtoDatabase(BuildContext context, OPH oph) async {
@@ -625,5 +634,8 @@ class BagiOPHNotifier extends ChangeNotifier {
           "Save OPH Lama",
           "Berhasil tersimpan");
     }
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
   }
 }

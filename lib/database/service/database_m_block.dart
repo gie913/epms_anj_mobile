@@ -7,6 +7,26 @@ import '../entity/block_entity.dart';
 
 class DatabaseMBlockSchema {
   void createTableMBlockSchema(Database db) async {
+    // await db.execute('''
+    //   CREATE TABLE $mBlockSchemaTable(
+    //    ${BlockEntity.blockId} INT NOT NULL,
+    //    ${BlockEntity.blockCompanyCode} TEXT,
+    //    ${BlockEntity.blockEstateCode} TEXT,
+    //    ${BlockEntity.blockDivisionCode} TEXT,
+    //    ${BlockEntity.blockCode} TEXT,
+    //    ${BlockEntity.blockName} TEXT,
+    //    ${BlockEntity.blockPlantedDate} TEXT,
+    //    ${BlockEntity.blockValidFrom} TEXT,
+    //    ${BlockEntity.blockValidTo} TEXT,
+    //    ${BlockEntity.blockHectarage} TEXT,
+    //    ${BlockEntity.blockKerapatanPokok} TEXT,
+    //    ${BlockEntity.createdBy} TEXT,
+    //    ${BlockEntity.createdDate} TEXT,
+    //    ${BlockEntity.createdTime} TEXT,
+    //    ${BlockEntity.updatedBy} TEXT,
+    //    ${BlockEntity.updatedDate} TEXT,
+    //    ${BlockEntity.updatedTime} TEXT)
+    // ''');
     await db.execute('''
       CREATE TABLE $mBlockSchemaTable(
        ${BlockEntity.blockId} INT NOT NULL,
@@ -14,29 +34,28 @@ class DatabaseMBlockSchema {
        ${BlockEntity.blockEstateCode} TEXT,
        ${BlockEntity.blockDivisionCode} TEXT,
        ${BlockEntity.blockCode} TEXT,
-       ${BlockEntity.blockName} TEXT,
-       ${BlockEntity.blockPlantedDate} TEXT,
-       ${BlockEntity.blockValidFrom} TEXT,
-       ${BlockEntity.blockValidTo} TEXT,
-       ${BlockEntity.blockHectarage} TEXT,
-       ${BlockEntity.blockKerapatanPokok} TEXT,
-       ${BlockEntity.createdBy} TEXT,
-       ${BlockEntity.createdDate} TEXT,
-       ${BlockEntity.createdTime} TEXT,
-       ${BlockEntity.updatedBy} TEXT,
-       ${BlockEntity.updatedDate} TEXT,
-       ${BlockEntity.updatedTime} TEXT)
+       ${BlockEntity.blockName} TEXT)
     ''');
   }
 
   Future<int> insertMBlockSchema(List<MBlockSchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(mBlockSchemaTable, object[i].toJson());
-      count = count + saved;
-    }
-    return count;
+    // int count = 0;
+    // List<MBlockSchema> listBlock = await selectMBlockSchema();
+    // for (int i = 0; i < object.length; i++) {
+    //   if(!(listBlock.contains(object[i]))) {
+    //     int saved = await db.insert(mBlockSchemaTable, object[i].toJson());
+    //     count = count + saved;
+    //   }
+    // }
+    // return count;
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MBlockSchema mBlockSchema =  val;
+      batch.insert(mBlockSchemaTable, mBlockSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MBlockSchema>> selectMBlockSchema() async {

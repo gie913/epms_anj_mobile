@@ -1,13 +1,25 @@
-import 'package:epms/base/ui/palette.dart';
+import 'package:epms/base/common/locator.dart';
+import 'package:epms/base/common/routes.dart';
+import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_oph_supervise_ancak.dart';
 import 'package:epms/model/m_ancak_employee.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph_supervise_ancak.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class DetailSupervisorAncakNotifier extends ChangeNotifier {
+  NavigatorService _navigationService = locator<NavigatorService>();
+
+  NavigatorService get navigationService => _navigationService;
+
+  DialogService _dialogService = locator<DialogService>();
+
+  DialogService get dialogService => _dialogService;
+
   OPHSuperviseAncak? _ophSuperviseAncak;
 
   OPHSuperviseAncak? get ophSuperviseAncak => _ophSuperviseAncak;
@@ -27,10 +39,6 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
   MEmployeeSchema? _pemanen;
 
   MEmployeeSchema? get pemanen => _pemanen;
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   TextEditingController _pokokPanen = TextEditingController();
 
@@ -72,6 +80,14 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
 
   TextEditingController get notes => _notes;
 
+  double _loosesBuahTinggal = 0.0;
+
+  double get loosesBuahTinggal => _loosesBuahTinggal;
+
+  double _loosesBrondolan = 0.0;
+
+  double get loosesBrondolan => _loosesBrondolan;
+
   onInit(OPHSuperviseAncak ophSuperviseAncak) {
     this._ophSuperviseAncak = ophSuperviseAncak;
     _ancakEmployee = MAncakEmployee(
@@ -79,20 +95,24 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
         userName: _ophSuperviseAncak?.supervisiAncakAssignToName);
     _pemanen = MEmployeeSchema(
         employeeCode: _ophSuperviseAncak?.supervisiAncakPemanenEmployeeCode,
-        employeeName: _ophSuperviseAncak?.supervisiAncakPemanenEmployeeCode);
+        employeeName: _ophSuperviseAncak?.supervisiAncakPemanenEmployeeName);
     _kemandoran = MEmployeeSchema(
-      employeeCode: _ophSuperviseAncak?.supervisiAncakMandorEmployeeCode,
-      employeeName: _ophSuperviseAncak?.supervisiAncakMandorEmployeeName
+        employeeCode: _ophSuperviseAncak?.supervisiAncakMandorEmployeeCode,
+        employeeName: _ophSuperviseAncak?.supervisiAncakMandorEmployeeName
     );
     _pokokPanen.text = _ophSuperviseAncak?.pokokSample ?? "0";
     _totalJanjang.text = _ophSuperviseAncak?.bunchesTotal.toString() ?? "0";
-    _totalBrondolan.text = _ophSuperviseAncak?.looseFruits.toString() ??"0";
+    _totalBrondolan.text = _ophSuperviseAncak?.looseFruits.toString() ?? "0";
     _rat.text = _ophSuperviseAncak?.bunchesRat.toString() ?? "0";
     _vCut.text = _ophSuperviseAncak?.bunchesVCut.toString() ?? "0";
-    _tangkaiPanjang.text = _ophSuperviseAncak?.bunchesTangkaiPanjang.toString() ?? "0";
-    _pelepahSengkleh.text = _ophSuperviseAncak?.pelepahSengkleh.toString() ?? "0";
+    _tangkaiPanjang.text =
+        _ophSuperviseAncak?.bunchesTangkaiPanjang.toString() ?? "0";
+    _pelepahSengkleh.text =
+        _ophSuperviseAncak?.pelepahSengkleh.toString() ?? "0";
     _janjangTinggal.text = _ophSuperviseAncak?.bunchesTinggal.toString() ?? "0";
-    _brondolanTinggal.text = _ophSuperviseAncak?.bunchesBrondolanTinggal.toString() ?? "0";
+    _brondolanTinggal.text =
+        _ophSuperviseAncak?.bunchesBrondolanTinggal.toString() ?? "0";
+    _notes.text = _ophSuperviseAncak?.supervisiAncakNotes.toString() ?? "";
   }
 
   onSetKemandoran(MEmployeeSchema mEmployeeSchema) {
@@ -110,27 +130,25 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future getCamera(BuildContext context) async {
-    try {
-      final pickedFile = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 20,
-      );
-      if (pickedFile != null) {
-        this._ophSuperviseAncak?.supervisiAncakPhoto = pickedFile.path;
-      }
-    } catch (e) {
-      print(e);
+  getCamera(BuildContext context) async {
+    String? picked = await CameraService.getImageByCamera(context);
+    if (picked != null) {
+      this._ophSuperviseAncak?.supervisiAncakPhoto = picked;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
-  updateToDatabase(BuildContext context) async {
+  updateToDatabase() async {
+    _dialogService.popDialog();
     DateTime now = DateTime.now();
-    _ophSuperviseAncak?.supervisiAncakMandorEmployeeCode = _kemandoran?.employeeCode;
-    _ophSuperviseAncak?.supervisiAncakMandorEmployeeName = _kemandoran?.employeeName;
-    _ophSuperviseAncak?.supervisiAncakPemanenEmployeeCode = _pemanen?.employeeCode;
-    _ophSuperviseAncak?.supervisiAncakPemanenEmployeeName = _pemanen?.employeeName;
+    _ophSuperviseAncak?.supervisiAncakMandorEmployeeCode =
+        _kemandoran?.employeeCode;
+    _ophSuperviseAncak?.supervisiAncakMandorEmployeeName =
+        _kemandoran?.employeeName;
+    _ophSuperviseAncak?.supervisiAncakPemanenEmployeeCode =
+        _pemanen?.employeeCode;
+    _ophSuperviseAncak?.supervisiAncakPemanenEmployeeName =
+        _pemanen?.employeeName;
     _ophSuperviseAncak?.supervisiAncakAssignToId = _ancakEmployee?.userId;
     _ophSuperviseAncak?.supervisiAncakAssignToName = _ancakEmployee?.userName;
     _ophSuperviseAncak?.bunchesVCut = int.parse(_vCut.text);
@@ -138,27 +156,29 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
     _ophSuperviseAncak?.bunchesTangkaiPanjang = int.parse(_tangkaiPanjang.text);
     _ophSuperviseAncak?.pelepahSengkleh = int.parse(_pelepahSengkleh.text);
     _ophSuperviseAncak?.bunchesTinggal = int.parse(_janjangTinggal.text);
-    _ophSuperviseAncak?.bunchesTinggalPercentage = (((int.parse(_janjangTinggal.text))/(int.parse(_totalJanjang.text)))*100).toDouble();
-    _ophSuperviseAncak?.bunchesBrondolanTinggal = int.parse(_brondolanTinggal.text);
-    _ophSuperviseAncak?.bunchesBrondolanTinggalPercentage = (((int.parse(_brondolanTinggal.text))/(int.parse(_totalJanjang.text)))*100).toDouble();
+    _ophSuperviseAncak?.bunchesBrondolanTinggal =
+        int.parse(_brondolanTinggal.text);
     _ophSuperviseAncak?.bunchesTotal = int.parse(_totalJanjang.text);
-    _ophSuperviseAncak?.looseFruits = int.parse(_brondolanTinggal.text);
+    _ophSuperviseAncak?.looseFruits = int.parse(_totalBrondolan.text);
     _ophSuperviseAncak?.supervisiAncakNotes = _notes.text;
     _ophSuperviseAncak?.updatedDate = TimeManager.dateWithDash(now);
     _ophSuperviseAncak?.createdTime = TimeManager.timeWithColon(now);
-    int count = await DatabaseOPHSuperviseAncak().updateOPHSuperviseAncakByID(_ophSuperviseAncak!);
+    int count = await DatabaseOPHSuperviseAncak().updateOPHSuperviseAncakByID(
+        _ophSuperviseAncak!);
     if (count > 0) {
-      Navigator.pop(context);
-      Navigator.pop(context);
-      // FlushBarManager.showFlushBarSuccess(context, "Berhasil tersimpan");
+      _navigationService.push(Routes.HOME_PAGE);
+      FlushBarManager.showFlushBarSuccess(
+          _navigationService.navigatorKey.currentContext!,
+          "Simpan Supervisi Ancak", "Berhasil menyimpan");
     } else {
-      // FlushBarManager.showFlushBarWarning(context, "Gagal tersimpan");
-      Navigator.pop(context);
+      FlushBarManager.showFlushBarError(
+          _navigationService.navigatorKey.currentContext!,
+          "Simpan Supervisi Ancak", "Gagal menyimpan");
     }
   }
 
-  countBunches(
-      BuildContext context, TextEditingController textEditingController) {
+  countBunches(BuildContext context,
+      TextEditingController textEditingController) {
     if (textEditingController.text.isEmpty ||
         textEditingController.text == "0") {
       textEditingController.value = TextEditingValue(text: "0");
@@ -173,46 +193,30 @@ class DetailSupervisorAncakNotifier extends ChangeNotifier {
   }
 
   showDialogQuestion(BuildContext context) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15))),
-            title: Center(
-                child: Text(
-                  "Apakah anda yakin ingin menyimpan?",
-                  textAlign: TextAlign.center,
-                )),
-            actions: <Widget>[
-              OutlinedButton(
-                  child: new Text(
-                    "Ya",
-                    style: TextStyle(
-                        color: Palette.primaryColorProd,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    updateToDatabase(context);
-                  }),
-              OutlinedButton(
-                  child: new Text(
-                    "Tidak",
-                    style: TextStyle(
-                        color: Palette.redColorLight,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  })
-            ],
-          );
-        });
+    _dialogService.showOptionDialog(title: "Simpan Supervisi Ancak",
+        subtitle: "Anda yakin ingin menyimpan?",
+        buttonTextYes: "Iya",
+        buttonTextNo: "Tidak",
+        onPressYes: updateToDatabase,
+        onPressNo: _dialogService.popDialog);
   }
 
   void onChangeEdit() {
     _onEdit = true;
+    notifyListeners();
+  }
+
+  countLoosesBuahTinggal(String janjangTinggal, String pokokPanen) {
+    if(janjangTinggal.isNotEmpty && pokokPanen.isNotEmpty) {
+      _ophSuperviseAncak?.bunchesTinggalPercentage = double.parse(janjangTinggal) / double.parse(pokokPanen);
+    }
+    notifyListeners();
+  }
+
+  countLoosesBrondolan(String brondolanTinggal, String pokokPanen) {
+    if(brondolanTinggal.isNotEmpty && pokokPanen.isNotEmpty) {
+      _ophSuperviseAncak?.bunchesBrondolanTinggalPercentage = double.parse(brondolanTinggal) / double.parse(pokokPanen);
+    }
     notifyListeners();
   }
 

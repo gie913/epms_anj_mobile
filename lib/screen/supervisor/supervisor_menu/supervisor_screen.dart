@@ -4,6 +4,7 @@ import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/model/menu_entities.dart';
 import 'package:epms/screen/home/home_notifier.dart';
+import 'package:epms/screen/kerani_panen/kerani_panen_menu/kerani_panen_notifier.dart';
 import 'package:epms/screen/supervisor/supervisor_menu/supervisor_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,9 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                             activeColor: Palette.greenColor,
                             value: theme.status ?? true,
                             onChanged: (value) {
-                              value ? theme.setDarkMode() : theme.setLightMode();
+                              value
+                                  ? theme.setDarkMode()
+                                  : theme.setLightMode();
                             }),
                       ))
             ],
@@ -105,12 +108,40 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                                 style: Style.textBold14,
                                               ),
                                               SizedBox(height: 30),
+                                              Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: InkWell(
+                                                    child: Text("Synch Ulang"),
+                                                    onTap: () {
+                                                      KeraniPanenNotifier()
+                                                          .reSynch();
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: InkWell(
+                                                    child: Text("Export Json"),
+                                                    onTap: () {
+                                                      SupervisorNotifier()
+                                                          .exportJson(context);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
                                               Divider(),
                                               Column(
                                                 children: [
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.all(8.0),
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: Image.asset(
                                                       ImageAssets.ANJ_LOGO,
                                                       height: 25,
@@ -124,10 +155,13 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                         )
                                       : TextButton(
                                           style: TextButton.styleFrom(
+                                            foregroundColor: Colors.white,
                                             backgroundColor:
                                                 colorCodesSupervisor[index - 2],
                                             minimumSize: Size(
-                                                MediaQuery.of(context).size.width,
+                                                MediaQuery.of(context)
+                                                    .size
+                                                    .width,
                                                 50),
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -136,7 +170,6 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                                     color: colorCodesSupervisor[
                                                         index - 2])),
                                             padding: const EdgeInsets.all(16.0),
-                                            primary: Colors.white,
                                             textStyle: const TextStyle(
                                                 fontSize: 20,
                                                 color: Colors.white),

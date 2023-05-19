@@ -1,6 +1,7 @@
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/time_manager.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_detail/supervisor_spb_detail_page.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_history/supervisor_spb_history_notifier.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,9 @@ class _SupervisorSPBHistoryScreenState
                                     value: value,
                                   );
                                 }).toList(),
-                                onChanged: (String? value) {},
+                                onChanged: (String? value) {
+                                  notifier.onChangeFilterSupervisiSPB(value!);
+                                },
                               ),
                             ),
                           ),
@@ -79,7 +82,8 @@ class _SupervisorSPBHistoryScreenState
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Jumlah Supervisi SPB:"),
-                          Text("${notifier.listSPBSupervise.length}")
+                          Text(
+                              "${notifier.listSPBSuperviseResult.length == 0 ? notifier.listSPBSupervise.length : notifier.listSPBSuperviseResult.length}")
                         ],
                       ),
                       SizedBox(height: 14),
@@ -111,107 +115,232 @@ class _SupervisorSPBHistoryScreenState
                         style: Style.textBold16,
                       ))
                 else
-                  Flexible(
-                    child: ListView.builder(
-                        itemCount: notifier.listSPBSupervise.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () {
-                              NavigatorService.navigateTo(
-                                  context,
-                                  SupervisorSPBDetailPage(
-                                      spbSupervise:
-                                          notifier.listSPBSupervise[index]));
-                            },
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "${notifier.listSPBSupervise[index].spbId}",
-                                        style: Style.textBold16,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Total Janjang:"),
-                                      Text(
-                                          "${notifier.listSPBSupervise[index].bunchesTotal} Janjang"),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Total Janjang Normal:"),
-                                      Text(
-                                          "${notifier.listSPBSupervise[index].bunchesTotalNormal} Janjang"),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Total Brondolan:"),
-                                      Text(
-                                          "${notifier.listSPBSupervise[index].looseFruits} Kg"),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Supir:"),
-                                      Text(
-                                          "${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeCode} ${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeName}"),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                            "Truk: ${notifier.listSPBSupervise[index].supervisiSpbLicenseNumber} "),
-                                        Text(
-                                            "SPB Sumber: ${notifier.listSPBSupervise[index].supervisiSpbMethod}"),
+                  notifier.listSPBSuperviseResult.isNotEmpty
+                      ? Flexible(
+                          child: ListView.builder(
+                              itemCount: notifier.listSPBSuperviseResult.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return InkWell(
+                                  onTap: () {
+                                    NavigatorService.navigateTo(
+                                        context,
+                                        SupervisorSPBDetailPage(
+                                            spbSupervise:
+                                                notifier.listSPBSuperviseResult[
+                                                    index]));
+                                  },
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "${notifier.listSPBSuperviseResult[index].spbId}",
+                                              style: Style.textBold16,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Janjang:"),
+                                            Text(
+                                                "${notifier.listSPBSuperviseResult[index].bunchesTotal} Janjang"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Janjang Normal:"),
+                                            Text(
+                                                "${notifier.listSPBSuperviseResult[index].bunchesTotalNormal} Janjang"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Brondolan:"),
+                                            Text(
+                                                "${notifier.listSPBSuperviseResult[index].looseFruits} Kg"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            notifier.listSPBSuperviseResult[index]
+                                                .supervisiSpbMethod ==
+                                                3
+                                                ? Text("Vendor:")
+                                                : Text("Supir:"),
+                                            notifier.listSPBSuperviseResult[index]
+                                                .supervisiSpbDriverEmployeeCode ==
+                                                notifier
+                                                    .listSPBSuperviseResult[index]
+                                                    .supervisiSpbDriverEmployeeName
+                                                ? Text(
+                                                "${notifier.listSPBSuperviseResult[index].supervisiSpbDriverEmployeeCode}")
+                                                : Text(
+                                                "${notifier.listSPBSuperviseResult[index].supervisiSpbDriverEmployeeCode} ${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeName}"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Truk: ${notifier.listSPBSuperviseResult[index].supervisiSpbLicenseNumber} "),
+                                              Text(
+                                                  "SPB Sumber: ${ValueService.spbSourceDataText(notifier.listSPBSuperviseResult[index].supervisiSpbType!)}"),
+                                            ]),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text("Jenis Pengangkutan:"),
+                                              Text(
+                                                  "${ValueService.typeOfFormToText(notifier.listSPBSuperviseResult[index].supervisiSpbMethod!)}"),
+                                            ]),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Tanggal: ${notifier.listSPBSuperviseResult[index].createdDate} "),
+                                              Text(
+                                                  "Waktu: ${notifier.listSPBSuperviseResult[index].createdTime}"),
+                                            ]),
                                       ]),
-                                  SizedBox(height: 8),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("Jenis Pengangkutan:"),
-                                        Text(
-                                            "${notifier.listSPBSupervise[index].supervisiSpbType}"),
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Flexible(
+                          child: ListView.builder(
+                              itemCount: notifier.listSPBSupervise.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return InkWell(
+                                  onTap: () {
+                                    NavigatorService.navigateTo(
+                                        context,
+                                        SupervisorSPBDetailPage(
+                                            spbSupervise: notifier
+                                                .listSPBSupervise[index]));
+                                  },
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "${notifier.listSPBSupervise[index].spbId}",
+                                              style: Style.textBold16,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Janjang:"),
+                                            Text(
+                                                "${notifier.listSPBSupervise[index].bunchesTotal} Janjang"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Janjang Normal:"),
+                                            Text(
+                                                "${notifier.listSPBSupervise[index].bunchesTotalNormal} Janjang"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Total Brondolan:"),
+                                            Text(
+                                                "${notifier.listSPBSupervise[index].looseFruits} Kg"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            notifier.listSPBSupervise[index]
+                                                        .supervisiSpbMethod ==
+                                                    3
+                                                ? Text("Vendor:")
+                                                : Text("Supir:"),
+                                            notifier.listSPBSupervise[index]
+                                                        .supervisiSpbDriverEmployeeCode ==
+                                                    notifier
+                                                        .listSPBSupervise[index]
+                                                        .supervisiSpbDriverEmployeeName
+                                                ? Text(
+                                                    "${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeCode}")
+                                                : Text(
+                                                    "${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeCode} ${notifier.listSPBSupervise[index].supervisiSpbDriverEmployeeName}"),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Truk: ${notifier.listSPBSupervise[index].supervisiSpbLicenseNumber} "),
+                                              Text(
+                                                  "SPB Sumber: ${ValueService.spbSourceDataText(notifier.listSPBSupervise[index].supervisiSpbType!)}"),
+                                            ]),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text("Jenis Pengangkutan:"),
+                                              Text(
+                                                  "${ValueService.typeOfFormToText(notifier.listSPBSupervise[index].supervisiSpbMethod!)}"),
+                                            ]),
+                                        SizedBox(height: 8),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Tanggal: ${notifier.listSPBSupervise[index].createdDate} "),
+                                              Text(
+                                                  "Waktu: ${notifier.listSPBSupervise[index].createdTime}"),
+                                            ]),
                                       ]),
-                                  SizedBox(height: 8),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                            "Tanggal: ${notifier.listSPBSupervise[index].createdDate} "),
-                                        Text(
-                                            "Waktu: ${notifier.listSPBSupervise[index].createdTime}"),
-                                      ]),
-                                ]),
-                              ),
-                            ),
-                          );
-                        }),
-                  )
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
               ]),
             ),
           ),

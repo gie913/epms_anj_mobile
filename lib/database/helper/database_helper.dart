@@ -34,6 +34,8 @@ import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
+import 'package:epms/database/service/database_tbs_luar.dart';
+import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -92,6 +94,8 @@ class DatabaseHelper {
     DatabaseSPBSupervise().createTableSPB(db);
     DatabaseTWorkplanSchema().createTWorkPlan(db);
     DatabaseMaterial().createMaterial(db);
+    DatabaseTBSLuar().createTableTBSLuar(db);
+    DatabaseTBSLuarOneMonth().createTableTBSLuarOneMonth(db);
   }
 
   Future<Database> get database async {

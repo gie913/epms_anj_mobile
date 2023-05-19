@@ -38,9 +38,11 @@ class HistorySuperviseAncakNotifier extends ChangeNotifier {
   onInit() async {
     _listOPHSupervise = await DatabaseOPHSuperviseAncak().selectOPHSuperviseAncak();
     for(int i=0; i < _listOPHSupervise.length; i++) {
-      _totalPokokPanen += _listOPHSupervise[i].bunchesTotal!;
+      _totalPokokPanen += int.parse(_listOPHSupervise[i].pokokSample!);
       _totalLooseFruits += _listOPHSupervise[i].looseFruits!;
-      _listDivision.add(_listOPHSupervise[i].supervisiAncakDivisionCode!);
+      if(!listDivision.contains(listOPHSupervise[i].supervisiAncakDivisionCode)) {
+        _listDivision.add(_listOPHSupervise[i].supervisiAncakDivisionCode!);
+      }
     }
     notifyListeners();
   }

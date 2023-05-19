@@ -2,6 +2,7 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/screen/synch/synch_notifier.dart';
+import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,18 @@ class _SynchScreenState extends State<SynchScreen> {
   void initState() {
     context.read<SynchNotifier>().doSynchMasterData(context);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    SynchRepository().deleteMasterData(context);
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    SynchRepository().deleteMasterData(context);
+    super.deactivate();
   }
 
   @override

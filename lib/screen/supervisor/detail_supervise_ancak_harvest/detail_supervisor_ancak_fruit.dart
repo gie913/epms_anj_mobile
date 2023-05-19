@@ -20,7 +20,7 @@ class _DetailSupervisorAncakFormFruitState
       return SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(22.0),
+            padding: const EdgeInsets.all(18.0),
             child: Column(children: [
               Table(
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -32,7 +32,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("Pokok Panen"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
@@ -40,7 +40,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("Total Janjang"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
@@ -48,7 +48,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("Total Brondolan"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                       ],
@@ -97,7 +97,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("Rat"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
@@ -105,7 +105,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("V Cut"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
@@ -113,7 +113,7 @@ class _DetailSupervisorAncakFormFruitState
                           child: Column(children: [
                             SizedBox(height: 12),
                             Text("Tangkai Panjang"),
-                            SizedBox(height: 6),
+                            SizedBox(height: 20),
                           ]),
                         ),
                       ],
@@ -152,24 +152,24 @@ class _DetailSupervisorAncakFormFruitState
                           width: 110,
                           child: Column(children: [
                             SizedBox(height: 12),
-                            Text("Pelepah Sengkleh"),
-                            SizedBox(height: 6),
+                            Text("Pelepah Sengkleh", textAlign: TextAlign.center,),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
                           width: 110,
                           child: Column(children: [
                             SizedBox(height: 12),
-                            Text("Janjang Tinggal"),
-                            SizedBox(height: 6),
+                            Text("Janjang Tinggal", textAlign: TextAlign.center,),
+                            SizedBox(height: 20),
                           ]),
                         ),
                         Container(
                           width: 110,
                           child: Column(children: [
                             SizedBox(height: 12),
-                            Text("Brondolan Tinggal"),
-                            SizedBox(height: 6),
+                            Text("Brondolan Tinggal", textAlign: TextAlign.center,),
+                            SizedBox(height: 20),
                           ]),
                         ),
                       ],

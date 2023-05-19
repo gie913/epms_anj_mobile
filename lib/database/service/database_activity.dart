@@ -26,9 +26,12 @@ class DatabaseMActivitySchema {
   Future<int> insertMActivitySchema(List<MActivitySchema> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<MActivitySchema> listActivity = await selectMActivitySchema();
     for (int i = 0; i < object.length; i++) {
-        int saved = await db.insert(mActivitySchemaTable, object[i].toJson());
-        count = count + saved;
+        if(!(listActivity.contains(object[i]))) {
+          int saved = await db.insert(mActivitySchemaTable, object[i].toJson());
+          count = count + saved;
+        }
     }
     return count;
   }

@@ -31,16 +31,16 @@ class NavigatorService {
         arguments: arguments);
   }
 
-  Future<dynamic> clearAllRoutesAndPush(
-    String routeName, {
-    dynamic arguments,
-  }) {
-    return navigatorKey.currentState!.pushNamedAndRemoveUntil(
-      routeName,
-      (Route<dynamic> pageRoute) => false,
-      arguments: arguments,
-    );
-  }
+  // Future<dynamic> clearAllRoutesAndPush(
+  //   String routeName, {
+  //   dynamic arguments,
+  // }) {
+  //   return navigatorKey.currentState!.pushNamedAndRemoveUntil(
+  //     routeName,
+  //     (Route<dynamic> pageRoute) => false,
+  //     arguments: arguments,
+  //   );
+  // }
 
   bool pop() {
     navigatorKey.currentState!.pop();
@@ -61,6 +61,7 @@ class NavigatorService {
   }
 
   Future<bool> onWillPopForm(BuildContext context) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     return await showDialog(
           context: context,
           builder: (context) => MediaQuery(

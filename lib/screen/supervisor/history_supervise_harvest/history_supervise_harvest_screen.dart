@@ -150,7 +150,7 @@ class _HistorySuperviseHarvestScreenState
                                               children: [
                                                 Text("Pemanen:"),
                                                 Text(
-                                                    "${notifier.listOPHSupervise[index].supervisiPemanenEmployeeName}"),
+                                                    "${notifier.listOPHSuperviseResult[index].supervisiPemanenEmployeeName}"),
                                               ],
                                             ),
                                             SizedBox(height: 8),
@@ -159,9 +159,9 @@ class _HistorySuperviseHarvestScreenState
                                                   MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
-                                                    "Blok: ${notifier.listOPHSupervise[index].supervisiBlockCode}"),
+                                                    "Blok: ${notifier.listOPHSuperviseResult[index].supervisiBlockCode}"),
                                                 Text(
-                                                    "Estate: ${notifier.listOPHSupervise[index].supervisiEstateCode}"),
+                                                    "Estate: ${notifier.listOPHSuperviseResult[index].supervisiEstateCode}"),
                                               ],
                                             ),
                                             SizedBox(height: 8),
@@ -170,9 +170,9 @@ class _HistorySuperviseHarvestScreenState
                                                   MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
-                                                    "Tanggal: ${notifier.listOPHSupervise[index].createdDate} "),
+                                                    "Tanggal: ${notifier.listOPHSuperviseResult[index].createdDate} "),
                                                 Text(
-                                                    "Waktu: ${notifier.listOPHSupervise[index].createdTime}"),
+                                                    "Waktu: ${notifier.listOPHSuperviseResult[index].createdTime}"),
                                               ],
                                             ),
                                           ],

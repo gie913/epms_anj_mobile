@@ -4,11 +4,16 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/spb_card_manager.dart';
+import 'package:epms/database/service/database_m_employee.dart';
+import 'package:epms/database/service/database_m_vendor.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_detail.dart';
+import 'package:collection/collection.dart';
 import 'package:epms/database/service/database_spb_loader.dart';
 import 'package:epms/model/m_c_spb_card_schema.dart';
+import 'package:epms/model/m_employee_schema.dart';
+import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
@@ -44,6 +49,14 @@ class DetailSPBNotifier extends ChangeNotifier {
 
   bool get isSPBExist => _isSPBExist;
 
+  List<MVendorSchema> _listMVendorSchema = [];
+
+  List<MVendorSchema> get listMVendorSchema => _listMVendorSchema;
+
+  List<MEmployeeSchema> _listDriver = [];
+
+  List<MEmployeeSchema> get listDriver => _listDriver;
+
   checkSPBExist(SPB spb) async {
     SPB? spbGet = await DatabaseSPB().selectSPBByID(spb.spbId!);
     if (spbGet != null) {
@@ -57,8 +70,16 @@ class DetailSPBNotifier extends ChangeNotifier {
       }
     } else {
       _spb = spb;
+      if(spb.spbType == 3) {
+        MVendorSchema? mVendorSchema = _listMVendorSchema.firstWhereOrNull((element) => element.vendorCode == spb.spbDriverEmployeeCode);
+        if(mVendorSchema != null) {
+          _spb?.spbDriverEmployeeName = mVendorSchema.vendorName;
+        }
+      } else {
+        _spb?.spbDriverEmployeeName = _listDriver.firstWhere((element) => element.employeeCode == spb.spbDriverEmployeeCode).employeeName;
+      }
     }
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       NfcManager.instance.stopSession();
     });
     _dialogService.popDialog();
@@ -66,6 +87,8 @@ class DetailSPBNotifier extends ChangeNotifier {
   }
 
   onInit(BuildContext context, SPB spb, String method) async {
+    _listMVendorSchema = await DatabaseMVendorSchema().selectMVendorSchema();
+    _listDriver = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     if (method == "BACA") {
       await Future.delayed(Duration(milliseconds: 50));
       SPBCardManager().readSPBCard(context, onSuccessRead, onErrorRead);
@@ -94,12 +117,15 @@ class DetailSPBNotifier extends ChangeNotifier {
 
   onErrorRead(BuildContext context, String message) {
     _dialogService.popDialog();
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
     FlushBarManager.showFlushBarWarning(context, "Gagal Membaca", message);
   }
 
   onPressCancelRead() {
     _dialogService.popDialog();
-    _navigationService.pop();
+    _navigationService.push(Routes.HOME_PAGE);
     Future.delayed(Duration(seconds: 2), () {
       NfcManager.instance.stopSession();
     });
@@ -134,7 +160,7 @@ class DetailSPBNotifier extends ChangeNotifier {
       _mcspbCardSchema =
           await DatabaseMCSPBCardSchema().selectMCSPBCardSchema(spbCardID);
       if (_mcspbCardSchema != null) {
-        _spb?.spbCardId = _mcspbCardSchema?.spbCardId;
+        // _spb?.spbCardId = _mcspbCardSchema?.spbCardId;
       } else {
         FlushBarManager.showFlushBarWarning(
             context, "No Kartu SPB", "Tidak sesuai");
@@ -144,20 +170,22 @@ class DetailSPBNotifier extends ChangeNotifier {
   }
 
   showDialogQuestion(BuildContext context) {
-    _dialogService.showOptionDialog(
-        title: "Memakai Kartu",
-        subtitle: "Apakah anda ingin memakai kartu",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: onClickYesCard,
-        onPressNo: onClickNoCard);
+    onClickYesCard();
+    // _dialogService.showOptionDialog(
+    //     title: "Memakai Kartu",
+    //     subtitle: "Apakah anda ingin memakai kartu",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: onClickYesCard,
+    //     onPressNo: onClickNoCard);
   }
 
   onClickYesCard() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     SPBCardManager().writeSPBCard(
         _navigationService.navigatorKey.currentContext!,
         _spb!,
+        _listSPBDetail,
         onSuccessWrite,
         onErrorWrite);
     _dialogService.showNFCDialog(
@@ -188,6 +216,7 @@ class DetailSPBNotifier extends ChangeNotifier {
   }
 
   void saveSPBtoDatabase(BuildContext context) async {
+    _spb?.spbCardId = _mcspbCardSchema?.spbCardId;
     int countSaved = await DatabaseSPB().updateSPBByID(_spb!);
     if (countSaved > 0) {
       _dialogService.popDialog();
@@ -202,11 +231,16 @@ class DetailSPBNotifier extends ChangeNotifier {
 
   onClickSaveSPB(BuildContext context) {
     if (spbNumber.text.isNotEmpty) {
-      if (_mcspbCardSchema != null) {
-        showDialogQuestion(context);
+      if(_spb?.spbCardId != spbNumber.text) {
+        if (_mcspbCardSchema != null) {
+          showDialogQuestion(context);
+        } else {
+          FlushBarManager.showFlushBarWarning(
+              context, "Kartu SPB", "Tidak Sesuai");
+        }
       } else {
         FlushBarManager.showFlushBarWarning(
-            context, "Kartu SPB", "Tidak Sesuai");
+            context, "Kartu SPB", "Kartu SPB Belum Diganti");
       }
     } else {
       FlushBarManager.showFlushBarWarning(

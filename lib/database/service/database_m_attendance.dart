@@ -25,13 +25,21 @@ class DatabaseMAttendance {
 
   Future<int> insertAttendance(List<MAttendanceSchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-        int saved = await db.insert(mAttendanceSchemaTable, object[i].toJson());
-        count = count + saved;
-
-    }
-    return count;
+    // int count = 0;
+    // List<MAttendanceSchema> listAttendance = await selectEmployeeAttendance();
+    // for (int i = 0; i < object.length; i++) {
+    //     if(!(listAttendance.contains(object[i]))) {
+    //       int saved = await db.insert(mAttendanceSchemaTable, object[i].toJson());
+    //       count = count + saved;
+    //     }
+    // }
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MAttendanceSchema mAttendanceSchema =  val;
+      batch.insert(mAttendanceSchemaTable, mAttendanceSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MAttendanceSchema>> selectEmployeeAttendance() async {

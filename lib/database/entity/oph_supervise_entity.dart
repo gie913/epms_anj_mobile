@@ -13,6 +13,7 @@ class OPHSuperviseEntity {
   static String supervisiKeraniPanenEmployeeCode = "supervisi_kerani_panen_employee_code";
   static String supervisiKeraniPanenEmployeeName = "supervisi_kerani_panen_employee_name";
   static String supervisiPemanenEmployeeName = "supervisi_pemanen_employee_name";
+  static String supervisiPemanenEmployeeCode = "supervisi_pemanen_employee_code";
   static String supervisiPhoto = "supervisi_photo";
   static String supervisiDivisionCode = "supervisi_division_code";
   static String bunchesRipe = "bunches_ripe";

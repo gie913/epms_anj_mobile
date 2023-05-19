@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:epms/base/common/locator.dart';
@@ -34,7 +35,6 @@ import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -50,10 +50,6 @@ class FormSPBNotifier extends ChangeNotifier {
   DialogService _dialogService = locator<DialogService>();
 
   DialogService get dialogService => _dialogService;
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   int _countOPH = 0;
 
@@ -108,6 +104,10 @@ class FormSPBNotifier extends ChangeNotifier {
   List<MEmployeeSchema> _driverNameList = [];
 
   List<MEmployeeSchema> get driverNameList => _driverNameList;
+
+  List<MEmployeeSchema> _listLoader = [];
+
+  List<MEmployeeSchema> get listLoader => _listLoader;
 
   List<MVendorSchema> _vendorList = [];
 
@@ -229,6 +229,10 @@ class FormSPBNotifier extends ChangeNotifier {
 
   String? get mDivisionCode => _mDivisionCode;
 
+  String? _estateCode;
+
+  String? get estateCode => _estateCode;
+
   bool _isLoaderExist = false;
 
   bool get isLoaderExist => _isLoaderExist;
@@ -237,22 +241,29 @@ class FormSPBNotifier extends ChangeNotifier {
 
   bool get isLoaderZero => _isLoaderZero;
 
+  List<OPH> _listOPHScanned = [];
+
+  List<OPH> get listOPHScanned => _listOPHScanned;
+
   /*On init Form SPB*/
 
   onInitFormSPB() async {
     generateVariable();
-    _driverNameList = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
-    _destinationList =
-        await DatabaseMDestinationSchema().selectMDestinationSchema();
+    _driverNameList = await DatabaseMEmployeeSchema().selectMEmployeeSchemaDriver();
+    _listLoader = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
+    _destinationList = await DatabaseMDestinationSchema().selectMDestinationSchema();
     _vendorList = await DatabaseMVendorSchema().selectMVendorSchema();
-    addOPH();
+    _listLoader.forEach((element) {
+      if(element.employeeCode == _mConfigSchema?.employeeCode) {
+        spbCardNumber.text = element.employeeDivisionCode!;
+      }
+    });
+    // addOPH();
     notifyListeners();
   }
 
   generateVariable() async {
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
-    _mEstateSchema = await DatabaseMEstateSchema()
-        .selectMEstateSchemaByEstateCode(_mConfigSchema!.estateCode!);
     DateTime now = DateTime.now();
     NumberFormat formatterNumber = new NumberFormat("000");
     String number = formatterNumber.format(_mConfigSchema?.userId!);
@@ -260,9 +271,25 @@ class FormSPBNotifier extends ChangeNotifier {
     _time = TimeManager.timeWithColon(now);
     _spbID = "${_mConfigSchema?.estateCode}" +
         ValueService.generateIDFromDateTime(now) +
-        "$number" "M";
+        "$number" +
+        "M";
     getLocation();
     notifyListeners();
+  }
+
+  addOPH() {
+    for(int i=0; i < 100; i++) {
+      SPBDetail spbDetail = SPBDetail(
+          spbId : "01100110011010${i}M",
+          ophId : "02020202020010${i}M",
+          ophBunchesDelivered : 10,
+          ophLooseFruitDelivered : 20,
+          ophBlockCode : "C10",
+          ophTphCode : '10',
+          ophCardId : 'A001'
+      );
+      listSPBDetail.add(spbDetail);
+    }
   }
 
   getLocation() async {
@@ -293,8 +320,15 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   onChangeDriver(MEmployeeSchema mEmployeeSchema) {
-    _driverNameValue = mEmployeeSchema;
-    notifyListeners();
+    if (_driverNameList.contains(mEmployeeSchema)) {
+      _driverNameValue = mEmployeeSchema;
+      notifyListeners();
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Supir Kendaraan",
+          "Pekerja yang dipilih bukan supir");
+    }
   }
 
   onCheckOtherVendor(bool value) {
@@ -303,7 +337,7 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   Future getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _pickedFile = picked;
       notifyListeners();
@@ -313,17 +347,17 @@ class FormSPBNotifier extends ChangeNotifier {
   checkVehicle(BuildContext context, String vehicleNumber) async {
     if (vehicleNumber.isNotEmpty) {
       if (_typeDeliverValue != "Kontrak") {
-        _mvraSchema =
-            await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
-        List list = await DatabaseMVRASchema().selectMVRASchema();
-        print(list);
-        _mvraSchema ??
-            FlushBarManager.showFlushBarWarning(
-                context, "Nomor Kendaraan", "Tidak sesuai");
+        _mvraSchema = await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
+        _mvraSchema ?? FlushBarManager.showFlushBarWarning(context, "Nomor Kendaraan", "Tidak sesuai");
         _totalCapacityTruck = _mvraSchema!.vraMaxCap!.toDouble();
         if (_mvraSchema != null) {
-          _totalCapacityTruck =
-              (_totalCapacityTruck - _totalWeightEstimation.toInt());
+          _totalCapacityTruck = _totalCapacityTruck - _totalWeightEstimation;
+        }
+      } else {
+        _mvraSchema =
+            await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
+        if (_mvraSchema != null) {
+          _totalCapacityTruck = _mvraSchema!.vraMaxCap!.toDouble();
         }
       }
     }
@@ -335,7 +369,7 @@ class FormSPBNotifier extends ChangeNotifier {
     for (int i = 0; i < _spbLoaderList.length; i++) {
       count = _spbLoaderList
           .where((c) =>
-      c.loaderEmployeeName == _spbLoaderList[i].loaderEmployeeName)
+              c.loaderEmployeeName == _spbLoaderList[i].loaderEmployeeName)
           .length;
     }
     if (count > 1) {
@@ -381,35 +415,11 @@ class FormSPBNotifier extends ChangeNotifier {
         onPress: onCancelScanOPH);
   }
 
-  addOPH() {
-    for(int i=0; i<500; i++) {
-      SPBDetail spbDetail = SPBDetail();
-      spbDetail.spbId = _spbID;
-      spbDetail.ophId = ValueService().generateIDLoader(DateTime.now());
-      spbDetail.ophBlockCode =  "C24";
-      spbDetail.ophLooseFruitDelivered = 9;
-      spbDetail.ophTphCode = "10";
-      spbDetail.ophCardId = "A" + generate4Digits();
-      spbDetail.ophBunchesDelivered = 80;
-      _listSPBDetail.add(spbDetail);
-      _lastOPH = _listSPBDetail.last.ophCardId!;
-      _countOPH = _listSPBDetail.length;
-      _totalBunches = _totalBunches + spbDetail.ophBunchesDelivered!;
-      _totalLooseFruits =
-          _totalLooseFruits + spbDetail.ophLooseFruitDelivered!;
-      _totalWeightEstimation =
-          _totalWeightEstimation + 1.2;
-      _totalWeightEstimation =
-          double.parse(_totalWeightEstimation.toStringAsFixed(3));
-    }
-  }
-
   String generate4Digits() {
     var rng = Random();
     String generatedNumber = '';
-    for(int i=0;i<4;i++){
-      generatedNumber += (rng.nextInt(9)+1).toString();
-
+    for (int i = 0; i < 4; i++) {
+      generatedNumber += (rng.nextInt(9) + 1).toString();
     }
     return generatedNumber;
   }
@@ -424,40 +434,54 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   onCheckOPHExist(BuildContext context, OPH oph) async {
-    SPBDetail? ophExist =
-        await DatabaseSPBDetail().selectSPBDetailByOPHID(oph.ophId!);
+    SPBDetail? ophExist = await DatabaseSPBDetail().selectSPBDetailByOPHID(oph.ophId!);
     SPBDetail spbDetail = SPBDetail();
+
+   // print('test spb');
+  //  print(json.encode(spbDetail));
+
+   print('test oph');
+    print(json.encode(oph));
+
+
     _mDivisionCode = oph.ophDivisionCode;
+    _estateCode = oph.ophEstateCode;
+    _mEstateSchema = await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(oph.ophEstateCode!);
     spbDetail.spbId = _spbID;
     spbDetail.ophCardId = oph.ophCardId;
     spbDetail.ophId = oph.ophId;
     spbDetail.ophBlockCode = oph.ophBlockCode;
     spbDetail.ophTphCode = oph.ophTphCode;
     spbDetail.ophLooseFruitDelivered = oph.looseFruits;
-    spbDetail.ophBunchesDelivered =
-        calculateJanjangSent(oph.bunchesTotal!, oph.bunchesNotSent!);
+    spbDetail.ophBunchesDelivered = calculateJanjangSent(oph.bunchesTotal!, oph.bunchesNotSent!);
     if (ophExist != null) {
       FlushBarManager.showFlushBarWarning(
           context, "Scan OPH", "OPH ini sudah pernah discan");
     } else {
       if (listSPBDetail.contains(spbDetail)) {
         _dialogService.popDialog();
-        Future.delayed(const Duration(seconds: 2), () {
-          NfcManager.instance.stopSession();
-        });
         FlushBarManager.showFlushBarWarning(
             context, "Scan OPH", "OPH ini sudah masuk SPB");
       } else {
+      //  print("spb");
+       // print(json.encode(spbDetail));
         _listSPBDetail.add(spbDetail);
+        _listOPHScanned.add(oph);
+
+       print(json.encode(_listSPBDetail));// check : ok
+      //  print("oph");
+        print(json.encode(_listOPHScanned)); //check : ok
         _lastOPH = _listSPBDetail.last.ophCardId!;
         _countOPH = _listSPBDetail.length;
+        /*  original */
         _totalBunches = _totalBunches + spbDetail.ophBunchesDelivered!;
-        _totalLooseFruits =
-            _totalLooseFruits + spbDetail.ophLooseFruitDelivered!;
-        _totalWeightEstimation =
-            _totalWeightEstimation + oph.ophEstimateTonnage!;
-        _totalWeightEstimation =
-            double.parse(_totalWeightEstimation.toStringAsFixed(3));
+        _totalLooseFruits = _totalLooseFruits + spbDetail.ophLooseFruitDelivered!;
+        _totalWeightEstimation = _totalWeightEstimation + oph.ophEstimateTonnage!;
+
+        /*_totalBunches = _totalBunches + oph.bunchesTotal!;
+        _totalLooseFruits = _totalLooseFruits + oph.looseFruits!;
+        _totalWeightEstimation = _totalWeightEstimation + oph.ophEstimateTonnage!;*/
+
         _dialogService.popDialog();
         _dialogService.showDialogScanOPH(
             title: "Tempel Kartu OPH",
@@ -469,14 +493,14 @@ class FormSPBNotifier extends ChangeNotifier {
       }
     }
     if (_mvraSchema != null) {
-      _totalCapacityTruck = (_mvraSchema!.vraMaxCap! - _totalWeightEstimation);
+      _totalCapacityTruck = _mvraSchema!.vraMaxCap - _totalWeightEstimation;
     }
     notifyListeners();
   }
 
   onErrorRead(BuildContext context, String response) {
     _dialogService.popDialog();
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       NfcManager.instance.stopSession();
     });
     FlushBarManager.showFlushBarWarning(context, "Gagal Membaca", response);
@@ -494,8 +518,15 @@ class FormSPBNotifier extends ChangeNotifier {
     _lastOPH = _listSPBDetail.isNotEmpty ? _listSPBDetail.last.ophCardId! : "";
     _countOPH = _listSPBDetail.length;
     if (_mvraSchema != null) {
-      _totalCapacityTruck =
-          (_totalCapacityTruck + _totalWeightEstimation.toInt());
+      _totalWeightEstimation =
+          _totalWeightEstimation - _listOPHScanned[index].ophEstimateTonnage!;
+      if (_totalWeightEstimation == 0.0) {
+        _totalCapacityTruck = _mvraSchema!.vraMaxCap;
+      } else {
+        _totalCapacityTruck =
+            (_totalCapacityTruck + _listOPHScanned[index].ophEstimateTonnage!);
+      }
+      _listOPHScanned.removeAt(index);
     }
     notifyListeners();
   }
@@ -509,9 +540,9 @@ class FormSPBNotifier extends ChangeNotifier {
           spbLoaderId: ValueService().generateIDLoader(DateTime.now()),
           loaderType: 1,
           loaderDestinationType: 1,
-          loaderEmployeeCode: _driverNameList.first.employeeCode,
+          loaderEmployeeCode: _listLoader.first.employeeCode,
           loaderPercentage: 0,
-          loaderEmployeeName: _driverNameList.first.employeeName);
+          loaderEmployeeName: _listLoader.first.employeeName);
       if (_spbLoaderList.any(
           (item) => item.loaderEmployeeName == newLoader.loaderEmployeeName)) {
         FlushBarManager.showFlushBarWarning(context,
@@ -522,7 +553,7 @@ class FormSPBNotifier extends ChangeNotifier {
       }
       _spbLoaderList.add(newLoader);
       _loaderType.add("Internal");
-      _loaderName.add(_driverNameList.first);
+      _loaderName.add(_listLoader.first);
       _vendorName.add(_vendorList.first);
       _jenisAngkutValue.add("TPH-PKS");
       _percentageAngkut.add(TextEditingController(text: "0"));
@@ -540,11 +571,11 @@ class FormSPBNotifier extends ChangeNotifier {
           spbLoaderId: ValueService().generateIDLoader(DateTime.now()),
           loaderType: 1,
           loaderDestinationType: 1,
-          loaderEmployeeCode: _driverNameList.first.employeeCode,
+          loaderEmployeeCode: _listLoader.first.employeeCode,
           loaderPercentage: 0,
-          loaderEmployeeName: _driverNameList.first.employeeName));
+          loaderEmployeeName: _listLoader.first.employeeName));
       _loaderType.add("Internal");
-      _loaderName.add(_driverNameList.first);
+      _loaderName.add(_listLoader.first);
       _vendorName.add(_vendorList.first);
       _jenisAngkutValue.add("TPH-PKS");
       _percentageAngkut.add(TextEditingController(text: "0"));
@@ -584,7 +615,8 @@ class FormSPBNotifier extends ChangeNotifier {
     loaderType[index] = loader;
     _spbLoaderList[index].loaderType = ValueService.typeOfFormToInt(loader);
     if (_spbLoaderList[index].loaderType == 3) {
-      _spbLoaderList[index].loaderEmployeeName = _vendorList.first.vendorName;
+      _spbLoaderList[index].loaderEmployeeName =
+          ValueService.rightTrimVendor(_vendorList.first.vendorName!);
       _spbLoaderList[index].loaderEmployeeCode = _vendorList.first.vendorCode;
     }
     checkLoaderExist();
@@ -594,9 +626,9 @@ class FormSPBNotifier extends ChangeNotifier {
 
   onChangeLoaderName(int index, MEmployeeSchema loaderName) {
     SPBLoader spbLoader =
-        SPBLoader(loaderEmployeeName: loaderName.employeeName);
+        SPBLoader(loaderEmployeeCode: loaderName.employeeCode);
     if (_spbLoaderList.any(
-        (item) => item.loaderEmployeeName == spbLoader.loaderEmployeeName)) {
+        (item) => item.loaderEmployeeCode == spbLoader.loaderEmployeeCode)) {
       FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "Loader sudah ada dimasukkan",
@@ -615,9 +647,9 @@ class FormSPBNotifier extends ChangeNotifier {
 
   onChangeVendorName(int index, MVendorSchema mVendorSchema) {
     SPBLoader spbLoader =
-        SPBLoader(loaderEmployeeName: mVendorSchema.vendorName);
+        SPBLoader(loaderEmployeeCode: mVendorSchema.vendorCode);
     if (_spbLoaderList.any(
-        (item) => item.loaderEmployeeName == spbLoader.loaderEmployeeName)) {
+        (item) => item.loaderEmployeeCode == spbLoader.loaderEmployeeCode)) {
       FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "Loader sudah ada dimasukkan",
@@ -627,7 +659,8 @@ class FormSPBNotifier extends ChangeNotifier {
       _isLoaderExist = false;
     }
     _vendorName[index] = mVendorSchema;
-    _spbLoaderList[index].loaderEmployeeName = mVendorSchema.vendorName;
+    _spbLoaderList[index].loaderEmployeeName =
+        ValueService.rightTrimVendor(mVendorSchema.vendorName!);
     _spbLoaderList[index].loaderEmployeeCode = mVendorSchema.vendorCode;
     checkLoaderExist();
     checkLoaderPercentageValue();
@@ -679,19 +712,19 @@ class FormSPBNotifier extends ChangeNotifier {
       if (_isOthersVendor) {
         spbTemp.spbVendorOthers = 1;
         spbTemp.spbDriverEmployeeCode = _vendorOther.text;
-        spbTemp.spbDriverEmployeeName = _vendorOther.text;
+        spbTemp.spbDriverEmployeeName = "";
       } else {
         spbTemp.spbVendorOthers = 0;
         spbTemp.spbDriverEmployeeCode = _vendorSchemaValue?.vendorCode;
-        spbTemp.spbDriverEmployeeName = _vendorSchemaValue?.vendorName;
+        spbTemp.spbDriverEmployeeName =
+            ValueService.rightTrimVendor(_vendorSchemaValue!.vendorName!);
       }
     }
     spbTemp.spbEstateVendorCode = _mEstateSchema?.estateVendorCode;
-    spbTemp.spbLicenseNumber =
-        _mvraSchema?.vraLicenseNumber ?? vehicleNumber.text;
+    spbTemp.spbLicenseNumber = _mvraSchema?.vraLicenseNumber ?? vehicleNumber.text;
     spbTemp.spbCardId = _mcspbCardSchema?.spbCardId;
     spbTemp.spbTotalOph = _countOPH;
-    spbTemp.spbEstateCode = _mConfigSchema?.estateCode;
+    spbTemp.spbEstateCode = _estateCode;
     spbTemp.spbDivisionCode = _mDivisionCode;
     spbTemp.spbType = ValueService.typeOfFormToInt(_typeDeliverValue);
     spbTemp.spbDeliverToCode = _destinationValue?.destinationCode;
@@ -721,20 +754,22 @@ class FormSPBNotifier extends ChangeNotifier {
 
   showDialogQuestion(BuildContext context) {
     generateSPB();
-    _dialogService.showOptionDialog(
-        title: "Memakai Kartu",
-        subtitle: "Apakah anda ingin memakai kartu",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: onClickYesCard,
-        onPressNo: onClickNoCard);
+    onClickYesCard();
+    // _dialogService.showOptionDialog(
+    //     title: "Memakai Kartu",
+    //     subtitle: "Apakah anda ingin memakai kartu",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: onClickYesCard,
+    //     onPressNo: onClickNoCard);
   }
 
   onClickYesCard() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     SPBCardManager().writeSPBCard(
         _navigationService.navigatorKey.currentContext!,
         _globalSPB,
+        _listSPBDetail,
         onSuccessWrite,
         onErrorWrite);
     _dialogService.showNFCDialog(
@@ -959,9 +994,12 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   void saveSPBtoDatabase(BuildContext context) async {
+    print("insert spb detail "); //check : value is wrong
+    print(json.encode(_listSPBDetail));
     int countSaved = await DatabaseSPB().insertSPB(_globalSPB);
     if (countSaved > 0) {
-      for (int i = 0; i < _listSPBDetail.length; i++) {
+      for (int
+      i = 0; i < _listSPBDetail.length; i++) {
         await DatabaseSPBDetail().insertSPBDetail(_listSPBDetail[i]);
       }
       for (int i = 0; i < _spbLoaderList.length; i++) {

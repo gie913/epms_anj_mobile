@@ -54,6 +54,7 @@ class _DialogManagerState extends State<DialogManager> {
 
   void _showNoOptionDialog(NoOptionDialogRequest request) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) =>
           NoOptionDialog(
@@ -67,6 +68,7 @@ class _DialogManagerState extends State<DialogManager> {
 
   void _showOptionDialog(OptionDialogRequest request) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) =>
           OptionDialog(
@@ -83,6 +85,7 @@ class _DialogManagerState extends State<DialogManager> {
   void _showNFCDialog(NFCDialogRequest request) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) =>
           NFCDialog(
               title: request.title,
@@ -105,6 +108,7 @@ class _DialogManagerState extends State<DialogManager> {
 
   void _showLoadingDialog(LoadingDialogRequest request) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) =>
           LoadingDialog(
@@ -115,6 +119,7 @@ class _DialogManagerState extends State<DialogManager> {
 
   void _showDialogScanOPH(DialogScanOPHRequest request) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) =>
           DialogScanOPH(

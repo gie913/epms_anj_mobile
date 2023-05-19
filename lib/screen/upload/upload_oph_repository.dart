@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:epms/base/api/api_configuration.dart';
 import 'package:epms/base/api/api_endpoint.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 
 class UploadOPHRepository extends APIConfiguration {
@@ -12,9 +13,10 @@ class UploadOPHRepository extends APIConfiguration {
     Map<String, dynamic> newMapAttendance = jsonDecode(listAttendance);
 
     String token = await StorageManager.readData("userToken");
+    String baseUrl = await StorageManager.readData("apiServer");
 
     try {
-      var url = APIEndPoint.BASE_URL + APIEndPoint.UPLOAD_ENDPOINT;
+      var url = baseUrl + APIEndPoint.UPLOAD_ENDPOINT;
       var uri = Uri.parse(url);
       var mapBC = Map<String, dynamic>();
 
@@ -28,7 +30,7 @@ class UploadOPHRepository extends APIConfiguration {
       var jsonMap = jsonEncode(mapBC);
       epmsData['epms_data'] = jsonMap;
       epmsData['user_token'] = token;
-
+      await FileManagerJson().writeFileJsonOPH();
       var response = await ioClient!.post(
         uri,
         body: epmsData,

@@ -16,9 +16,12 @@ class DatabaseMAncakEmployee {
   Future<int> insertMAncakEmployeeSchema(List<MAncakEmployee> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<MAncakEmployee> listAncak = await selectMAncakEmployeeSchema();
     for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(mAncakEmployeeTable, object[i].toJson());
-      count = count + saved;
+      if(!(listAncak.contains(object[i]))) {
+        int saved = await db.insert(mAncakEmployeeTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }

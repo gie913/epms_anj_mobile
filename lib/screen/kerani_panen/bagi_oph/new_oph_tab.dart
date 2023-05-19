@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/bunches_formatter.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/screen/qr_reader/qr_reader_screen.dart';
 import 'package:flutter/material.dart';
@@ -185,8 +186,10 @@ class _NewOPHTabState extends State<NewOPHTab> {
                     Container(
                       width: 160,
                       child: TextFormField(
+                        enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                         controller: bagiOPH.ophNumber,
                         textAlign: TextAlign.center,
+                        textCapitalization: TextCapitalization.characters,
                         onChanged: (value) {
                           if(value.length >= 4) {
                             bagiOPH.cardOPHNumberCheck(context, value);
@@ -203,16 +206,20 @@ class _NewOPHTabState extends State<NewOPHTab> {
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: () async {
-                          String? result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => QRReaderScreen()));
-                          if (result != null) {
-                            setState(() {
-                              bagiOPH.ophNumber =
-                                  TextEditingController(text: result);
-                            });
-                          }
+                         if(!(bagiOPH.isOldSaved || bagiOPH.isNewSaved) == true) {
+                           String? result = await Navigator.push(
+                               context,
+                               MaterialPageRoute(
+                                   builder: (context) => QRReaderScreen()));
+                           if (result != null) {
+                             setState(() {
+                               bagiOPH.ophNumber =
+                                   TextEditingController(text: result);
+                             });
+                           }
+                         } else {
+                           FlushBarManager.showFlushBarWarning(context, "OPH Sudah tersimpah", "OPH Sudah terbagi anda tidak boleh mengubah data");
+                         }
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -276,6 +283,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               onChanged: (value) {
                                 bagiOPH.countBunches(
                                     context,
@@ -298,6 +306,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -320,6 +329,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -374,6 +384,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -396,6 +407,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -418,6 +430,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -491,6 +504,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -513,6 +527,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
+                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               controller: bagiOPH.bunchesNotSent,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,

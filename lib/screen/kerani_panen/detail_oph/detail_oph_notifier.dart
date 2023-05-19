@@ -8,16 +8,17 @@ import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/oph_card_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
+import 'package:epms/common_manager/validation_service.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
 import 'package:epms/database/service/database_m_employee.dart';
 import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/model/laporan_panen_kemarin.dart';
+import 'package:epms/model/m_block_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/t_abw_schema.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
 class DetailOPHNotifier extends ChangeNotifier {
@@ -83,11 +84,15 @@ class DetailOPHNotifier extends ChangeNotifier {
 
   TextEditingController ophNumber = TextEditingController();
 
+  TextEditingController _blockNumber = TextEditingController();
+
+  TextEditingController get blockNumber => _blockNumber;
+
+  MBlockSchema? _mBlockSchema;
+
+  MBlockSchema? get mBlockSchema => _mBlockSchema;
+
   ValueNotifier<dynamic> resultNFC = ValueNotifier(null);
-
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
 
   bool _isChangeCard = false;
 
@@ -112,6 +117,20 @@ class DetailOPHNotifier extends ChangeNotifier {
   onPressCancelRead() {
     _dialogService.popDialog();
     _navigationService.push(Routes.HOME_PAGE);
+  }
+
+  void blockNumberCheck(BuildContext context, String block) async {
+    if (block.isNotEmpty) {
+      block.toUpperCase();
+      _mBlockSchema =
+          await ValidationService.checkBlockSchema(block, _oph.ophEstateCode!);
+      _mBlockSchema ??
+          FlushBarManager.showFlushBarWarning(
+              context, "Kode Blok", "Tidak sesuai dengan estate");
+    } else {
+      _mBlockSchema = null;
+    }
+    notifyListeners();
   }
 
   onInit(BuildContext context, OPH oph, String method, bool isRestan) async {
@@ -149,6 +168,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       looseFruits.text = _oph.looseFruits.toString();
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
+      _blockNumber.text = _oph.ophBlockCode!;
       _isExist = true;
     }
   }
@@ -195,6 +215,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       looseFruits.text = _oph.looseFruits.toString();
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
+      _blockNumber.text = _oph.ophBlockCode.toString();
       _isExist = true;
     } else {
       _oph = oph;
@@ -212,8 +233,8 @@ class DetailOPHNotifier extends ChangeNotifier {
   }
 
   getEstimationTonnage() async {
-    TABWSchema? tabwSchema =
-        await DatabaseTABWSchema().selectTABWSchemaByBlock(_oph.ophBlockCode!);
+    TABWSchema? tabwSchema = await DatabaseTABWSchema()
+        .selectTABWSchemaByBlock(_oph.ophBlockCode!, _oph.ophEstateCode!);
     _oph.ophEstimateTonnage =
         (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
     _oph.ophEstimateTonnage =
@@ -222,25 +243,39 @@ class DetailOPHNotifier extends ChangeNotifier {
   }
 
   getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
-      _oph.ophPhoto  = picked;
+      _oph.ophPhoto = picked;
       notifyListeners();
     }
   }
 
   onUpdateOPHClicked(BuildContext context) {
-    _dialogService.showOptionDialog(
-        title: "Memakai Kartu NFC",
-        subtitle: "Apakah ingin menyimpan data dengan NFC?",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Tidak",
-        onPressYes: dialogNFCWrite,
-        onPressNo: updateOPHToDatabase);
+    dialogNFCWrite();
+    // _dialogService.showOptionDialog(
+    //     title: "Memakai Kartu NFC",
+    //     subtitle: "Apakah ingin menyimpan data dengan NFC?",
+    //     buttonTextYes: "Ya",
+    //     buttonTextNo: "Tidak",
+    //     onPressYes: dialogNFCWrite,
+    //     onPressNo: updateOPHToDatabase);
+  }
+
+  onSaveChangeCard(BuildContext context) {
+    if (_oph.ophCardId != ophNumber.text) {
+      if (_restan) {
+        doWriteRestanDialog();
+      } else {
+        onUpdateOPHClicked(context);
+      }
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Kartu OPH", "Kartu OPH belum diganti");
+    }
   }
 
   dialogNFCWrite() {
-    _dialogService.popDialog();
+    // _dialogService.popDialog();
     _oph.bunchesRipe = int.tryParse(bunchesRipe.text);
     _oph.bunchesOverripe = int.tryParse(bunchesOverRipe.text);
     _oph.bunchesHalfripe = int.tryParse(bunchesHalfRipe.text);
@@ -250,11 +285,19 @@ class DetailOPHNotifier extends ChangeNotifier {
     _oph.looseFruits = int.tryParse(looseFruits.text);
     _oph.bunchesTotal = int.tryParse(bunchesTotal.text);
     _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
-    OPHCardManager().writeOPHCard(
-        _navigationService.navigatorKey.currentContext!,
-        _oph,
-        onSuccessWrite,
-        onErrorWrite);
+    if(_onEdit) {
+      OPHCardManager().readWriteOPHCard(
+          _navigationService.navigatorKey.currentContext!,
+          _oph,
+          onSuccessWrite,
+          onErrorWrite);
+    } else {
+      OPHCardManager().writeOPHCard(
+          _navigationService.navigatorKey.currentContext!,
+          _oph,
+          onSuccessWrite,
+          onErrorWrite);
+    }
     _dialogService.showNFCDialog(
         title: "Tempel Kartu NFC",
         subtitle: "Untuk membaca data",
@@ -266,12 +309,15 @@ class DetailOPHNotifier extends ChangeNotifier {
     updateOPHToDatabase();
   }
 
-  onErrorWrite(BuildContext context) {
+  onErrorWrite(BuildContext context, String message) {
     _dialogService.popDialog();
-    FlushBarManager.showFlushBarSuccess(
+    FlushBarManager.showFlushBarWarning(
         _navigationService.navigatorKey.currentContext!,
         "Simpan OPH",
-        "Berhasil Menyimpan");
+        "$message");
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
   }
 
   updateOPHToDatabase() async {
@@ -282,6 +328,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       _oph.ophCardId = ophNumber.text;
     } else {
       _oph.ophNotes = notesOPH.text;
+      _oph.ophBlockCode = _blockNumber.text;
       _oph.bunchesRipe = int.tryParse(bunchesRipe.text);
       _oph.bunchesOverripe = int.tryParse(bunchesOverRipe.text);
       _oph.bunchesHalfripe = int.tryParse(bunchesHalfRipe.text);
@@ -292,19 +339,23 @@ class DetailOPHNotifier extends ChangeNotifier {
       _oph.bunchesTotal = int.tryParse(bunchesTotal.text);
       _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
     }
-
     int count = await DatabaseOPH().updateOPHByID(_oph);
     if (count > 0) {
-      updateLaporanPanenKemarin();
-      Future.delayed(Duration(seconds: 2), () {
-        NfcManager.instance.stopSession();
-      });
-      _dialogService.popDialog();
-      _navigationService.push(Routes.HOME_PAGE);
-      FlushBarManager.showFlushBarSuccess(
-          _navigationService.navigatorKey.currentContext!,
-          "Simpan OPH",
-          "Berhasil Menyimpan");
+      // updateLaporanPanenKemarin();
+      try {
+        _dialogService.popDialog();
+        _navigationService.push(Routes.HOME_PAGE);
+        FlushBarManager.showFlushBarSuccess(
+            _navigationService.navigatorKey.currentContext!,
+            "Simpan OPH",
+            "Berhasil Menyimpan");
+      } catch (e) {
+        _dialogService.popDialog();
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Simpan OPH",
+            "Gagal Menyimpan");
+      }
     } else {
       _dialogService.popDialog();
       FlushBarManager.showFlushBarWarning(
@@ -312,6 +363,9 @@ class DetailOPHNotifier extends ChangeNotifier {
           "Simpan OPH",
           "Gagal Menyimpan");
     }
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
   }
 
   updateLaporanPanenKemarin() async {
@@ -357,15 +411,15 @@ class DetailOPHNotifier extends ChangeNotifier {
   }
 
   onSuccessWriteRestan(BuildContext context, OPH oph) {
-    Future.delayed(Duration(seconds: 2), () {
-      NfcManager.instance.stopSession();
-    });
     _dialogService.popDialog();
     _navigationService.push(Routes.HOME_PAGE);
     FlushBarManager.showFlushBarSuccess(
         _navigationService.navigatorKey.currentContext!,
         "Simpan OPH",
         "Berhasil Menyimpan");
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
   }
 
   onErrorWriteRestan(BuildContext context) {
@@ -374,5 +428,8 @@ class DetailOPHNotifier extends ChangeNotifier {
         _navigationService.navigatorKey.currentContext!,
         "Simpan OPH",
         "Berhasil Menyimpan");
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
   }
 }

@@ -2,6 +2,7 @@ import 'package:epms/model/global.dart';
 import 'package:epms/model/kerani_kirim.dart';
 import 'package:epms/model/kerani_panen.dart';
 import 'package:epms/model/supervisi.dart';
+import 'package:epms/model/supervisi_3rd_party.dart';
 
 class SynchResponse {
   String? message;
@@ -9,9 +10,15 @@ class SynchResponse {
   KeraniPanen? keraniPanen;
   KeraniKirim? keraniKirim;
   Supervisi? supervisi;
+  List<Supervisi3rdParty>? supervisi3rdParty;
 
   SynchResponse(
-      {this.message, this.global, this.keraniPanen, this.keraniKirim, this.supervisi});
+      {this.message,
+      this.global,
+      this.keraniPanen,
+      this.keraniKirim,
+      this.supervisi,
+      this.supervisi3rdParty});
 
   SynchResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -26,6 +33,12 @@ class SynchResponse {
     supervisi = json['supervisi'] != null
         ? new Supervisi.fromJson(json['supervisi'])
         : null;
+    if (json['supervisi_3rd_party'] != null) {
+      supervisi3rdParty = <Supervisi3rdParty>[];
+      json['supervisi_3rd_party'].forEach((v) {
+        supervisi3rdParty!.add(new Supervisi3rdParty.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -42,6 +55,10 @@ class SynchResponse {
     }
     if (this.supervisi != null) {
       data['supervisi'] = this.supervisi!.toJson();
+    }
+    if (this.supervisi3rdParty != null) {
+      data['supervisi_3rd_party'] =
+          this.supervisi3rdParty!.map((v) => v.toJson()).toList();
     }
     return data;
   }

@@ -253,15 +253,10 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                     child: Container(
                       width: 160,
                       child: Focus(
-                        onFocusChange: (hasFocus) {
-                          if (!hasFocus) {
-                            notifier.blockNumberCheck(
-                                context, notifier.blockCode.text);
-                          }
-                        },
                         child: TextFormField(
                           controller: notifier.blockCode,
                           textAlign: TextAlign.center,
+                          textCapitalization: TextCapitalization.characters,
                           decoration: InputDecoration(hintText: "Tulis blok"),
                           onChanged: (value) {
                             if (value.length >= 3) {
@@ -284,11 +279,6 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                 Container(
                   width: 160,
                   child: Focus(
-                    onFocusChange: (hasFocus) {
-                      if (!hasFocus) {
-                        notifier.tPHNumberCheck(context, notifier.tphCode.text);
-                      }
-                    },
                     child: TextFormField(
                       onChanged: (value) {
                         if (value.length >= 2) {
@@ -296,7 +286,10 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                         }
                       },
                       controller: notifier.tphCode,
+                      textCapitalization:
+                      TextCapitalization.characters,
                       textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(hintText: "Tulis Nomor TPH"),
                       onFieldSubmitted: (value) {
                         notifier.tPHNumberCheck(context, value);

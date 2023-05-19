@@ -5,6 +5,7 @@ class LoginResponse {
   String? serverDate;
   String? serverTime;
   dynamic configId;
+  String? millCode;
   String? companyCode;
   String? companyName;
   String? employeeCode;
@@ -14,6 +15,7 @@ class LoginResponse {
   String? profileName;
   String? estateCode;
   String? estateName;
+  String? userRole;
   String? plantCode;
   String? createdBy;
   String? createdDate;
@@ -33,6 +35,7 @@ class LoginResponse {
       this.serverDate,
       this.serverTime,
       this.configId,
+        this.millCode,
       this.companyCode,
       this.companyName,
       this.employeeCode,
@@ -43,6 +46,7 @@ class LoginResponse {
       this.estateCode,
       this.estateName,
       this.plantCode,
+        this.userRole,
       this.createdBy,
       this.createdDate,
       this.createdTime,
@@ -61,6 +65,7 @@ class LoginResponse {
     serverDate = json['server_date'];
     serverTime = json['server_time'];
     configId = json['config_id'];
+    millCode = json['mill_code'];
     employeeName = json['employee_name'];
     employeeCode = json['employee_code'];
     mCompanyId = json['m_company_id'];
@@ -71,6 +76,7 @@ class LoginResponse {
     estateCode = json['estate_code'];
     estateName = json['estate_name'];
     plantCode = json['plant_code'];
+    userRole = json['user_role'];
     createdBy = json['created_by'];
     createdDate = json['created_date'];
     createdTime = json['created_time'];
@@ -91,6 +97,7 @@ class LoginResponse {
     data['server_date'] = this.serverDate;
     data['server_time'] = this.serverTime;
     data['config_id'] = this.configId;
+    // data['mill_code'] = this.millCode;
     data['company_code'] = this.companyCode;
     data['company_name'] = this.companyName;
     data['employee_name'] = this.employeeName;

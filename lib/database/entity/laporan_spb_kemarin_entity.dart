@@ -16,6 +16,8 @@ class LaporanSPBKemarinEntity {
   static String spbDriverEmployeeName = "spb_driver_employee_name";
   static String spbTotalBunches = "spb_total_bunches";
   static String spbTotalOph = "spb_total_oph";
+  static String createdDate = "created_date";
+  static String createdTime = "created_time";
   static String spbTotalLooseFruit = "spb_total_loose_fruit";
   static String spbCapacityTonnage = "spb_capacity_tonnage";
   static String spbEstimateTonnage = "spb_estimate_tonnage";

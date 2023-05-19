@@ -36,6 +36,7 @@ class DatabaseSPBDetail {
 
   Future<List<SPBDetail>> selectSPBDetail() async {
     Database db = await DatabaseHelper().database;
+    //var mapList = await db.query(tSPBDetailSchemaListTable, groupBy: '${SPBDetailEntity.ophId}');
     var mapList = await db.query(tSPBDetailSchemaListTable);
     List<SPBDetail> list = [];
     for (int i = 0; i < mapList.length; i++) {

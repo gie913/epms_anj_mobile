@@ -3,6 +3,7 @@ import 'package:epms/base/constants/image_assets.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/model/m_employee_schema.dart';
+import 'package:epms/screen/kerani_panen/kerani_panen_menu/kerani_panen_notifier.dart';
 import 'package:epms/screen/search/search_employee_screen.dart';
 import 'package:epms/screen/supervisor_form/supervisor_form_notifier.dart';
 import 'package:flutter/material.dart';
@@ -76,11 +77,11 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "${supervisor.mandorValue?.employeeCode}",
+                                            "${supervisor.mandorValue?.employeeCode ?? "Tidak ada data"}",
                                             style: Style.textBold14,
                                           ),
                                           Text(
-                                              "${supervisor.mandorValue?.employeeName}")
+                                              "${supervisor.mandorValue?.employeeName ?? "belum di mapping"}")
                                         ],
                                       ),
                                     ),
@@ -122,11 +123,11 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "${supervisor.mandorValue1?.employeeCode}",
+                                            "${supervisor.mandorValue1?.employeeCode ?? "Tidak ada data"}",
                                             style: Style.textBold14,
                                           ),
                                           Text(
-                                              "${supervisor.mandorValue1?.employeeName}")
+                                              "${supervisor.mandorValue1?.employeeName ?? "belum di mapping"}")
                                         ],
                                       ),
                                     ),
@@ -165,11 +166,11 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "${supervisor.keraniPanenValue?.employeeCode}",
+                                            "${supervisor.keraniPanenValue?.employeeCode ?? "Tidak ada data"}",
                                             style: Style.textBold14,
                                           ),
                                           Text(
-                                              "${supervisor.keraniPanenValue?.employeeName}")
+                                              "${supervisor.keraniPanenValue?.employeeName ?? "belum di mapping"}")
                                         ],
                                       ),
                                     ),
@@ -209,11 +210,11 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "${supervisor.keraniKirimValue?.employeeCode}",
+                                            "${supervisor.keraniKirimValue?.employeeCode ?? "Tidak ada data"}",
                                             style: Style.textBold14,
                                           ),
                                           Text(
-                                              "${supervisor.keraniKirimValue?.employeeName}")
+                                              "${supervisor.keraniKirimValue?.employeeName ?? "belum di mapping"}")
                                         ],
                                       ),
                                     ),
@@ -292,6 +293,17 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                 : Container(),
                             SizedBox(height: 30),
                             Divider(),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  child: Text("Synch Ulang"),
+                                  onTap: () {
+                                    KeraniPanenNotifier().reSynch();
+                                  },
+                                ),
+                              ),
+                            ),
                             Column(
                               children: [
                                 Padding(

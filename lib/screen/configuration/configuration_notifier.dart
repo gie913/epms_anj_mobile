@@ -1,4 +1,3 @@
-import 'package:epms/base/api/api_endpoint.dart';
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
@@ -26,7 +25,7 @@ class ConfigurationNotifier extends ChangeNotifier {
   onInitConfiguration() async {
     String? apiServerTemp = await StorageManager.readData("apiServer");
     if (apiServerTemp == null) {
-      _apiServer.text = APIEndPoint.BASE_URL;
+      // _apiServer.text = APIEndPoint.BASE_URL;
     } else {
       _apiServer.text = apiServerTemp;
     }

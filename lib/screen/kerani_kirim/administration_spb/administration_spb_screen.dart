@@ -77,7 +77,8 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                 ? Padding(
                                     padding: EdgeInsets.all(6),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Image.asset(
                                           "${ImageAssets.KERANI_KIRIM}",
@@ -92,7 +93,8 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                         )
                                       ],
                                     ))
-                                : index == administrationSPBMenuEntries.length + 2
+                                : index ==
+                                        administrationSPBMenuEntries.length + 2
                                     ? Container(
                                         padding: EdgeInsets.only(top: 16),
                                         alignment: Alignment.center,
@@ -120,6 +122,7 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                       )
                                     : TextButton(
                                         style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
                                           backgroundColor:
                                               colorCodesAdministrationSPB[
                                                   index - 2],
@@ -134,9 +137,9 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
                                                       colorCodesAdministrationSPB[
                                                           index - 2])),
                                           padding: const EdgeInsets.all(16.0),
-                                          primary: Colors.white,
                                           textStyle: const TextStyle(
-                                              fontSize: 20, color: Colors.white),
+                                              fontSize: 20,
+                                              color: Colors.white),
                                         ),
                                         onPressed: () {
                                           onClickMenu(index);
@@ -170,7 +173,7 @@ class _AdministrationSPBScreenState extends State<AdministrationSPBScreen> {
       case "GANTI OPH HILANG":
         _navigationService.push(Routes.RESTAN_REPORT, arguments: "GANTI");
         break;
-      case "KEMBALI" :
+      case "KEMBALI":
         _navigationService.pop();
         break;
     }

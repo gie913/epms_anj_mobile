@@ -29,9 +29,14 @@ class DatabaseLaporanPanenKemarin {
       List<LaporanPanenKemarin> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<LaporanPanenKemarin> listLaporanKemarin =
+        await selectLaporanPanenKemarin();
     for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(laporanPanenKemarinTable, object[i].toJson());
-      count = count + saved;
+      if (!(listLaporanKemarin.contains(object[i]))) {
+        int saved =
+            await db.insert(laporanPanenKemarinTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }
@@ -52,6 +57,18 @@ class DatabaseLaporanPanenKemarin {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(laporanPanenKemarinTable,
         where: "${LaporanPanenKemarinEntity.createdDate}=?", whereArgs: [date]);
+    List<LaporanPanenKemarin> list = [];
+    for (int i = 0; i < mapList.length; i++) {
+      LaporanPanenKemarin laporanPanenKemarin =
+          LaporanPanenKemarin.fromJson(mapList[i]);
+      list.add(laporanPanenKemarin);
+    }
+    return list;
+  }
+
+  Future<List<LaporanPanenKemarin>> selectLaporanPanenKemarin() async {
+    Database db = await DatabaseHelper().database;
+    var mapList = await db.query(laporanPanenKemarinTable);
     List<LaporanPanenKemarin> list = [];
     for (int i = 0; i < mapList.length; i++) {
       LaporanPanenKemarin laporanPanenKemarin =

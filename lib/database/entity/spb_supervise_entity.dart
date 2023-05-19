@@ -1,4 +1,5 @@
 class SPBSuperviseEntity {
+  static String spbSuperviseId = "spb_supervisi_id";
   static String spbId = "spb_id";
   static String supervisiSpbEmployeeCode = "supervisi_spb_employee_code";
   static String supervisiSpbEmployeeName = "supervisi_spb_employee_name";
@@ -6,6 +7,7 @@ class SPBSuperviseEntity {
   static String supervisiSpbLong = "supervisi_spb_long";
   static String supervisiSpbDriverEmployeeCode = "supervisi_spb_driver_employee_code";
   static String supervisiSpbDriverEmployeeName = "supervisi_spb_driver_employee_name";
+  static String supervisiEstateCode = "supervisi_spb_estate_code";
   static String supervisiSpbDivisionCode = "supervisi_spb_division_code";
   static String supervisiSpbLicenseNumber = "supervisi_spb_license_number";
   static String supervisiSpbType = "supervisi_spb_type";
@@ -20,6 +22,7 @@ class SPBSuperviseEntity {
   static String looseFruits = "loose_fruits";
   static String bunchesTotal = "bunches_total";
   static String bunchesTotalNormal = "bunches_total_normal";
+  static String bunchesTangkaiPanjang = "bunches_tangkai_panjang";
   static String bunchesSampah = "bunches_sampah";
   static String bunchesBatu = "bunches_batu";
   static String catatanBunchesTangkaiPanjang = "catatan_bunches_tangkai_panjang";

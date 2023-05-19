@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 class ThemeNotifier with ChangeNotifier {
   final darkTheme = ThemeData(
     fontFamily: "DIN Pro",
-    primarySwatch: Colors.orange,
     primaryColor: Color(0xFF212121),
-    brightness: Brightness.dark,
     dividerTheme: DividerThemeData(color: Colors.grey),
-    backgroundColor: Colors.black,
     appBarTheme: AppBarTheme(color: Colors.transparent),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -18,15 +15,17 @@ class ThemeNotifier with ChangeNotifier {
     ),
     scaffoldBackgroundColor: Colors.black,
     dividerColor: Colors.black,
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange).copyWith(
+      background: Colors.black,
+      brightness: Brightness.dark,
+    ),
   );
 
   final lightTheme = ThemeData(
     fontFamily: "DIN Pro",
-    primarySwatch: Colors.orange,
     primaryColor: Palette.greenColor,
     primaryColorDark: Palette.greenColorDark,
     primaryColorLight: Palette.greenColorLight,
-    brightness: Brightness.light,
     appBarTheme: AppBarTheme(
         foregroundColor: Colors.white,
         titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
@@ -39,7 +38,10 @@ class ThemeNotifier with ChangeNotifier {
         backgroundColor: MaterialStateProperty.all(Palette.greenColor),
       ),
     ),
-    backgroundColor: Palette.greenColorLight,
+    colorScheme: ColorScheme.fromSwatch(
+      primarySwatch: Colors.orange,
+      brightness: Brightness.light,
+    ).copyWith(background: Palette.greenColorLight),
   );
 
   ThemeData? _themeData;

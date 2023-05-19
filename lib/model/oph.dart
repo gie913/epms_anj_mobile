@@ -142,6 +142,7 @@ class OPH {
     bunchesTotal = json['bunches_total'];
     bunchesNotSent = json['bunches_not_sent'];
     ophEstimateTonnage = json['oph_estimate_tonnage'];
+
     isPlanned = json['is_planned']; //Backend
     isApproved = json['is_approved']; //Backend
     isRestantPermanent = json['is_restant_permanent']; //Backend
@@ -150,6 +151,7 @@ class OPH {
     ophApprovedDate = json['oph_approved_date']; //Backend
     ophApprovedTime = json['oph_approved_time']; //Backend
     ophCustomerCode = json['oph_customer_code']; //Backend
+
     createdBy = json['created_by'];
     createdDate = json['created_date'];
     createdTime = json['created_time'];

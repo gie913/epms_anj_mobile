@@ -290,6 +290,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                           child: TextFormField(
                             controller: notifier.blockNumber,
                             textAlign: TextAlign.center,
+                            textCapitalization: TextCapitalization.characters,
                             decoration: InputDecoration(hintText: "Tulis blok"),
                             onChanged: (value) {
                               if(value.length >= 3) {
@@ -343,6 +344,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                           child: TextFormField(
                             controller: notifier.tphNumber,
                             textAlign: TextAlign.center,
+                            textCapitalization: TextCapitalization.characters,
                             decoration:
                                 InputDecoration(hintText: "Tulis Nomor TPH"),
                             onChanged: (value) {
@@ -368,6 +370,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                               setState(() {
                                 notifier.tphNumber =
                                     TextEditingController(text: result);
+                                notifier.cardOPHNumberCheck(context, result);
                               });
                             }
                           },
@@ -400,6 +403,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                           child: TextFormField(
                             controller: notifier.ophNumber,
                             textAlign: TextAlign.center,
+                            textCapitalization: TextCapitalization.characters,
                             decoration:
                                 InputDecoration(hintText: "Tulis Kartu OPH"),
                             onChanged: (value) {
@@ -411,11 +415,6 @@ class _FormOPHTabState extends State<FormOPHTab> {
                               notifier.cardOPHNumberCheck(context, value);
                             },
                           ),
-                          onFocusChange: (hasFocus) {
-                            if(!hasFocus) {
-                              notifier.cardOPHNumberCheck(context, notifier.ophNumber.text);
-                            }
-                          },
                         ),
                       ),
                       Padding(

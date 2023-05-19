@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
@@ -29,6 +31,7 @@ class SupervisorNotifier extends ChangeNotifier {
   DialogService get dialogService => _dialogService;
 
   doUpload() async {
+    _dialogService.popDialog();
     List<OPHSupervise> _listOPHSupervise =
         await DatabaseOPHSupervise().selectOPHSupervise();
     List<OPHSuperviseAncak> _listOPHAncak =
@@ -37,19 +40,37 @@ class SupervisorNotifier extends ChangeNotifier {
     List<String> mapListOPHSupervise = [];
     List<String> mapListOPHAncak = [];
 
-    for (int i = 0; i < _listOPHSupervise.length; i++) {
-      String jsonString = jsonEncode(_listOPHSupervise[i]);
-      mapListOPHSupervise.add("\"$i\":$jsonString");
+    if (_listOPHSupervise.isNotEmpty) {
+      for (int i = 0; i < _listOPHSupervise.length; i++) {
+        String jsonString = jsonEncode(_listOPHSupervise[i]);
+        mapListOPHSupervise.add("\"$i\":$jsonString");
+      }
     }
-    for (int i = 0; i < _listOPHAncak.length; i++) {
-      String jsonString = jsonEncode(_listOPHAncak[i]);
-      mapListOPHAncak.add("\"$i\":$jsonString");
+    if (_listOPHAncak.isNotEmpty) {
+      for (int i = 0; i < _listOPHAncak.length; i++) {
+        String jsonString = jsonEncode(_listOPHAncak[i]);
+        mapListOPHAncak.add("\"$i\":$jsonString");
+      }
     }
 
     var stringListSPB = mapListOPHSupervise.join(",");
     var stringListSPBDetail = mapListOPHAncak.join(",");
-    String listSPB = "{$stringListSPB}";
-    String listSPBDetail = "{$stringListSPBDetail}";
+
+    String? listSPBDetail;
+    String? listSPB;
+
+    if (stringListSPBDetail != "") {
+      listSPBDetail = "{$stringListSPBDetail}";
+    } else {
+      listSPBDetail = "Null";
+    }
+
+    if (stringListSPB != "") {
+      listSPB = "{$stringListSPB}";
+    } else {
+      listSPB = "Null";
+    }
+    _dialogService.showLoadingDialog(title: "Upload Supervisi");
     UploadSupervisiRepository().doPostUploadSupervisi(
         _navigationService.navigatorKey.currentContext!,
         listSPB,
@@ -65,7 +86,7 @@ class SupervisorNotifier extends ChangeNotifier {
   onErrorUploadSPB(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload SPB", "Gagal mengupload data");
+        context, "Upload Supervisi", "Gagal mengupload data");
   }
 
   uploadImage(BuildContext context) async {
@@ -73,29 +94,37 @@ class SupervisorNotifier extends ChangeNotifier {
         await DatabaseOPHSupervise().selectOPHSupervise();
     List<OPHSuperviseAncak> listSPBDetail =
         await DatabaseOPHSuperviseAncak().selectOPHSuperviseAncak();
-    for (int i = 0; i < listSPB.length; i++) {
-      UploadImageOPHRepository().doUploadPhoto(
-          context,
-          listSPB[i].supervisiPhoto!,
-          listSPB[i].ophSupervisiId!,
-          "oph_supervise",
-          onSuccessUploadImage,
-          onErrorUploadImage);
+    if(listSPB.isNotEmpty) {
+      for (int i = 0; i < listSPB.length; i++) {
+        if(listSPB[i].supervisiPhoto != null) {
+          UploadImageOPHRepository().doUploadPhoto(
+              context,
+              listSPB[i].supervisiPhoto!,
+              listSPB[i].ophSupervisiId!,
+              "oph_supervise",
+              onSuccessUploadImage,
+              onErrorUploadImage);
+        }
+      }
     }
-    for (int i = 0; i < listSPB.length; i++) {
-      UploadImageOPHRepository().doUploadPhoto(
-          context,
-          listSPBDetail[i].supervisiAncakPhoto!,
-          listSPBDetail[i].supervisiAncakId!,
-          "oph_supervise_ancak",
-          onSuccessUploadImage,
-          onErrorUploadImage);
+    if(listSPBDetail.isNotEmpty) {
+      for (int i = 0; i < listSPBDetail.length; i++) {
+        if(listSPBDetail[i].supervisiAncakPhoto != null) {
+          UploadImageOPHRepository().doUploadPhoto(
+              context,
+              listSPBDetail[i].supervisiAncakPhoto!,
+              listSPBDetail[i].supervisiAncakId!,
+              "ancak_supervise",
+              onSuccessUploadImage,
+              onErrorUploadImage);
+        }
+      }
     }
     DatabaseOPHSupervise().deleteOPHSupervise();
     DatabaseOPHSuperviseAncak().deleteOPHSuperviseAncak();
     _dialogService.popDialog();
     FlushBarManager.showFlushBarSuccess(
-        context, "Upload SPB", "Berhasil mengupload data");
+        context, "Upload Supervisi", "Berhasil mengupload data");
   }
 
   onSuccessUploadImage(BuildContext context, response) {}
@@ -103,7 +132,7 @@ class SupervisorNotifier extends ChangeNotifier {
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload Foto SPB", "Gagal mengupload data");
+        context, "Upload Foto Supervisi", "Gagal mengupload data");
   }
 
   dialogReLogin() {
@@ -115,7 +144,7 @@ class SupervisorNotifier extends ChangeNotifier {
 
   void onClickMenu(int index) async {
     String dateNow = TimeManager.dateWithDash(DateTime.now());
-    String dateLogin = await StorageManager.readData("lastSynchDate");
+    String? dateLogin = await StorageManager.readData("lastSynchDate");
     switch (supervisorMenuEntries[index - 2].toUpperCase()) {
       case "KELUAR":
         _dialogService.showOptionDialog(
@@ -143,7 +172,7 @@ class SupervisorNotifier extends ChangeNotifier {
       case "BACA KARTU OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_DETAIL_PAGE,
-              arguments: {"method": "BACA", "oph": OPH(), "restan" : false});
+              arguments: {"method": "BACA", "oph": OPH(), "restan": false});
         } else {
           dialogReLogin();
         }
@@ -165,7 +194,7 @@ class SupervisorNotifier extends ChangeNotifier {
         break;
       case "LAPORAN SUPERVISI ANCAK PANEN":
         if (dateLogin == dateNow) {
-          _navigationService.push(Routes.OPH_SUPERVISI_ANCAK_HISTORY_PAGE);
+        _navigationService.push(Routes.OPH_SUPERVISI_ANCAK_HISTORY_PAGE);
         } else {
           dialogReLogin();
         }
@@ -207,6 +236,17 @@ class SupervisorNotifier extends ChangeNotifier {
             onPressYes: doUpload,
             onPressNo: _dialogService.popDialog);
         break;
+    }
+  }
+
+  exportJson(BuildContext context) async {
+    File? fileExport = await FileManagerJson().writeFileJsonSupervisi();
+    if(fileExport != null) {
+      FlushBarManager.showFlushBarSuccess(
+          context, "Export Json Berhasil", "${fileExport.path}");
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Export Json", "Belum ada Transaksi Supervisi");
     }
   }
 }

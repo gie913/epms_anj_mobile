@@ -36,7 +36,7 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("ID OPH:"),
+                    Text("ID Ancak:"),
                     Text("${notifier.harvestingID}", style: Style.textBold16)
                   ]),
             ),
@@ -52,7 +52,7 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Name:"),
+                  Text("Nama:"),
                   Text("${notifier.mConfigSchema?.employeeName}")
                 ],
               ),
@@ -273,13 +273,8 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                     child: Container(
                       width: 160,
                       child: Focus(
-                        onFocusChange: (hasFocus) {
-                          if(!hasFocus) {
-                            notifier.blockNumberCheck(context, notifier.blockCode.text);
-                          }
-                        },
                         child: TextFormField(
-                          textCapitalization: TextCapitalization.none,
+                          textCapitalization: TextCapitalization.characters,
                           controller: notifier.blockCode,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(hintText: "Tulis blok"),
@@ -304,7 +299,7 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Losses buah tinggal (janjang/pokok):"),
-                  Text("${notifier.janjangTinggal.text}")
+                  Text("${notifier.loosesBuahTinggal}")
                 ],
               ),
             ),
@@ -314,7 +309,7 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Losses brondolan (butir/pokok):"),
-                  Text("${notifier.brondolanTinggal.text}")
+                  Text("${notifier.loosesBrondolan}")
                 ],
               ),
             ),

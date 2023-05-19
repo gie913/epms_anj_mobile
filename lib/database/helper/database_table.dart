@@ -35,3 +35,5 @@ const String tSPBSuperviseSchemaListTable = "T_SPB_Supervise_Schema_List";
 const String mAncakEmployeeTable = "M_Ancak_Employee";
 const String tWorkPlanSchemaTable = "T_Workplan_Schema";
 const String tMaterial = "T_Material";
+const String tTBSLuar = "T_TBS_Luar";
+const String tTBSLuarOneMonth = "T_TBS_Luar_One_Month";

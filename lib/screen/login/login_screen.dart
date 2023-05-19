@@ -60,7 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
-                                    hintText: "Username", labelText: "Username"),
+                                    hintText: "Username",
+                                    labelText: "Username"),
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     return "Username tidak boleh kosong";
@@ -93,39 +94,62 @@ class _LoginScreenState extends State<LoginScreen> {
                               SizedBox(height: 30),
                               Container(
                                 width: MediaQuery.of(context).size.width,
-                                child: InkWell(
-                                  onTap: () {
-                                    login.doLogin(context);
-                                  },
-                                  child: Card(
-                                    color: Palette.primaryColorProd,
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      padding: EdgeInsets.all(14),
-                                      child: login.loading
-                                          ? SizedBox(
+                                child: login.loading
+                                    ? Card(
+                                        color: Palette.primaryColorProd,
+                                        elevation: 2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.all(14),
+                                            child: SizedBox(
                                               child: CircularProgressIndicator(
                                                 color: Colors.white,
                                                 strokeWidth: 3,
                                               ),
                                               height: 26.0,
                                               width: 26.0,
-                                            )
-                                          : Text(
-                                              "LOGIN",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                    ),
-                                  ),
-                                ),
+                                            )),
+                                      )
+                                    : InkWell(
+                                        onTap: () {
+                                          login.doLogin(context);
+                                        },
+                                        child: Card(
+                                          color: Palette.primaryColorProd,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.all(14),
+                                            child: login.loading
+                                                ? SizedBox(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                      strokeWidth: 3,
+                                                    ),
+                                                    height: 26.0,
+                                                    width: 26.0,
+                                                  )
+                                                : Text(
+                                                    "LOGIN",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
                               ),
                               SizedBox(height: 30),
                               Container(
@@ -158,8 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     children: [
                                       Text(
                                         "${Constanta.APP_VERSION}",
-                                        style:
-                                            TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(height: 10),
                                       Text("${login.appName}"),

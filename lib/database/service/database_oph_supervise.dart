@@ -22,6 +22,7 @@ class DatabaseOPHSupervise {
         ${OPHSuperviseEntity.supervisiKeraniPanenEmployeeCode} TEXT,
         ${OPHSuperviseEntity.supervisiKeraniPanenEmployeeName} TEXT,
         ${OPHSuperviseEntity.supervisiPemanenEmployeeName} TEXT,
+         ${OPHSuperviseEntity.supervisiPemanenEmployeeCode} TEXT,
         ${OPHSuperviseEntity.supervisiPhoto} TEXT,
         ${OPHSuperviseEntity.supervisiDivisionCode} TEXT,
         ${OPHSuperviseEntity.bunchesRipe} INT,
@@ -52,7 +53,8 @@ class DatabaseOPHSupervise {
 
   Future<List<OPHSupervise>> selectOPHSupervise() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(tOPHSuperviseSchemaListTable);
+    var mapList = await db.query(tOPHSuperviseSchemaListTable,
+        groupBy: "${OPHSuperviseEntity.ophSupervisiId}");
     List<OPHSupervise> list = [];
     for (int i = 0; i < mapList.length; i++) {
       OPHSupervise oph = OPHSupervise.fromJson(mapList[i]);
@@ -61,17 +63,18 @@ class DatabaseOPHSupervise {
     return list.reversed.toList();
   }
 
-  Future<List> selectOPHSuperviseByID(OPHSupervise oph) async {
+  Future<List> selectOPHSuperviseByID(String ophID) async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(tOPHSuperviseSchemaListTable,
-        where: "${OPHSuperviseEntity.ophSupervisiId} = ?", whereArgs: [oph.ophSupervisiId]);
+        where: "${OPHSuperviseEntity.ophId} = ?", whereArgs: [ophID]);
     return mapList;
   }
 
   Future<int> updateOPHSuperviseByID(OPHSupervise object) async {
     Database db = await DatabaseHelper().database;
     int count = await db.update(tOPHSuperviseSchemaListTable, object.toJson(),
-        where: '${OPHSuperviseEntity.ophSupervisiId}=?', whereArgs: [object.ophSupervisiId]);
+        where: '${OPHSuperviseEntity.ophSupervisiId}=?',
+        whereArgs: [object.ophSupervisiId]);
     return count;
   }
 

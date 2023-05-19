@@ -1,16 +1,20 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
+import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/model/menu_entities.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_supervise.dart';
+import 'package:epms/model/tbs_luar.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_supervisi_spb_repository.dart';
@@ -33,23 +37,43 @@ class SupervisorSPBNotifier extends ChangeNotifier {
   }
 
   doUpload() async {
-    List<SPBSupervise> _listOPHSupervise =
-        await DatabaseSPBSupervise().selectSPBSupervise();
+    _dialogService.popDialog();
+    List<SPBSupervise> _listOPHSupervise = await DatabaseSPBSupervise().selectSPBSupervise();
+    List<TBSLuar> _listTBSLuarGrading = await DatabaseTBSLuar().selectTBSLuar();
 
-    List<String> mapListOPHSupervise = [];
+    if (_listOPHSupervise.isNotEmpty || _listTBSLuarGrading.isNotEmpty) {
+      List<String> mapListOPHSupervise = [];
+      List<String> mapListTBSLuarGrading = [];
 
-    for (int i = 0; i < _listOPHSupervise.length; i++) {
-      String jsonString = jsonEncode(_listOPHSupervise[i]);
-      mapListOPHSupervise.add("\"$i\":$jsonString");
+      for (int i = 0; i < _listOPHSupervise.length; i++) {
+        String jsonString = jsonEncode(_listOPHSupervise[i]);
+        mapListOPHSupervise.add("\"$i\":$jsonString");
+      }
+
+      for (int i = 0; i < _listTBSLuarGrading.length; i++) {
+        _listTBSLuarGrading[i].formType = 2;
+        String jsonString = jsonEncode(_listTBSLuarGrading[i]);
+        mapListTBSLuarGrading.add("\"$i\":$jsonString");
+      }
+
+      var stringListSPB = mapListOPHSupervise.join(",");
+      var stringListGrading = mapListTBSLuarGrading.join(",");
+      String listSPB = "{$stringListSPB}";
+      String listGrading = "{$stringListGrading}";
+
+      _dialogService.showLoadingDialog(title: "Upload Supervisi SPB");
+      UploadSupervisiSPBRepository().doPostUploadSupervisiSPB(
+          _navigationService.navigatorKey.currentContext!,
+          listSPB,
+          listGrading,
+          onSuccessUploadSPB,
+          onErrorUploadSPB);
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Upload Supervisi SPB",
+          "Tidak ada supervisi SPB yang dibuat");
     }
-
-    var stringListSPB = mapListOPHSupervise.join(",");
-    String listSPB = "{$stringListSPB}";
-    UploadSupervisiSPBRepository().doPostUploadSupervisiSPB(
-        _navigationService.navigatorKey.currentContext!,
-        listSPB,
-        onSuccessUploadSPB,
-        onErrorUploadSPB);
   }
 
   onSuccessUploadSPB(BuildContext context, response) {
@@ -59,39 +83,56 @@ class SupervisorSPBNotifier extends ChangeNotifier {
   onErrorUploadSPB(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload SPB", "Gagal mengupload data");
+        context, "Upload Supervisi SPB", "Gagal mengupload data");
   }
 
   uploadImage(BuildContext context) async {
     List<SPBSupervise> listSPB =
         await DatabaseSPBSupervise().selectSPBSupervise();
+    List<TBSLuar> listTBSLuar=
+    await DatabaseTBSLuar().selectTBSLuar();
     for (int i = 0; i < listSPB.length; i++) {
-      UploadImageOPHRepository().doUploadPhoto(
-          context,
-          listSPB[i].supervisiSpbPhoto!,
-          listSPB[i].spbId!,
-          "spb",
-          onSuccessUploadImage,
-          onErrorUploadImage);
+      if (listSPB[i].supervisiSpbPhoto != null) {
+        UploadImageOPHRepository().doUploadPhoto(
+            context,
+            listSPB[i].supervisiSpbPhoto!,
+            listSPB[i].spbSuperviseId!,
+            "spb_supervise",
+            onSuccessUploadImage,
+            onErrorUploadImage);
+      }
+    }
+    for (int i = 0; i < listTBSLuar.length; i++) {
+      if (listTBSLuar[i].gradingPhoto != null) {
+        UploadImageOPHRepository().doUploadPhoto(
+            context,
+            listTBSLuar[i].gradingPhoto!,
+            listTBSLuar[i].spdID!,
+            "spb_supervise",
+            onSuccessUploadImage,
+            onErrorUploadImage);
+      }
     }
     DatabaseSPBSupervise().deleteSPBSupervise();
+    DatabaseTBSLuar().deleteTBSLuar();
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarSuccess(
+        context, "Upload Supervisi SPB", "Berhasil mengupload data");
   }
 
   onSuccessUploadImage(BuildContext context, response) {
-    _dialogService.popDialog();
-    FlushBarManager.showFlushBarSuccess(
-        context, "Upload SPB", "Berhasil mengupload data");
+    print("Success Upload Image");
   }
 
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload Foto SPB", "Gagal mengupload data");
+        context, "Upload Foto Supervisi SPB", "Gagal mengupload data");
   }
 
   onClickMenu(int index) async {
     String dateNow = TimeManager.dateWithDash(DateTime.now());
-    String dateLogin = await StorageManager.readData("lastSynchDate");
+    String? dateLogin = await StorageManager.readData("lastSynchDate");
 
     switch (supervisorSPBMenuEntries[index - 2].toUpperCase()) {
       case "KELUAR":
@@ -102,6 +143,28 @@ class SupervisorSPBNotifier extends ChangeNotifier {
             buttonTextNo: "Tidak",
             onPressYes: HomeNotifier().doLogOut,
             onPressNo: _dialogService.popDialog);
+        break;
+      case "SUPERVISI TBS LUAR":
+        // if (dateLogin == dateNow) {
+        _navigationService.push(Routes.TBS_LUAR_FORM_PAGE);
+        // } else {
+        //   dialogReLogin();
+        // }
+        break;
+      case "HISTORY GRADING TBS LUAR":
+        // if (dateLogin == dateNow) {
+        _navigationService.push(Routes.TBS_LUAR_HISTORY_PAGE);
+        // } else {
+        //   dialogReLogin();
+        // }
+        break;
+      case "BACA KARTU TBS LUAR":
+        // if (dateLogin == dateNow) {
+        _navigationService.push(Routes.TBS_LUAR_DETAIL_PAGE,
+            arguments: {"tbs_luar": TBSLuar(), "method": 'BACA'});
+        // } else {
+        //   dialogReLogin();
+        // }
         break;
       case "SUPERVISI SPB":
         if (dateLogin == dateNow) {
@@ -134,6 +197,17 @@ class SupervisorSPBNotifier extends ChangeNotifier {
             onPressYes: doUpload,
             onPressNo: _dialogService.popDialog);
         break;
+    }
+  }
+
+  exportJson(BuildContext context) async {
+    File? fileExport = await FileManagerJson().writeFileJsonSupervisiSPB();
+    if (fileExport != null) {
+      FlushBarManager.showFlushBarSuccess(
+          context, "Export Json Berhasil", "${fileExport.path}");
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Export Json", "Belum ada Transaksi Supervisi SPB");
     }
   }
 }

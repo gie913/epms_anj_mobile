@@ -62,7 +62,8 @@ class _DetailOPHScreenState extends State<DetailOPHScreen> {
                   ],
                 ),
               ),
-              body: TabBarView(children: <Widget>[
+              body: TabBarView(
+                  children: <Widget>[
                 DetailOPHTab(),
                 notifier.onEdit ? DetailOPHEditFruit() : DetailOPHFruit()
               ]),

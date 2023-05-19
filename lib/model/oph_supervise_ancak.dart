@@ -3,7 +3,7 @@ class OPHSuperviseAncak {
   String? supervisiAncakEstateCode;
   String? supervisiAncakBlockCode;
   String? supervisiAncakLat;
-  String? supervisiAncakLon;
+  String? supervisiAncakLong;
   String? supervisiAncakLatEnd;
   String? supervisiAncakLongEnd;
   String? supervisiAncakMandorEmployeeCode;
@@ -41,7 +41,7 @@ class OPHSuperviseAncak {
         this.supervisiAncakEstateCode,
         this.supervisiAncakBlockCode,
         this.supervisiAncakLat,
-        this.supervisiAncakLon,
+        this.supervisiAncakLong,
         this.supervisiAncakLatEnd,
         this.supervisiAncakLongEnd,
         this.supervisiAncakMandorEmployeeCode,
@@ -79,7 +79,7 @@ class OPHSuperviseAncak {
     supervisiAncakEstateCode = json['supervisi_ancak_estate_code'];
     supervisiAncakBlockCode = json['supervisi_ancak_block_code'];
     supervisiAncakLat = json['supervisi_ancak_lat'];
-    supervisiAncakLon = json['supervisi_ancak_lon'];
+    supervisiAncakLong = json['supervisi_ancak_long'];
     supervisiAncakLatEnd = json['supervisi_ancak_lat_end'];
     supervisiAncakLongEnd = json['supervisi_ancak_long_end'];
     supervisiAncakMandorEmployeeCode =
@@ -102,8 +102,7 @@ class OPHSuperviseAncak {
     bunchesTinggal = json['bunches_tinggal'];
     bunchesTinggalPercentage = json['bunches_tinggal_percentage'];
     bunchesBrondolanTinggal = json['bunches_brondolan_tinggal'];
-    bunchesBrondolanTinggalPercentage =
-    json['bunches_brondolan_tinggal_percentage'];
+    bunchesBrondolanTinggalPercentage = json['bunches_brondolan_tinggal_percentage'];
     bunchesTotal = json['bunches_total'];
     looseFruits = json['loose_fruits'];
     supervisiAncakNotes = json['supervisi_ancak_notes'];
@@ -124,7 +123,7 @@ class OPHSuperviseAncak {
     data['supervisi_ancak_estate_code'] = this.supervisiAncakEstateCode;
     data['supervisi_ancak_block_code'] = this.supervisiAncakBlockCode;
     data['supervisi_ancak_lat'] = this.supervisiAncakLat;
-    data['supervisi_ancak_lon'] = this.supervisiAncakLon;
+    data['supervisi_ancak_long'] = this.supervisiAncakLong;
     data['supervisi_ancak_lat_end'] = this.supervisiAncakLatEnd;
     data['supervisi_ancak_long_end'] = this.supervisiAncakLongEnd;
     data['supervisi_ancak_mandor_employee_code'] =

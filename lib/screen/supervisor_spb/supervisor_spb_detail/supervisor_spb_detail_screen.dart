@@ -1,4 +1,5 @@
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_detail/supervisor_spb_detail_edit_fruit.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_detail/supervisor_spb_detail_fruit.dart';
@@ -29,30 +30,39 @@ class _SupervisorSPBDetailScreenState extends State<SupervisorSPBDetailScreen> {
   Widget build(BuildContext context) {
     return Consumer<SupervisorSPBDetailNotifier>(
       builder: (context, notifier, child) {
-        return DefaultTabController(
-          initialIndex: 0,
-          length: 2,
-          child: MediaQuery(
-            data: Style.mediaQueryText(context),
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Detail Supervisi SPB'),
-                bottom: TabBar(
-                  tabs: <Widget>[
-                    Tab(
-                      icon: Text("Form"),
-                    ),
-                    Tab(
-                      icon: Text("Hasil"),
-                    ),
+        return WillPopScope(
+          onWillPop: () async {
+            if (notifier.onEdit) {
+              return NavigatorService().onWillPopForm(context);
+            } else {
+              return true;
+            }
+          },
+          child: DefaultTabController(
+            initialIndex: 0,
+            length: 2,
+            child: MediaQuery(
+              data: Style.mediaQueryText(context),
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text('Detail Supervisi SPB'),
+                  bottom: TabBar(
+                    tabs: <Widget>[
+                      Tab(
+                        icon: Text("Form"),
+                      ),
+                      Tab(
+                        icon: Text("Hasil"),
+                      ),
+                    ],
+                  ),
+                ),
+                body: TabBarView(
+                  children: <Widget>[
+                    SupervisorSPBDetailTab(),
+                    notifier.onEdit ? SupervisorSPBFormEditFruit() : SupervisorSPBDetailFruit()
                   ],
                 ),
-              ),
-              body: TabBarView(
-                children: <Widget>[
-                  SupervisorSPBDetailTab(),
-                  notifier.onEdit ? SupervisorSPBFormEditFruit() : SupervisorSPBDetailFruit()
-                ],
               ),
             ),
           ),

@@ -2,8 +2,8 @@ import 'package:epms/database/entity/t_attendance_entity.dart';
 import 'package:epms/model/t_attendance_schema.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../helper/database_table.dart';
 import '../helper/database_helper.dart';
+import '../helper/database_table.dart';
 
 class DatabaseAttendance {
   void createTableAttendance(Database db) async {
@@ -31,9 +31,12 @@ class DatabaseAttendance {
   Future<int> insertAttendance(List<TAttendanceSchema> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<TAttendanceSchema> listTAttendance = await selectEmployeeAttendance();
     for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(tAttendanceSchemaTable, object[i].toJson());
-      count = count + saved;
+      if (!(listTAttendance.contains(object[i]))) {
+        int saved = await db.insert(tAttendanceSchemaTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }
@@ -41,7 +44,8 @@ class DatabaseAttendance {
   Future<int> updateDatabaseAttendance(
       TAttendanceSchema tAttendanceSchema) async {
     Database db = await DatabaseHelper().database;
-    int count = await db.update(tAttendanceSchemaTable, tAttendanceSchema.toJson(),
+    int count = await db.update(
+        tAttendanceSchemaTable, tAttendanceSchema.toJson(),
         where: '${TAttendanceEntity.attendanceEmployeeCode} = ?',
         whereArgs: [tAttendanceSchema.attendanceEmployeeCode]);
     return count;

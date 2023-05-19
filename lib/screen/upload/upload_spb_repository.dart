@@ -3,19 +3,21 @@ import 'dart:io';
 
 import 'package:epms/base/api/api_configuration.dart';
 import 'package:epms/base/api/api_endpoint.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:flutter/cupertino.dart';
 
 class UploadSPBRepository extends APIConfiguration {
   void doPostUploadSPB(BuildContext context, String listSPB, String listSPBDetail, String listSPBLoader, onSuccess, onError) async {
     String token = await StorageManager.readData("userToken");
+    String baseUrl = await StorageManager.readData("apiServer");
 
     Map<String, dynamic> newMapSPB = jsonDecode(listSPB);
     Map<String, dynamic> newMapSPBDetail = jsonDecode(listSPBDetail);
     Map<String, dynamic> newMapSPBLoader = jsonDecode(listSPBLoader);
 
     try {
-      var url = APIEndPoint.BASE_URL + APIEndPoint.UPLOAD_ENDPOINT;
+      var url = baseUrl + APIEndPoint.UPLOAD_ENDPOINT;
       var uri = Uri.parse(url);
       var mapTP = Map<String, dynamic>();
       mapTP = {
@@ -29,7 +31,7 @@ class UploadSPBRepository extends APIConfiguration {
       var jsonMap = jsonEncode(mapTP);
       epmsData['epms_data'] = jsonMap;
       epmsData['user_token'] = token;
-      print(jsonMap);
+      await FileManagerJson().writeFileJsonSPB();
       var response = await ioClient!.post(
         uri,
         body: epmsData,

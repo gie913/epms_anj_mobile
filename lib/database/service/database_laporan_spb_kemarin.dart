@@ -35,6 +35,8 @@ class DatabaseLaporanSPBKemarin {
        ${LaporanSPBKemarinEntity.spbActualTonnage} REAL,
        ${LaporanSPBKemarinEntity.spbIsClosed} INT,
        ${LaporanSPBKemarinEntity.spbCertificateId} TEXT,
+       ${LaporanSPBKemarinEntity.createdDate} TEXT,
+       ${LaporanSPBKemarinEntity.createdTime} TEXT,
        ${LaporanSPBKemarinEntity.certificationCertNoRspo} TEXT,
        ${LaporanSPBKemarinEntity.certificationCertNoIspo} TEXT,
        ${LaporanSPBKemarinEntity.certificationCertNoIscc} TEXT,
@@ -50,9 +52,12 @@ class DatabaseLaporanSPBKemarin {
   Future<int> insertLaporanSPBKemarin(List<LaporanSPBKemarin> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<LaporanSPBKemarin> listLaporanKemarin = await selectLaporanSPBKemarin();
     for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(laporanSPBKemarinTable, object[i].toJson());
-      count = count + saved;
+     if(!(listLaporanKemarin.contains(object[i]))) {
+       int saved = await db.insert(laporanSPBKemarinTable, object[i].toJson());
+       count = count + saved;
+     }
     }
     return count;
   }

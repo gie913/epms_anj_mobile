@@ -132,7 +132,31 @@ class _KeraniPanenScreenState extends State<KeraniPanenScreen> {
                                           child: Text("Lihat Supervisi",
                                               style: Style.primaryBold16),
                                         ),
+                                        SizedBox(height: 30),
+                                        Card(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: InkWell(
+                                              child: Text("Synch Ulang"),
+                                              onTap: () {
+                                                KeraniPanenNotifier().reSynch();
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                         SizedBox(height: 10),
+                                        Card(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: InkWell(
+                                              child: Text("Export Json"),
+                                              onTap: () {
+                                                KeraniPanenNotifier()
+                                                    .exportJson(context);
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                         Divider(),
                                         Column(children: [
                                           Padding(
@@ -148,6 +172,7 @@ class _KeraniPanenScreenState extends State<KeraniPanenScreen> {
                                     )
                                   : TextButton(
                                       style: TextButton.styleFrom(
+                                        foregroundColor: Colors.white,
                                         backgroundColor:
                                             colorCodesHarvester[index - 2],
                                         minimumSize: Size(
@@ -160,7 +185,6 @@ class _KeraniPanenScreenState extends State<KeraniPanenScreen> {
                                                 color: colorCodesHarvester[
                                                     index - 2])),
                                         padding: const EdgeInsets.all(16.0),
-                                        primary: Colors.white,
                                         textStyle: const TextStyle(
                                             fontSize: 20, color: Colors.white),
                                       ),

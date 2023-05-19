@@ -1,3 +1,4 @@
+import 'package:epms/database/entity/m_employee_entity.dart';
 import 'package:epms/database/entity/t_user_assignment_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
 import 'package:epms/model/m_config_schema.dart';
@@ -36,10 +37,14 @@ class DatabaseTUserAssignment {
   Future<int> insertTUserAssignment(List<TUserAssignmentSchema> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<TUserAssignmentSchema> listTUserAssignment =
+        await selectTUserAssignment();
     for (int i = 0; i < object.length; i++) {
-      int saved =
-          await db.insert(tUserAssignmentSchemaTable, object[i].toJson());
-      count = count + saved;
+      if(!(listTUserAssignment.contains(object[i]))) {
+        int saved =
+        await db.insert(tUserAssignmentSchemaTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }
@@ -48,8 +53,21 @@ class DatabaseTUserAssignment {
       MConfigSchema mConfigSchema) async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.rawQuery(
-        "SELECT * FROM $tUserAssignmentSchemaTable WHERE ${TUserAssignmentEntity.keraniPanenEmployeeCode}=?",
-        [mConfigSchema.employeeCode]);
+        "SELECT $tUserAssignmentSchemaTable.* FROM $tUserAssignmentSchemaTable INNER JOIN $mEmployeeSchemaTable ON $tUserAssignmentSchemaTable.${TUserAssignmentEntity.employeeCode}=$mEmployeeSchemaTable.${MEmployeeEntity.employeeCode}  WHERE ${TUserAssignmentEntity.keraniPanenEmployeeCode}=? OR ${TUserAssignmentEntity.keraniKirimEmployeeCode}=? ORDER BY ${TUserAssignmentEntity.employeeName}",
+        [mConfigSchema.employeeCode, mConfigSchema.employeeCode]);
+    List<TUserAssignmentSchema> list = [];
+    for (int i = 0; i < mapList.length; i++) {
+      TUserAssignmentSchema mEmployeeSchema =
+          TUserAssignmentSchema.fromJson(mapList[i]);
+      list.add(mEmployeeSchema);
+    }
+    return list;
+  }
+
+  Future<List<TUserAssignmentSchema>> selectTUserAssignment() async {
+    Database db = await DatabaseHelper().database;
+    var mapList =
+        await db.rawQuery("SELECT * FROM $tUserAssignmentSchemaTable");
     List<TUserAssignmentSchema> list = [];
     for (int i = 0; i < mapList.length; i++) {
       TUserAssignmentSchema mEmployeeSchema =
@@ -62,11 +80,8 @@ class DatabaseTUserAssignment {
   Future<List<TUserAssignmentSchema>> selectEmployeeTUserAssignmentSupervisor(
       MConfigSchema mConfigSchema) async {
     Database db = await DatabaseHelper().database;
-    var mapListAll =
-        await db.rawQuery("SELECT * FROM $tUserAssignmentSchemaTable");
-    print(mapListAll);
     var mapList = await db.rawQuery(
-        "SELECT * FROM $tUserAssignmentSchemaTable WHERE ${TUserAssignmentEntity.keraniPanenEmployeeCode}=?",
+        "SELECT * FROM $tUserAssignmentSchemaTable WHERE ${TUserAssignmentEntity.keraniPanenEmployeeCode}=? GROUP BY ${TUserAssignmentEntity.employeeCode}",
         [mConfigSchema.employeeCode]);
     List<TUserAssignmentSchema> list = [];
     for (int i = 0; i < mapList.length; i++) {

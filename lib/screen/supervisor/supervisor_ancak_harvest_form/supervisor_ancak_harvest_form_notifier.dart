@@ -17,7 +17,6 @@ import 'package:epms/model/m_tph_schema.dart';
 import 'package:epms/model/oph_supervise_ancak.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class SupervisorAncakFormNotifier extends ChangeNotifier {
@@ -127,13 +126,18 @@ class SupervisorAncakFormNotifier extends ChangeNotifier {
 
   TextEditingController blockCode = TextEditingController();
 
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
-
   String? _pickedFile;
 
   String? get pickedFile => _pickedFile;
+
+  double _loosesBuahTinggal = 0.0;
+
+  double get loosesBuahTinggal => _loosesBuahTinggal;
+
+  double _loosesBrondolan = 0.0;
+
+  double get loosesBrondolan => _loosesBrondolan;
+
 
   getLocation() async {
     _position = await LocationService.getGPSLocation();
@@ -211,7 +215,7 @@ class SupervisorAncakFormNotifier extends ChangeNotifier {
   }
 
   getCamera(BuildContext context) async {
-    String? picked = await CameraService.getImageByCamera();
+    String? picked = await CameraService.getImageByCamera(context);
     if (picked != null) {
       _pickedFile = picked;
       notifyListeners();
@@ -266,7 +270,7 @@ class SupervisorAncakFormNotifier extends ChangeNotifier {
     ophSuperviseAncak.supervisiAncakBlockCode = blockCode.text;
     if (_position != null) {
       ophSuperviseAncak.supervisiAncakLat = _position?.latitude.toString();
-      ophSuperviseAncak.supervisiAncakLon = _position?.longitude.toString();
+      ophSuperviseAncak.supervisiAncakLong = _position?.longitude.toString();
     }
     if (_positionUpdate != null) {
       ophSuperviseAncak.supervisiAncakLatEnd =
@@ -285,27 +289,18 @@ class SupervisorAncakFormNotifier extends ChangeNotifier {
     ophSuperviseAncak.supervisiAncakAssignToId = _ancakEmployee?.userId;
     ophSuperviseAncak.supervisiAncakAssignToName = _ancakEmployee?.userName;
     ophSuperviseAncak.supervisiAncakPhoto = _pickedFile;
-    ophSuperviseAncak.supervisiAncakDivisionCode =
-        _mBlockSchema?.blockDivisionCode;
+    ophSuperviseAncak.supervisiAncakDivisionCode = _mBlockSchema?.blockDivisionCode;
     ophSuperviseAncak.pokokSample = _pokokPanen.text;
     ophSuperviseAncak.bunchesVCut = int.parse(_vCut.text);
     ophSuperviseAncak.bunchesRat = int.parse(_rat.text);
     ophSuperviseAncak.bunchesTangkaiPanjang = int.parse(_tangkaiPanjang.text);
     ophSuperviseAncak.pelepahSengkleh = int.parse(_pelepahSengkleh.text);
     ophSuperviseAncak.bunchesTinggal = int.parse(_janjangTinggal.text);
-    ophSuperviseAncak.bunchesTinggalPercentage =
-        (((int.parse(_janjangTinggal.text)) / (int.parse(_totalJanjang.text))) *
-                100)
-            .toDouble();
-    ophSuperviseAncak.bunchesBrondolanTinggal =
-        int.parse(_brondolanTinggal.text);
-    ophSuperviseAncak.bunchesBrondolanTinggalPercentage =
-        (((int.parse(_brondolanTinggal.text)) /
-                    (int.parse(_totalJanjang.text))) *
-                100)
-            .toDouble();
+    ophSuperviseAncak.bunchesTinggalPercentage = loosesBuahTinggal;
+    ophSuperviseAncak.bunchesBrondolanTinggal = int.parse(_brondolanTinggal.text);
+    ophSuperviseAncak.bunchesBrondolanTinggalPercentage = loosesBrondolan;
     ophSuperviseAncak.bunchesTotal = int.parse(_totalJanjang.text);
-    ophSuperviseAncak.looseFruits = int.parse(_brondolanTinggal.text);
+    ophSuperviseAncak.looseFruits = int.parse(_totalBrondolan.text);
     ophSuperviseAncak.supervisiAncakNotes = _notes.text;
     ophSuperviseAncak.createdBy = _mConfigSchema?.employeeName;
     ophSuperviseAncak.supervisiAncakEmployeeCode = _mConfigSchema?.employeeCode;
@@ -339,5 +334,20 @@ class SupervisorAncakFormNotifier extends ChangeNotifier {
         buttonTextNo: "Tidak",
         onPressYes: saveToDatabase,
         onPressNo: _dialogService.popDialog);
+  }
+
+  countLoosesBuahTinggal(String janjangTinggal, String pokokPanen) {
+    if(janjangTinggal.isNotEmpty && pokokPanen.isNotEmpty) {
+      _loosesBuahTinggal = double.parse((double.parse(janjangTinggal) / double.parse(pokokPanen)).toStringAsFixed(3));
+      _loosesBuahTinggal.toStringAsFixed(3);
+    }
+    notifyListeners();
+  }
+
+  countLoosesBrondolan(String brondolanTinggal, String pokokPanen) {
+    if(brondolanTinggal.isNotEmpty && pokokPanen.isNotEmpty) {
+      _loosesBrondolan = double.parse((double.parse(brondolanTinggal) / double.parse(pokokPanen)).toStringAsFixed(3));
+    }
+    notifyListeners();
   }
 }

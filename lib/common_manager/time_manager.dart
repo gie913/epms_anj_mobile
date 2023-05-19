@@ -8,6 +8,7 @@ class TimeManager {
   }
 
   static String dateWithDash(DateTime dateTime) {
+    print("This is date Time now : $dateTime");
     String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
     return formattedDate;
   }

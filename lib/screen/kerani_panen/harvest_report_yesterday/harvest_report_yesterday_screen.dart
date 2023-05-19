@@ -148,7 +148,7 @@ class _HarvestReportYesterdayScreenState
                 ),
               ),
               SizedBox(height: 14),
-              laporanKemarin.listLaporanPanen.isEmpty
+              laporanKemarin.listResult.isEmpty
                   ? Container(
                       alignment: Alignment.center,
                       height: 200,
@@ -157,7 +157,7 @@ class _HarvestReportYesterdayScreenState
                     )
                   : Flexible(
                       child: ListView.builder(
-                          itemCount: laporanKemarin.listLaporanPanen.length,
+                          itemCount: laporanKemarin.listResult.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Container(
                               margin: EdgeInsets.only(top: 2, bottom: 2),
@@ -169,7 +169,7 @@ class _HarvestReportYesterdayScreenState
                                   alignment: Alignment.centerLeft,
                                   padding: EdgeInsets.all(10),
                                   child: Text(
-                                    "${laporanKemarin.listLaporanPanen[index].employeeCode ?? ""} ${laporanKemarin.listLaporanPanen[index].employeeName ?? ""}",
+                                    "${laporanKemarin.listResult[index].employeeCode ?? ""} ${laporanKemarin.listResult[index].employeeName ?? ""}",
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
@@ -215,7 +215,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                        "${laporanKemarin.listLaporanPanen[index].bunchesRipe}",
+                                                        "${laporanKemarin.listResult[index].bunchesRipe}",
                                                         style: TextStyle(
                                                             fontSize: 18),
                                                       ),
@@ -226,7 +226,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                        "${laporanKemarin.listLaporanPanen[index].bunchesOverripe}",
+                                                        "${laporanKemarin.listResult[index].bunchesOverripe}",
                                                         style: TextStyle(
                                                             fontSize: 18),
                                                       ),
@@ -237,7 +237,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                        "${laporanKemarin.listLaporanPanen[index].bunchesHalfripe}",
+                                                        "${laporanKemarin.listResult[index].bunchesHalfripe}",
                                                         style: TextStyle(
                                                             fontSize: 18),
                                                       ),
@@ -277,7 +277,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].bunchesUnripe}",
+                                                          "${laporanKemarin.listResult[index].bunchesUnripe}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),
@@ -287,7 +287,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].bunchesAbnormal}",
+                                                          "${laporanKemarin.listResult[index].bunchesAbnormal}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),
@@ -297,7 +297,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].bunchesEmpty}",
+                                                          "${laporanKemarin.listResult[index].bunchesEmpty}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),
@@ -342,7 +342,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].bunchesTotal}",
+                                                          "${laporanKemarin.listResult[index].bunchesTotal}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),
@@ -352,7 +352,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].looseFruits}",
+                                                          "${laporanKemarin.listResult[index].looseFruits}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),
@@ -362,7 +362,7 @@ class _HarvestReportYesterdayScreenState
                                                     width: 110,
                                                     child: Column(children: [
                                                       Text(
-                                                          "${laporanKemarin.listLaporanPanen[index].bunchesNotSent}",
+                                                          "${laporanKemarin.listResult[index].bunchesNotSent}",
                                                           style: TextStyle(
                                                               fontSize: 18)),
                                                       SizedBox(height: 16),

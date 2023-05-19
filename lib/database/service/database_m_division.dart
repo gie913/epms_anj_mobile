@@ -7,32 +7,50 @@ import '../helper/database_helper.dart';
 
 class DatabaseMDivisionSchema {
   void createTableMDivisionSchema(Database db) async {
+    // await db.execute('''
+    //   CREATE TABLE $mDivisionSchemaTable(
+    //    ${MDivisionEntity.divisionId} INT NOT NULL,
+    //    ${MDivisionEntity.divisionCompanyCode} TEXT,
+    //    ${MDivisionEntity.divisionEstateCode} TEXT,
+    //    ${MDivisionEntity.divisionCode} TEXT,
+    //    ${MDivisionEntity.divisionName} TEXT,
+    //    ${MDivisionEntity.divisionValidFrom} TEXT,
+    //    ${MDivisionEntity.divisionValidTo} TEXT,
+    //    ${MDivisionEntity.createdBy} TEXT,
+    //    ${MDivisionEntity.createdDate} TEXT,
+    //    ${MDivisionEntity.createdTime} TEXT,
+    //    ${MDivisionEntity.updatedBy} TEXT,
+    //    ${MDivisionEntity.updatedDate} TEXT,
+    //    ${MDivisionEntity.updatedTime} TEXT)
+    // ''');
     await db.execute('''
       CREATE TABLE $mDivisionSchemaTable(
        ${MDivisionEntity.divisionId} INT NOT NULL,
        ${MDivisionEntity.divisionCompanyCode} TEXT,
        ${MDivisionEntity.divisionEstateCode} TEXT,
        ${MDivisionEntity.divisionCode} TEXT,
-       ${MDivisionEntity.divisionName} TEXT,
-       ${MDivisionEntity.divisionValidFrom} TEXT,
-       ${MDivisionEntity.divisionValidTo} TEXT,
-       ${MDivisionEntity.createdBy} TEXT,
-       ${MDivisionEntity.createdDate} TEXT,
-       ${MDivisionEntity.createdTime} TEXT,
-       ${MDivisionEntity.updatedBy} TEXT,
-       ${MDivisionEntity.updatedDate} TEXT,
-       ${MDivisionEntity.updatedTime} TEXT)
+       ${MDivisionEntity.divisionName} TEXT)
     ''');
   }
 
   Future<int> insertMDivisionSchema(List<MDivisionSchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-        int saved = await db.insert(mDivisionSchemaTable, object[i].toJson());
-        count = count + saved;
-    }
-    return count;
+    // int count = 0;
+    // List<MDivisionSchema> listDivision = await selectMDivisionSchema();
+    // for (int i = 0; i < object.length; i++) {
+    //     if(!(listDivision.contains(object[i]))) {
+    //       int saved = await db.insert(mDivisionSchemaTable, object[i].toJson());
+    //       count = count + saved;
+    //     }
+    // }
+    // return count;
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MDivisionSchema mDivisionSchema =  val;
+      batch.insert(mDivisionSchemaTable, mDivisionSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MDivisionSchema>> selectMDivisionSchema() async {

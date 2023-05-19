@@ -1,3 +1,4 @@
+import 'package:epms/base/ui/style.dart';
 import 'package:epms/screen/supervisor/detail_supervise_harvest/detail_supervise_harvest_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,21 +28,21 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("Masak"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
                         width: 110,
                         child: Column(children: [
                           Text("Lewat Masak"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
                         width: 110,
                         child: Column(children: [
                           Text("Mengkal"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                     ],
@@ -53,7 +54,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         child: Column(children: [
                           Text(
                             "${notifier.ophSupervise?.bunchesRipe ?? 0}",
-                            style: TextStyle(fontSize: 18),
+                            style: Style.textBold20
                           ),
                           SizedBox(height: 20),
                         ]),
@@ -63,7 +64,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         child: Column(children: [
                           Text(
                             "${notifier.ophSupervise?.bunchesOverripe ?? 0}",
-                            style: TextStyle(fontSize: 18),
+                            style: Style.textBold20,
                           ),
                           SizedBox(height: 20),
                         ]),
@@ -73,7 +74,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         child: Column(children: [
                           Text(
                             "${notifier.ophSupervise?.bunchesHalfripe ?? 0}",
-                            style: TextStyle(fontSize: 18),
+                            style: Style.textBold20,
                           ),
                           SizedBox(height: 20),
                         ]),
@@ -86,21 +87,21 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("Mentah"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
                         width: 110,
                         child: Column(children: [
                           Text("Tidak Normal"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
                         width: 110,
                         child: Column(children: [
                           Text("Janjang Kosong"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                     ],
@@ -111,7 +112,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.bunchesUnripe ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -119,7 +120,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.bunchesAbnormal ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -127,7 +128,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.bunchesEmpty ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -139,14 +140,14 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("Total Janjang"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
                         width: 110,
                         child: Column(children: [
                           Text("Brondolan (Kg)"),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                       Container(
@@ -158,7 +159,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                                 "Janjang Tidak Dikirim",
                                 textAlign: TextAlign.center,
                               )),
-                          SizedBox(height: 8),
+                          SizedBox(height:20),
                         ]),
                       ),
                     ],
@@ -169,7 +170,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.bunchesTotal ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -177,7 +178,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.looseFruits ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -185,7 +186,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
                         width: 110,
                         child: Column(children: [
                           Text("${notifier.ophSupervise?.bunchesNotSent ?? 0}",
-                              style: TextStyle(fontSize: 18)),
+                              style: Style.textBold20),
                           SizedBox(height: 20),
                         ]),
                       ),
@@ -197,7 +198,7 @@ class _SuperviseHarvestDetailFruitState extends State<SuperviseHarvestDetailFrui
               Column(children: [
                 Text(
                     "Catatan (${notifier.ophSupervise?.supervisiNotes != null ? 50 - notifier.ophSupervise!.supervisiNotes!.length : 50})"),
-                SizedBox(height: 8),
+                SizedBox(height:20),
                 Text("${notifier.ophSupervise?.supervisiNotes ?? "Tidak ada catatan"}")
               ]),
             ]),

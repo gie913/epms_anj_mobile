@@ -30,6 +30,9 @@ import 'package:epms/screen/supervisor/supervisor_harvest_form/supervisor_harves
 import 'package:epms/screen/supervisor/workplan/workplan_page.dart';
 import 'package:epms/screen/supervisor_form/supervisor_form_page.dart';
 import 'package:epms/screen/supervisor_spb/supervisi_spb_form/supervisor_spb_form_page.dart';
+import 'package:epms/screen/supervisor_spb/supervisi_tbs_luar_detail/supervisor_tbs_luar_detail_page.dart';
+import 'package:epms/screen/supervisor_spb/supervisi_tbs_luar_form/supervisor_tbs_luar_form_page.dart';
+import 'package:epms/screen/supervisor_spb/supervisi_tbs_luar_history/supervisor_tbs_luar_history_page.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_detail/supervisor_spb_detail_page.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_history/supervisor_spb_history_page.dart';
 import 'package:epms/screen/synch/synch_page.dart';
@@ -41,7 +44,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => SplashScreen(),
       );
-
     case Routes.LOGIN_PAGE:
       return MaterialPageRoute(
         builder: (context) => LoginPage(),
@@ -187,6 +189,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => SupervisorSPBHistoryPage(),
       );
 
+    case Routes.TBS_LUAR_HISTORY_PAGE:
+      return MaterialPageRoute(
+        builder: (context) => SupervisorTBSLuarHistoryPage(),
+      );
+
     case Routes.SPB_SUPERVISI_DETAIL_PAGE:
       final argument = settings.arguments as SPBSupervise;
       return MaterialPageRoute(
@@ -217,7 +224,19 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => SupervisorAncakHarvestFormPage(),
       );
+    case Routes.TBS_LUAR_FORM_PAGE:
+      return MaterialPageRoute(
+        builder: (context) => SupervisorTBSLuarFormPage(),
+      );
 
+    case Routes.TBS_LUAR_DETAIL_PAGE:
+      final arguments = (settings.arguments ?? <String, dynamic>{}) as Map;
+      return MaterialPageRoute(
+        builder: (context) => SupervisorTBSLuarDetailPage(
+          tbsLuar: arguments['tbs_luar'],
+          method: arguments['method'],
+        ),
+      );
     default:
       return MaterialPageRoute(
         builder: (context) => Scaffold(

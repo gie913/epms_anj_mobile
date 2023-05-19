@@ -1,4 +1,3 @@
-import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/model/laporan_restan.dart';
@@ -227,33 +226,33 @@ class _DetailRestanScreenState extends State<DetailRestanScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Card(
-                        color: Palette.redColorDark,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.all(14),
-                          child: Text(
-                            "KEMBALI",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   width: MediaQuery.of(context).size.width,
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       Navigator.pop(context);
+                  //     },
+                  //     child: Card(
+                  //       color: Palette.redColorDark,
+                  //       elevation: 2,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(10.0),
+                  //       ),
+                  //       child: Container(
+                  //         alignment: Alignment.center,
+                  //         padding: EdgeInsets.all(14),
+                  //         child: Text(
+                  //           "KEMBALI",
+                  //           style: TextStyle(
+                  //               fontSize: 18,
+                  //               fontWeight: FontWeight.bold,
+                  //               color: Colors.white),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ]),
               ),
             ),

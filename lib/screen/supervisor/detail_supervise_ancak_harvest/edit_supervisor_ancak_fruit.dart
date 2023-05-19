@@ -70,8 +70,8 @@ class _EditSupervisorAncakFormFruitState extends State<EditSupervisorAncakFormFr
                                 ],
                                 decoration: InputDecoration(hintText: "0"),
                                 onChanged: (value) {
-                                  notifier.countBunches(
-                                      context, notifier.pokokPanen);
+                                  notifier.countLoosesBrondolan(notifier.brondolanTinggal.text, value);
+                                  notifier.countLoosesBuahTinggal(notifier.janjangTinggal.text, value);
                                 },
                               ),
                             ),
@@ -215,7 +215,7 @@ class _EditSupervisorAncakFormFruitState extends State<EditSupervisorAncakFormFr
                               width: 110,
                               child: Column(children: [
                                 SizedBox(height: 12),
-                                Text("Pelepah Sengkleh"),
+                                Text("Pelepah Sengkleh", textAlign: TextAlign.center),
                                 SizedBox(height: 6),
                               ]),
                             ),
@@ -231,7 +231,7 @@ class _EditSupervisorAncakFormFruitState extends State<EditSupervisorAncakFormFr
                               width: 110,
                               child: Column(children: [
                                 SizedBox(height: 12),
-                                Text("Brondolan Tinggal"),
+                                Text("Brondolan Tinggal", textAlign: TextAlign.center),
                                 SizedBox(height: 6),
                               ]),
                             ),
@@ -269,8 +269,7 @@ class _EditSupervisorAncakFormFruitState extends State<EditSupervisorAncakFormFr
                               ],
                               decoration: InputDecoration(hintText: "0"),
                               onChanged: (value) {
-                                notifier.countBunches(
-                                    context, notifier.janjangTinggal);
+                                notifier.countLoosesBuahTinggal(value, notifier.pokokPanen.text);
                               },
                             ),
                           ),
@@ -287,8 +286,7 @@ class _EditSupervisorAncakFormFruitState extends State<EditSupervisorAncakFormFr
                               ],
                               decoration: InputDecoration(hintText: "0"),
                               onChanged: (value) {
-                                notifier.countBunches(
-                                    context, notifier.brondolanTinggal);
+                                notifier.countLoosesBrondolan(value, notifier.pokokPanen.text);
                               },
                             ),
                           ),

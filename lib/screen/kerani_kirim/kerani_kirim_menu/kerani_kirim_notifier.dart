@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
@@ -31,10 +33,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
   doUpload() async {
     _dialogService.popDialog();
     List<SPB> _listSPB = await DatabaseSPB().selectSPB();
-    List<SPBDetail> _listSPBDetail =
-        await DatabaseSPBDetail().selectSPBDetail();
-    List<SPBLoader> _listSPBLoader =
-        await DatabaseSPBLoader().selectSPBLoader();
+    List<SPBDetail> _listSPBDetail = await DatabaseSPBDetail().selectSPBDetail();
+    List<SPBLoader> _listSPBLoader = await DatabaseSPBLoader().selectSPBLoader();
     if (_listSPB.isNotEmpty) {
       List<String> mapListSPB = [];
       List<String> mapListSPBDetail = [];
@@ -57,6 +57,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
       var stringListSPB = mapListSPB.join(",");
       var stringListSPBDetail = mapListSPBDetail.join(",");
       var stringListSPBLoader = mapListSPBLoader.join(",");
+
       String listSPB = "{$stringListSPB}";
       String listSPBDetail = "{$stringListSPBDetail}";
       String listSPBLoader = "{$stringListSPBLoader}";
@@ -70,7 +71,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
           onSuccessUploadSPB,
           onErrorUploadSPB);
     } else {
-      FlushBarManager.showFlushBarError(
+      FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "Upload SPB",
           "Belum ada SPB dibuat");
@@ -90,24 +91,26 @@ class KeraniKirimNotifier extends ChangeNotifier {
   uploadImage(BuildContext context) async {
     List<SPB> listSPB = await DatabaseSPB().selectSPB();
     for (int i = 0; i < listSPB.length; i++) {
-      UploadImageOPHRepository().doUploadPhoto(context, listSPB[i].spbPhoto!,
-          listSPB[i].spbId!, "spb", onSuccessUploadImage, onErrorUploadImage);
+      if(listSPB[i].spbPhoto != null) {
+        UploadImageOPHRepository().doUploadPhoto(context, listSPB[i].spbPhoto!,
+            listSPB[i].spbId!, "spb", onSuccessUploadImage, onErrorUploadImage);
+      }
     }
     DatabaseSPB().deleteSPB();
     DatabaseSPBDetail().deleteSPBDetail();
     DatabaseSPBLoader().deleteSPBLoader();
-  }
-
-  onSuccessUploadImage(BuildContext context, response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarSuccess(
         context, "Upload SPB", "Berhasil mengupload data");
   }
 
+  onSuccessUploadImage(BuildContext context, response) {
+  }
+
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload Foto SPB", "Gagal mengupload data");
+        context, "Upload Foto SPB", "Gagal mengupload data Foto");
   }
 
   dialogReLogin() {
@@ -119,7 +122,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
 
   onClickMenu(List<String> deliveryMenuEntries, int index) async {
     String dateNow = TimeManager.dateWithDash(DateTime.now());
-    String dateLogin = await StorageManager.readData("lastSynchDate");
+    String? dateLogin = await StorageManager.readData("lastSynchDate");
 
     switch (deliveryMenuEntries[index - 2].toUpperCase()) {
       case "BUAT FORM SPB":
@@ -191,6 +194,17 @@ class KeraniKirimNotifier extends ChangeNotifier {
             onPressYes: HomeNotifier().doLogOut,
             onPressNo: _dialogService.popDialog);
         break;
+    }
+  }
+
+  exportJson(BuildContext context) async {
+    File? fileExport = await FileManagerJson().writeFileJsonSPB();
+    if(fileExport != null) {
+      FlushBarManager.showFlushBarSuccess(
+          context, "Export Json Berhasil", "${fileExport.path}");
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Export Json Berhasil", "Belum ada Transaksi SPB");
     }
   }
 }

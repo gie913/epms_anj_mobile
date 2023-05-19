@@ -7,28 +7,43 @@ import '../helper/database_helper.dart';
 
 class DatabaseMCOPHSchema {
   void createTableMCOPHSchema(Database db) async {
+    // await db.execute('''
+    //   CREATE TABLE $mCOPHCardSchemaTable(
+    //    ${MCOPHEntity.ophCardId} TEXT NOT NULL,
+    //    ${MCOPHEntity.ophCardDivision} TEXT,
+    //    ${MCOPHEntity.ophCardStatus} TEXT,
+    //    ${MCOPHEntity.createdBy} TEXT,
+    //    ${MCOPHEntity.createdDate} TEXT,
+    //    ${MCOPHEntity.createdTime} TEXT,
+    //    ${MCOPHEntity.updatedBy} TEXT,
+    //    ${MCOPHEntity.updatedDate} TEXT,
+    //    ${MCOPHEntity.updatedTime} TEXT
+    //    )
+    // ''');
     await db.execute('''
       CREATE TABLE $mCOPHCardSchemaTable(
        ${MCOPHEntity.ophCardId} TEXT NOT NULL,
-       ${MCOPHEntity.ophCardDivision} TEXT,
-       ${MCOPHEntity.ophCardStatus} TEXT,
-       ${MCOPHEntity.createdBy} TEXT,
-       ${MCOPHEntity.createdDate} TEXT,
-       ${MCOPHEntity.createdTime} TEXT,
-       ${MCOPHEntity.updatedBy} TEXT,
-       ${MCOPHEntity.updatedDate} TEXT,
-       ${MCOPHEntity.updatedTime} TEXT)
+       ${MCOPHEntity.ophCardDivision} TEXT)
     ''');
   }
 
   Future<int> insertMCOPHSchema(List<MCOPHCardSchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(mCOPHCardSchemaTable, object[i].toJson());
-      count = count + saved;
-    }
-    return count;
+    // int count = 0;
+    // List<MCOPHCardSchema> listMCOPH = await selectMCOPHSchema();
+    // for (int i = 0; i < object.length; i++) {
+    //   if(!(listMCOPH.contains(object[i]))) {
+    //     int saved = await db.insert(mCOPHCardSchemaTable, object[i].toJson());
+    //     count = count + saved;
+    //   }
+    // }
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MCOPHCardSchema mcophCardSchema =  val;
+      batch.insert(mCOPHCardSchemaTable, mcophCardSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MCOPHCardSchema>> selectMCOPHSchema() async {

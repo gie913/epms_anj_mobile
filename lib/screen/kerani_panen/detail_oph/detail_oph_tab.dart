@@ -42,7 +42,8 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Tanggal:"),
-                  Text("${notifier.oph.createdDate ?? ""} ${notifier.oph.createdTime ?? ""}")
+                  Text(
+                      "${notifier.oph.createdDate ?? ""} ${notifier.oph.createdTime ?? ""}")
                 ],
               ),
             ),
@@ -109,50 +110,56 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                 ],
               ),
             ),
-            notifier.oph.ophHarvestingType == 3 ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Vendor:"),
-                  Container(
-                    width: 200,
-                    child: Text(
-                        "${notifier.oph.employeeCode ?? ""} ${notifier.oph.employeeName ?? ""}",
-                        textAlign: TextAlign.end),
+            notifier.oph.ophHarvestingType == 3
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Vendor:"),
+                        Container(
+                          width: 200,
+                          child: Text(
+                              "${notifier.oph.employeeCode ?? ""} ${notifier.oph.employeeName ?? ""}",
+                              textAlign: TextAlign.end),
+                        )
+                      ],
+                    ),
                   )
-                ],
-              ),
-            ) : Container(),
-            notifier.oph.ophHarvestingType != 3 ?Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Pekerja:"),
-                  Container(
-                    width: 200,
-                    child: Text(
-                        "${notifier.oph.employeeCode ?? ""} ${notifier.oph.employeeName ?? ""}",
-                        textAlign: TextAlign.end),
+                : Container(),
+            notifier.oph.ophHarvestingType != 3
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Pekerja:"),
+                        Container(
+                          width: 200,
+                          child: Text(
+                              "${notifier.oph.employeeCode ?? ""} ${notifier.oph.employeeName ?? ""}",
+                              textAlign: TextAlign.end),
+                        )
+                      ],
+                    ),
                   )
-                ],
-              ),
-            ) : Container(),
-            notifier.oph.ophHarvestingType == 2 ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Customer:"),
-                  Container(
-                    width: 200,
-                    child: Text("${notifier.oph.ophCustomerCode ?? ""}",
-                        textAlign: TextAlign.end),
+                : Container(),
+            notifier.oph.ophHarvestingType == 2
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Customer:"),
+                        Container(
+                          width: 200,
+                          child: Text("${notifier.oph.ophCustomerCode ?? ""}",
+                              textAlign: TextAlign.end),
+                        )
+                      ],
+                    ),
                   )
-                ],
-              ),
-            ) : Container(),
+                : Container(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -181,21 +188,57 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Blok:"),
-                  Container(
-                      width: 200,
-                      child: Text(
-                        "${notifier.oph.ophBlockCode ?? ""}",
-                        textAlign: TextAlign.end,
-                      ))
-                ],
-              ),
-            ),
+            notifier.onEdit
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Blok:"),
+                        Flexible(
+                          child: Container(
+                            width: 160,
+                            child: Focus(
+                              child: TextFormField(
+                                controller: notifier.blockNumber,
+                                textAlign: TextAlign.center,
+                                textCapitalization:
+                                    TextCapitalization.characters,
+                                decoration:
+                                    InputDecoration(hintText: "Tulis blok"),
+                                onChanged: (value) {
+                                  if (value.length >= 3) {
+                                    notifier.blockNumberCheck(context, value);
+                                  }
+                                  if (value.isEmpty) {
+                                    notifier.blockNumberCheck(context, value);
+                                  }
+                                },
+                                onFieldSubmitted: (value) {
+                                  notifier.blockNumberCheck(context, value);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Blok:"),
+                        Container(
+                            width: 200,
+                            child: Text(
+                              "${notifier.oph.ophBlockCode ?? ""}",
+                              textAlign: TextAlign.end,
+                            ))
+                      ],
+                    ),
+                  ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -225,7 +268,10 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                         Text("TPH"),
                         Padding(
                           padding: const EdgeInsets.all(20.0),
-                          child: Text("${notifier.oph.ophTphCode ?? ""}", style: Style.textBold18,),
+                          child: Text(
+                            "${notifier.oph.ophTphCode ?? ""}",
+                            style: Style.textBold18,
+                          ),
                         )
                       ],
                     ),
@@ -237,65 +283,69 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Kartu OPH"),
-                        notifier.onChangeCard ? Column(
-                          children: [
-                            Container(
-                              width: 160,
-                              child: TextFormField(
-                                controller: notifier.ophNumber,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                    hintText: "Tulis Kartu OPH"),
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                onTap: () async {
-                                  String? result =
-                                  await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              QRReaderScreen()));
-                                  if (result != null) {
-                                    setState(() {
-                                      notifier.ophNumber =
-                                          TextEditingController(
-                                              text: result);
-                                    });
-                                  }
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10.0),
-                                  ),
-                                  color: Colors.green,
-                                  child: Padding(
-                                    padding:
-                                    const EdgeInsets.all(16.0),
-                                    child: Text(
-                                      "BACA QR KARTU",
+                        notifier.onChangeCard
+                            ? Column(
+                                children: [
+                                  Container(
+                                    width: 160,
+                                    child: TextFormField(
+                                      controller: notifier.ophNumber,
                                       textAlign: TextAlign.center,
-                                      style: Style.whiteBold14,
+                                      textCapitalization:
+                                          TextCapitalization.characters,
+                                      decoration: InputDecoration(
+                                          hintText: "Tulis Kartu OPH"),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter some text';
+                                        }
+                                        return null;
+                                      },
                                     ),
                                   ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        String? result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    QRReaderScreen()));
+                                        if (result != null) {
+                                          setState(() {
+                                            notifier.ophNumber =
+                                                TextEditingController(
+                                                    text: result);
+                                          });
+                                        }
+                                      },
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        color: Colors.green,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Text(
+                                            "BACA QR KARTU",
+                                            textAlign: TextAlign.center,
+                                            style: Style.whiteBold14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(
+                                  "${notifier.oph.ophCardId ?? ""}",
+                                  style: Style.textBold18,
                                 ),
-                              ),
-                            )
-                          ],
-                        ) : Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text("${notifier.oph.ophCardId ?? ""}", style: Style.textBold18,),
-                        )
+                              )
                       ],
                     ),
                   )
@@ -316,146 +366,124 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
             SizedBox(
               height: 20,
             ),
-            notifier.onEdit ? Container(
-              width: MediaQuery.of(context).size.width,
-              child: InkWell(
-                onTap: () {
-                  notifier.getCamera(context);
-                },
-                child: Card(
-                  color: Palette.greenColor,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(14),
-                    child: Text(
-                      "FOTO HASIL PANEN",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ) : Container(),
-            notifier.isChangeCard ? Container(
-              width: MediaQuery.of(context).size.width,
-              child: InkWell(
-                onTap: () {
-                  notifier.onChangeCardEdit();
-                },
-                child: Card(
-                  color: Palette.primaryColorProd,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(14),
-                    child: Text(
-                      "UBAH KARTU OPH",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ) : Container(),
-            notifier.onEdit || notifier.onChangeCard ? Container(
-              width: MediaQuery.of(context).size.width,
-              child: InkWell(
-                onTap: () {
-                  if(notifier.restan) {
-                    notifier.doWriteRestanDialog();
-                  } else {
-                    notifier.onUpdateOPHClicked(context);
-                  }
-                },
-                child: Card(
-                  color: Palette.primaryColorProd,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(14),
-                    child: Text(
-                      "SIMPAN",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ) : Container(),
-            !notifier.isExist
+            notifier.onEdit
                 ? Container(
-              width: MediaQuery.of(context).size.width,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Card(
-                  color: Palette.redColorDark,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(14),
-                    child: Text(
-                      "KEMBALI",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
+                    width: MediaQuery.of(context).size.width,
+                    child: InkWell(
+                      onTap: () {
+                        notifier.getCamera(context);
+                      },
+                      child: Card(
+                        color: Palette.greenColor,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(14),
+                          child: Text(
+                            "FOTO HASIL PANEN",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
-                : notifier.onEdit ? Container() : Container(
-              width: MediaQuery.of(context).size.width,
-              child: InkWell(
-                onTap: () {
-                  notifier.onChangeEdit();
-                },
-                child: Card(
-                  color: Palette.primaryColorProd,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(14),
-                    child: Text(
-                      "UBAH DATA OPH",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
+                  )
+                : Container(),
+            notifier.isChangeCard
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: InkWell(
+                      onTap: () {
+                        notifier.onChangeCardEdit();
+                      },
+                      child: Card(
+                        color: Palette.primaryColorProd,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(14),
+                          child: Text(
+                            "GANTI KARTU OPH",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : Container(),
+            notifier.onEdit || notifier.onChangeCard
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: InkWell(
+                      onTap: () {
+                        notifier.onSaveChangeCard(context);
+                      },
+                      child: Card(
+                        color: Palette.primaryColorProd,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(14),
+                          child: Text(
+                            "SIMPAN",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
+            !notifier.isExist
+                ? Container()
+                : notifier.onEdit
+                    ? Container()
+                    : Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: InkWell(
+                          onTap: () {
+                            notifier.onChangeEdit();
+                          },
+                          child: Card(
+                            color: Palette.primaryColorProd,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(14),
+                              child: Text(
+                                "UBAH DATA OPH",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
           ]),
         ),
       );

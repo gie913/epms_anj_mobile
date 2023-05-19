@@ -47,9 +47,12 @@ class DatabaseLaporanRestan {
   Future<int> insertLaporanRestan(List<LaporanRestan> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<LaporanRestan> listRestan = await selectLaporanRestan();
     for (int i = 0; i < object.length; i++) {
-      int saved = await db.insert(laporanRestanTable, object[i].toJson());
-      count = count + saved;
+      if(!(listRestan.contains(object[i]))) {
+        int saved = await db.insert(laporanRestanTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }

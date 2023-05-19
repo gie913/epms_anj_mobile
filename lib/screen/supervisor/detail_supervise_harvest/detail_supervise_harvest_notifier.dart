@@ -1,11 +1,24 @@
+import 'package:epms/base/common/locator.dart';
+import 'package:epms/base/common/routes.dart';
+import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_oph_supervise.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph_supervise.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class DetailSuperviseHarvestNotifier extends ChangeNotifier {
+  NavigatorService _navigationService = locator<NavigatorService>();
+
+  NavigatorService get navigationService => _navigationService;
+
+  DialogService _dialogService = locator<DialogService>();
+
+  DialogService get dialogService => _dialogService;
+
   TextEditingController _bunchesRipe = TextEditingController();
 
   TextEditingController get bunchesRipe => _bunchesRipe;
@@ -66,10 +79,6 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
 
   bool get onEdit => _onEdit;
 
-  ImagePicker _picker = ImagePicker();
-
-  ImagePicker get picker => _picker;
-
   onInit(OPHSupervise ophSupervise) {
     _ophSupervise = ophSupervise;
     _kemandoran = MEmployeeSchema(
@@ -79,7 +88,8 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
         employeeCode: _ophSupervise?.supervisiKeraniPanenEmployeeCode,
         employeeName: _ophSupervise?.supervisiKeraniPanenEmployeeName);
     _pemanen = MEmployeeSchema(
-        employeeName: _ophSupervise?.supervisiPemanenEmployeeName);
+        employeeName: _ophSupervise?.supervisiPemanenEmployeeName,
+        employeeCode: _ophSupervise?.supervisiPemanenEmployeeCode);
     notesOPH.text = _ophSupervise?.supervisiNotes ?? "";
     bunchesRipe.text = _ophSupervise!.bunchesRipe!.toString();
     bunchesOverRipe.text = _ophSupervise!.bunchesOverripe.toString();
@@ -112,8 +122,8 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  countBunches(
-      BuildContext context, TextEditingController textEditingController) {
+  countBunches(BuildContext context,
+      TextEditingController textEditingController) {
     if (textEditingController.text.isEmpty ||
         textEditingController.text == "0") {
       textEditingController.value = TextEditingValue(text: "0");
@@ -127,18 +137,19 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     }
     try {
       bunchesTotal.text = (int.parse(bunchesRipe.text) +
-              int.parse(bunchesOverRipe.text) +
-              int.parse(bunchesHalfRipe.text) +
-              int.parse(bunchesUnRipe.text) +
-              int.parse(bunchesAbnormal.text) +
-              int.parse(bunchesEmpty.text))
+          int.parse(bunchesOverRipe.text) +
+          int.parse(bunchesHalfRipe.text) +
+          int.parse(bunchesUnRipe.text) +
+          int.parse(bunchesAbnormal.text) +
+          int.parse(bunchesEmpty.text))
           .toString();
     } catch (e) {
       print(e);
     }
   }
 
-  onUpdateOPHSupervise(BuildContext context) async {
+  onUpdateOPHSupervise() async {
+    _dialogService.popDialog();
     DateTime now = DateTime.now();
     _ophSupervise?.updatedDate = TimeManager.dateWithDash(now);
     _ophSupervise?.updatedTime = TimeManager.dateWithDash(now);
@@ -149,6 +160,7 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     _ophSupervise?.supervisiMandorEmployeeName = _kemandoran?.employeeName;
     _ophSupervise?.supervisiMandorEmployeeCode = _kemandoran?.employeeCode;
     _ophSupervise?.supervisiPemanenEmployeeName = _pemanen?.employeeName;
+    _ophSupervise?.supervisiPemanenEmployeeCode = _pemanen?.employeeCode;
     _ophSupervise?.bunchesRipe = int.parse(_bunchesRipe.text);
     _ophSupervise?.bunchesOverripe = int.parse(bunchesOverRipe.text);
     _ophSupervise?.bunchesHalfripe = int.parse(bunchesHalfRipe.text);
@@ -159,27 +171,34 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     _ophSupervise?.bunchesTotal = int.parse(bunchesTotal.text);
     _ophSupervise?.bunchesNotSent = int.parse(bunchesNotSent.text);
     int count =
-        await DatabaseOPHSupervise().updateOPHSuperviseByID(_ophSupervise!);
+    await DatabaseOPHSupervise().updateOPHSuperviseByID(_ophSupervise!);
     if (count > 0) {
-      Navigator.pop(context);
-      // FlushBarManager.showFlushBarSuccess(context, "Berhasil tersimpan");
+      _navigationService.push(Routes.HOME_PAGE);
+      FlushBarManager.showFlushBarSuccess(
+          _navigationService.navigatorKey.currentContext!,
+          "Simpan Supervisi", "Berhasil menyimpan");
     } else {
-      // FlushBarManager.showFlushBarWarning(context, "Gagal tersimpan");
+      FlushBarManager.showFlushBarError(
+          _navigationService.navigatorKey.currentContext!,
+          "Simpan Supervisi", "Gagal menyimpan");
     }
   }
 
+  showDialogQuestion(BuildContext context) {
+    _dialogService.showOptionDialog(title: "Simpan Supervisi Ancak",
+        subtitle: "Anda yakin ingin menyimpan?",
+        buttonTextYes: "Iya",
+        buttonTextNo: "Tidak",
+        onPressYes: onUpdateOPHSupervise,
+        onPressNo: _dialogService.popDialog);
+  }
+
+
   Future getCamera(BuildContext context) async {
-    try {
-      final pickedFile = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 20,
-      );
-      if (pickedFile != null) {
-        this.ophSupervise?.supervisiPhoto = pickedFile.path;
-      }
-    } catch (e) {
-      print(e);
+    String? picked = await CameraService.getImageByCamera(context);
+    if (picked != null) {
+      this.ophSupervise?.supervisiPhoto = picked;
+      notifyListeners();
     }
-    notifyListeners();
   }
 }

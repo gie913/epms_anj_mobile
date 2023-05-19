@@ -34,6 +34,14 @@ class RestanReportNotifier extends ChangeNotifier {
 
   String get blockValue => _blockValue;
 
+  List<String> _listDivision = ["Semua"];
+
+  List<String> get listDivision => _listDivision;
+
+  String _divisionValue = "Semua";
+
+  String get divisionValue => _divisionValue;
+
   dynamic _totalBunches = 0;
 
   dynamic get totalBunches => _totalBunches;
@@ -48,20 +56,30 @@ class RestanReportNotifier extends ChangeNotifier {
 
   getListLaporanRestan() async {
     List<String> listBlockTemp = [];
+    List<String> listDivisionTemp = [];
     _listRestan = await DatabaseLaporanRestan().selectLaporanRestan();
     _listRestan.forEach((element) {
       _totalBunches = _totalBunches + element.bunchesTotal;
       _totalLooseFruits = _totalLooseFruits + element.looseFruits;
       if (!listBlockTemp.contains(element.ophBlockCode)) {
-        if(element.ophBlockCode == null) {
+        if (element.ophBlockCode == null) {
           print(element.ophId);
         } else {
           listBlockTemp.add(element.ophBlockCode!);
           listBlockTemp.sort((a, b) => a.toString().compareTo(b.toString()));
         }
       }
+      if (!listDivisionTemp.contains(element.ophDivisionCode)) {
+        if (element.ophDivisionCode == null) {
+          print(element.ophId);
+        } else {
+          listDivisionTemp.add(element.ophDivisionCode!);
+          listDivisionTemp.sort((a, b) => a.toString().compareTo(b.toString()));
+        }
+      }
     });
     _listBlock.addAll(listBlockTemp);
+    _listDivision.addAll(listDivisionTemp);
     _countOPHRestan = listRestan.length;
     notifyListeners();
   }
@@ -77,33 +95,128 @@ class RestanReportNotifier extends ChangeNotifier {
     }
   }
 
+  onSetDivisionValue(String value) {
+    _blockValue = "Semua";
+    _divisionValue = value;
+    _totalBunches = 0;
+    _totalLooseFruits = 0;
+    _listRestanResult.clear();
+    _listBlock = ["Semua"];
+    List<String> listBlockTemp = [];
+    if (value == "Semua" && _blockValue == "Semua") {
+      for (int i = 0; i < _listRestan.length; i++) {
+        _totalBunches = _totalBunches + _listRestan[i].bunchesTotal;
+        _totalLooseFruits = _totalLooseFruits + _listRestan[i].looseFruits;
+      }
+      _countOPHRestan = _listRestan.length;
+      notifyListeners();
+    } else if (_blockValue == "Semua") {
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i].ophDivisionCode != null) {
+          if (_listRestan[i]
+              .ophDivisionCode!
+              .toLowerCase()
+              .contains(value.toLowerCase()))
+            _listRestanResult.add(_listRestan[i]);
+        }
+      }
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+        if (!listBlockTemp.contains(_listRestanResult[i].ophBlockCode)) {
+          if (_listRestanResult[i].ophBlockCode == null) {
+            print(_listRestanResult[i].ophId);
+          } else {
+            listBlockTemp.add(_listRestanResult[i].ophBlockCode!);
+            listBlockTemp.sort((a, b) => a.toString().compareTo(b.toString()));
+          }
+        }
+      }
+      _listBlock = ["Semua"];
+      _listBlock.addAll(listBlockTemp);
+      _countOPHRestan = listRestanResult.length;
+    } else {
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i].ophDivisionCode != null) {
+          if (_listRestan[i]
+                  .ophDivisionCode!
+                  .toLowerCase()
+                  .contains(value.toLowerCase()) &&
+              _listRestan[i]
+                  .ophBlockCode!
+                  .toLowerCase()
+                  .contains(value.toLowerCase()))
+            _listRestanResult.add(_listRestan[i]);
+        }
+      }
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+        if (!listBlockTemp.contains(_listRestanResult[i].ophBlockCode)) {
+          if (_listRestanResult[i].ophBlockCode == null) {
+            print(_listRestanResult[i].ophId);
+          } else {
+            listBlockTemp.add(_listRestanResult[i].ophBlockCode!);
+            listBlockTemp.sort((a, b) => a.toString().compareTo(b.toString()));
+          }
+        }
+      }
+      _listBlock = ["Semua"];
+      _listBlock.addAll(listBlockTemp);
+      _countOPHRestan = listRestanResult.length;
+    }
+    notifyListeners();
+  }
+
   onSetBlockValue(String value) {
     _blockValue = value;
     _totalBunches = 0;
     _totalLooseFruits = 0;
     _listRestanResult.clear();
-    if (value == "Semua") {
-      _listRestan.forEach((element) {
-        _totalBunches = _totalBunches + element.bunchesTotal;
-        _totalLooseFruits = _totalLooseFruits + element.looseFruits;
-      });
+    if (value == "Semua" && _divisionValue == "Semua") {
+      for (int i = 0; i < _listRestan.length; i++) {
+        _totalBunches = _totalBunches + _listRestan[i].bunchesTotal;
+        _totalLooseFruits = _totalLooseFruits + _listRestan[i].looseFruits;
+      }
       _countOPHRestan = _listRestan.length;
       notifyListeners();
-      return;
-    } else {
-      _listRestan.forEach((laporanRestan) {
-        if(laporanRestan.ophBlockCode != null) {
-          if (laporanRestan.ophBlockCode!
+    } else if (_divisionValue == "Semua") {
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i].ophBlockCode != null ||
+            _listRestan[i].ophDivisionCode != null) {
+          if (_listRestan[i]
+              .ophBlockCode!
               .toLowerCase()
               .contains(value.toLowerCase()))
-            _listRestanResult.add(laporanRestan);
+            _listRestanResult.add(_listRestan[i]);
         }
-      });
-      _listRestanResult.forEach((element) {
-        _totalBunches = _totalBunches + element.bunchesTotal;
-        _totalLooseFruits = _totalLooseFruits + element.looseFruits;
-      });
+      }
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
       _countOPHRestan = listRestanResult.length;
+      notifyListeners();
+    } else {
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i].ophBlockCode != null ||
+            _listRestan[i].ophDivisionCode != null) {
+          if (_listRestan[i].ophBlockCode! == value &&
+              _listRestan[i].ophDivisionCode! == _divisionValue) {
+            _listRestanResult.add(_listRestan[i]);
+          }
+        }
+      }
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
+      _countOPHRestan = listRestanResult.length;
+      notifyListeners();
     }
     notifyListeners();
   }

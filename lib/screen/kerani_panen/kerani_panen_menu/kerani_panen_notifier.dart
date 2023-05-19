@@ -1,18 +1,26 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
+import 'package:epms/common_manager/connection_manager.dart';
+import 'package:epms/common_manager/delete_master.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_attendance.dart';
+import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/supervisor.dart';
+import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/model/t_attendance_schema.dart';
 import 'package:epms/screen/home/home_notifier.dart';
+import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_oph_repository.dart';
 import 'package:flutter/material.dart';
@@ -29,26 +37,43 @@ class KeraniPanenNotifier extends ChangeNotifier {
   doUpload() async {
     _dialogService.popDialog();
     List<OPH> _listOPH = await DatabaseOPH().selectOPH();
-    List<TAttendanceSchema> _listAttendance =
-        await DatabaseAttendance().selectEmployeeAttendance();
-
+    List<TAttendanceSchema> _listAttendance = await DatabaseAttendance().selectEmployeeAttendance();
     if (_listOPH.isNotEmpty) {
-      _dialogService.showLoadingDialog(title: "Upload OPH");
-      List<String> mapListOPH = [];
-      List<String> mapListAttendance = [];
+      List<OPH> photo = await DatabaseOPH().selectOPHPhoto();
+      if (photo.isNotEmpty) {
+        onErrorUploadImageEmpty(_navigationService.navigatorKey.currentContext!,
+            "${photo[0].ophId}");
+      } else {
+        _dialogService.showLoadingDialog(title: "Upload OPH");
+        List<String> mapListOPH = [];
+        List<String> mapListAttendance = [];
 
-      for (int i = 0; i < _listOPH.length; i++) {
-        String jsonString = jsonEncode(_listOPH[i]);
-        mapListOPH.add("\"$i\":$jsonString");
+        for (int i = 0; i < _listOPH.length; i++) {
+          String jsonString = jsonEncode(_listOPH[i]);
+          mapListOPH.add("\"$i\":$jsonString");
+        }
+
+        for (int i = 0; i < _listAttendance.length; i++) {
+          String jsonString = jsonEncode(_listAttendance[i]);
+          mapListAttendance.add("\"$i\":$jsonString");
+        }
+        var stringListOPH = mapListOPH.join(",");
+        var stringListAttendance = mapListAttendance.join(",");
+        String listOPH = "{$stringListOPH}";
+        String listAttendance = "{$stringListAttendance}";
+        UploadOPHRepository().doPostUploadOPH(
+            listOPH, listAttendance, onSuccessUploadOPH, onErrorUploadOPH);
       }
-
+    } else if(_listAttendance.isNotEmpty) {
+      _dialogService.showLoadingDialog(title: "Upload OPH");
+      List<String> mapListAttendance = [];
+      List<TAttendanceSchema> _listAttendance = await DatabaseAttendance().selectEmployeeAttendance();
       for (int i = 0; i < _listAttendance.length; i++) {
         String jsonString = jsonEncode(_listAttendance[i]);
         mapListAttendance.add("\"$i\":$jsonString");
       }
-      var stringListOPH = mapListOPH.join(",");
       var stringListAttendance = mapListAttendance.join(",");
-      String listOPH = "{$stringListOPH}";
+      String listOPH = "{}";
       String listAttendance = "{$stringListAttendance}";
       UploadOPHRepository().doPostUploadOPH(
           listOPH, listAttendance, onSuccessUploadOPH, onErrorUploadOPH);
@@ -67,8 +92,10 @@ class KeraniPanenNotifier extends ChangeNotifier {
   uploadImage(BuildContext context) async {
     List<OPH> listOPH = await DatabaseOPH().selectOPH();
     for (int i = 0; i < listOPH.length; i++) {
-      UploadImageOPHRepository().doUploadPhoto(context, listOPH[i].ophPhoto!,
-          listOPH[i].ophId!, "oph", onSuccessUploadImage, onErrorUploadImage);
+      if (listOPH[i].ophPhoto != null) {
+        UploadImageOPHRepository().doUploadPhoto(context, listOPH[i].ophPhoto!,
+            listOPH[i].ophId!, "oph", onSuccessUploadImage, onErrorUploadImage);
+      }
     }
     DatabaseOPH().deleteOPH();
     _dialogService.popDialog();
@@ -76,6 +103,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
         _navigationService.navigatorKey.currentContext!,
         "Upload Data",
         "Berhasil mengupload data");
+    // DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+    // SynchNotifier().doSynchMasterDataBackground(context);
   }
 
   onErrorUploadOPH(String response) {
@@ -92,10 +121,18 @@ class KeraniPanenNotifier extends ChangeNotifier {
 
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
+    // FlushBarManager.showFlushBarWarning(
+    //     _navigationService.navigatorKey.currentContext!,
+    //     "Upload Foto",
+    //     "Gagal mengupload foto");
+  }
+
+  onErrorUploadImageEmpty(BuildContext context, String response) {
+    _dialogService.popDialog();
     FlushBarManager.showFlushBarWarning(
         _navigationService.navigatorKey.currentContext!,
         "Upload Foto",
-        "Gagal mengupload foto");
+        "Ada OPH yang tidak ada foto, ID OPH $response");
   }
 
   onLogOutClicked() {
@@ -108,7 +145,7 @@ class KeraniPanenNotifier extends ChangeNotifier {
   onClickedMenu(BuildContext context, List<String> harvesterMenuEntries,
       int index) async {
     String dateNow = TimeManager.dateWithDash(DateTime.now());
-    String dateLogin = await StorageManager.readData("lastSynchDate");
+    String? dateLogin = await StorageManager.readData("lastSynchDate");
     switch (harvesterMenuEntries[index - 2].toUpperCase()) {
       case "ABSENSI":
         if (dateLogin == dateNow) {
@@ -200,7 +237,70 @@ class KeraniPanenNotifier extends ChangeNotifier {
         supervisor: supervisor, onPress: _dialogService.popDialog);
   }
 
+  reSynch() {
+    _dialogService.showOptionDialog(
+        title: "Sinkronisasi Ulang",
+        subtitle: "Anda yakin ingin synch ulang?",
+        buttonTextYes: "Ya",
+        buttonTextNo: "Tidak",
+        onPressYes: onPressYes,
+        onPressNo: onPressNo);
+  }
+
+  onSuccessSynch(BuildContext context, SynchResponse synchResponse) {
+    _dialogService.popDialog();
+    DeleteMaster().deleteMasterData().then((value) {
+      if (value) {
+        _navigationService.push(Routes.SYNCH_PAGE);
+      }
+    });
+  }
+
+  onErrorSynch(BuildContext context, String response) {
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarWarning(
+        _navigationService.navigatorKey.currentContext!,
+        "Koneksi",
+        "Tidak terkoneksi jaringan lokal");
+  }
+
   navigateToSupervisionForm() {
     _navigationService.push(Routes.SUPERVISOR_FORM_PAGE, arguments: "Home");
+  }
+
+  onPressYes() {
+    _dialogService.popDialog();
+    ConnectionManager().checkConnection().then((value) {
+      if (value == ConnectivityResult.none) {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Koneksi",
+            "Tidak ada koneksi internet");
+      } else {
+        DatabaseMConfig().selectMConfig().then((value) {
+          _dialogService.showLoadingDialog(title: "Mohon tunggu");
+          SynchRepository().doPostSynch(
+              _navigationService.navigatorKey.currentContext!,
+              value.estateCode!,
+              onSuccessSynch,
+              onErrorSynch);
+        });
+      }
+    });
+  }
+
+  onPressNo() {
+    _dialogService.popDialog();
+  }
+
+  exportJson(BuildContext context) async {
+    File? fileExport = await FileManagerJson().writeFileJsonOPH();
+    if (fileExport != null) {
+      FlushBarManager.showFlushBarSuccess(
+          context, "Export Json Berhasil", "${fileExport.path}");
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          context, "Export Json", "Belum ada transaksi OPH");
+    }
   }
 }

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'base/common/locator.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
   FlavorConfig(
     variables: {

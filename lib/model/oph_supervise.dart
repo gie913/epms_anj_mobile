@@ -13,6 +13,7 @@ class OPHSupervise {
   String? supervisiKeraniPanenEmployeeCode;
   String? supervisiKeraniPanenEmployeeName;
   String? supervisiPemanenEmployeeName;
+  String? supervisiPemanenEmployeeCode;
   String? supervisiPhoto;
   String? supervisiDivisionCode;
   int? bunchesRipe;
@@ -48,6 +49,7 @@ class OPHSupervise {
         this.supervisiKeraniPanenEmployeeCode,
         this.supervisiKeraniPanenEmployeeName,
         this.supervisiPemanenEmployeeName,
+        this.supervisiPemanenEmployeeCode,
         this.supervisiPhoto,
         this.supervisiDivisionCode,
         this.bunchesRipe,
@@ -85,6 +87,7 @@ class OPHSupervise {
     supervisiKeraniPanenEmployeeName =
     json['supervisi_kerani_panen_employee_name'];
     supervisiPemanenEmployeeName = json['supervisi_pemanen_employee_name'];
+    supervisiKeraniPanenEmployeeCode = json['supervisi_pemanen_employee_code'];
     supervisiPhoto = json['supervisi_photo'];
     supervisiDivisionCode = json['supervisi_division_code'];
     bunchesRipe = json['bunches_ripe'];
@@ -124,6 +127,7 @@ class OPHSupervise {
     data['supervisi_kerani_panen_employee_name'] =
         this.supervisiKeraniPanenEmployeeName;
     data['supervisi_pemanen_employee_name'] = this.supervisiPemanenEmployeeName;
+    data['supervisi_pemanen_employee_code'] = this.supervisiPemanenEmployeeCode;
     data['supervisi_photo'] = this.supervisiPhoto;
     data['supervisi_division_code'] = this.supervisiDivisionCode;
     data['bunches_ripe'] = this.bunchesRipe;

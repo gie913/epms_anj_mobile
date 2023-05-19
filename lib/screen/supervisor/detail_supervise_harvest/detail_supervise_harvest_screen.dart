@@ -1,4 +1,5 @@
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/model/oph_supervise.dart';
 import 'package:epms/screen/supervisor/detail_supervise_harvest/detail_supervise_harvest_notifier.dart';
 import 'package:epms/screen/supervisor/detail_supervise_harvest/supervise_harvest_detail_edit_fruit.dart';
@@ -30,30 +31,39 @@ class _DetailSuperviseHarvestScreenState
   Widget build(BuildContext context) {
     return Consumer<DetailSuperviseHarvestNotifier>(
       builder: (context, notifier, child) {
-        return DefaultTabController(
-          initialIndex: 0,
-          length: 2,
-          child: MediaQuery(
-            data: Style.mediaQueryText(context),
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Detail Laporan Supervisi'),
-                bottom: TabBar(
-                  tabs: <Widget>[
-                    Tab(
-                      icon: Text("Form"),
-                    ),
-                    Tab(
-                      icon: Text("Hasil"),
-                    ),
+        return WillPopScope(
+          onWillPop: () async {
+            if (notifier.onEdit) {
+              return NavigatorService().onWillPopForm(context);
+            } else {
+              return true;
+            }
+          },
+          child: DefaultTabController(
+            initialIndex: 0,
+            length: 2,
+            child: MediaQuery(
+              data: Style.mediaQueryText(context),
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text('Detail Laporan Supervisi'),
+                  bottom: TabBar(
+                    tabs: <Widget>[
+                      Tab(
+                        icon: Text("Form"),
+                      ),
+                      Tab(
+                        icon: Text("Hasil"),
+                      ),
+                    ],
+                  ),
+                ),
+                body: TabBarView(
+                  children: <Widget>[
+                    SuperviseHarvestDetailTab(),
+                    notifier.onEdit ? SuperviseDetailEditFruit() : SuperviseHarvestDetailFruit()
                   ],
                 ),
-              ),
-              body: TabBarView(
-                children: <Widget>[
-                  SuperviseHarvestDetailTab(),
-                  notifier.onEdit ? SuperviseDetailEditFruit() : SuperviseHarvestDetailFruit()
-                ],
               ),
             ),
           ),

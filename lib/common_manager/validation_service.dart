@@ -17,7 +17,6 @@ import 'package:epms/model/m_vras_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/spb.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ValidationService {
   static bool checkIsNull(TextEditingController textEditingController) {
@@ -37,9 +36,9 @@ class ValidationService {
     return mBlockSchema;
   }
 
-  static Future<MTPHSchema?> checkMTPHSchema(String tphCode, String estateCode) async {
+  static Future<MTPHSchema?> checkMTPHSchema(String tphCode, String estateCode, String blokCode) async {
     MTPHSchema? mtphSchema =
-        await DatabaseMTPHSchema().selectMTPHSchemaByID(tphCode, estateCode);
+        await DatabaseMTPHSchema().selectMTPHSchemaByID(tphCode, estateCode, blokCode);
     return mtphSchema;
   }
 
@@ -53,11 +52,6 @@ class ValidationService {
     MCSPBCardSchema? mcspbCardSchema =
         await DatabaseMCSPBCardSchema().selectMCSPBCardSchema(spbCardID);
     return mcspbCardSchema;
-  }
-
-  static bool checkPhoto(PickedFile? pickedFile) {
-    if (pickedFile != null) return true;
-    return false;
   }
 
   static bool checkGrading(String totalJanjang, String brondolan) {

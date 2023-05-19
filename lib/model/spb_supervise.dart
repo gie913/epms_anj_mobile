@@ -1,15 +1,17 @@
 class SPBSupervise {
+  String? spbSuperviseId;
   String? spbId;
   String? supervisiSpbEmployeeCode;
   String? supervisiSpbEmployeeName;
+  String? supervisiEstateCode;
   String? supervisiSpbLat;
   String? supervisiSpbLong;
   String? supervisiSpbDriverEmployeeCode;
   String? supervisiSpbDriverEmployeeName;
   String? supervisiSpbDivisionCode;
   String? supervisiSpbLicenseNumber;
-  String? supervisiSpbType;
-  String? supervisiSpbMethod;
+  int? supervisiSpbType;
+  int? supervisiSpbMethod;
   String? supervisiSpbPhoto;
   int? bunchesRipe;
   int? bunchesOverripe;
@@ -20,6 +22,7 @@ class SPBSupervise {
   int? looseFruits;
   int? bunchesTotal;
   int? bunchesTotalNormal;
+  int? bunchesTangkaiPanjang;
   int? bunchesSampah;
   int? bunchesBatu;
   String? catatanBunchesTangkaiPanjang;
@@ -33,9 +36,11 @@ class SPBSupervise {
   String? updatedTime;
 
   SPBSupervise(
-      {this.spbId,
+      {this.spbSuperviseId,
+        this.spbId,
       this.supervisiSpbEmployeeCode,
       this.supervisiSpbEmployeeName,
+        this.supervisiEstateCode,
       this.supervisiSpbLat,
       this.supervisiSpbLong,
       this.supervisiSpbDriverEmployeeCode,
@@ -54,6 +59,7 @@ class SPBSupervise {
       this.looseFruits,
       this.bunchesTotal,
       this.bunchesTotalNormal,
+        this.bunchesTangkaiPanjang,
       this.bunchesSampah,
       this.bunchesBatu,
       this.catatanBunchesTangkaiPanjang,
@@ -67,9 +73,11 @@ class SPBSupervise {
       this.updatedTime});
 
   SPBSupervise.fromJson(Map<String, dynamic> json) {
+    spbSuperviseId = json['spb_supervisi_id'];
     spbId = json['spb_id'];
     supervisiSpbEmployeeCode = json['supervisi_spb_employee_code'];
     supervisiSpbEmployeeName = json['supervisi_spb_employee_name'];
+    supervisiEstateCode = json['supervisi_spb_estate_code'];
     supervisiSpbLat = json['supervisi_spb_lat'];
     supervisiSpbLong = json['supervisi_spb_long'];
     supervisiSpbDriverEmployeeCode = json['supervisi_spb_driver_employee_code'];
@@ -88,6 +96,7 @@ class SPBSupervise {
     looseFruits = json['loose_fruits'];
     bunchesTotal = json['bunches_total'];
     bunchesTotalNormal = json['bunches_total_normal'];
+    bunchesTangkaiPanjang = json['bunches_tangkai_panjang'];
     bunchesSampah = json['bunches_sampah'];
     bunchesBatu = json['bunches_batu'];
     catatanBunchesTangkaiPanjang = json['catatan_bunches_tangkai_panjang'];
@@ -103,9 +112,11 @@ class SPBSupervise {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['spb_supervisi_id'] = this.spbSuperviseId;
     data['spb_id'] = this.spbId;
     data['supervisi_spb_employee_code'] = this.supervisiSpbEmployeeCode;
     data['supervisi_spb_employee_name'] = this.supervisiSpbEmployeeName;
+    data['supervisi_spb_estate_code'] = this.supervisiEstateCode;
     data['supervisi_spb_lat'] = this.supervisiSpbLat;
     data['supervisi_spb_long'] = this.supervisiSpbLong;
     data['supervisi_spb_driver_employee_code'] =
@@ -126,6 +137,7 @@ class SPBSupervise {
     data['loose_fruits'] = this.looseFruits;
     data['bunches_total'] = this.bunchesTotal;
     data['bunches_total_normal'] = this.bunchesTotalNormal;
+    data['bunches_tangkai_panjang'] = this.bunchesTangkaiPanjang;
     data['bunches_sampah'] = this.bunchesSampah;
     data['bunches_batu'] = this.bunchesBatu;
     data['catatan_bunches_tangkai_panjang'] = this.catatanBunchesTangkaiPanjang;

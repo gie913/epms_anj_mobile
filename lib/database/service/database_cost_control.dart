@@ -28,10 +28,13 @@ class DatabaseMCostControlSchema {
   Future<int> insertMCostControlSchema(List<MCostControlSchema> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<MCostControlSchema> listCost = await selectMCostControlSchema();
     for (int i = 0; i < object.length; i++) {
-      int saved =
-      await db.insert(mCostControlSchemaTable, object[i].toJson());
-      count = count + saved;
+      if(!(listCost.contains(object[i]))) {
+        int saved =
+        await db.insert(mCostControlSchemaTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }

@@ -15,11 +15,13 @@ class UploadImageOPHRepository extends APIConfiguration {
   void doUploadPhoto(BuildContext context, String image, String moduleId,
       String module, onSuccess, onError) async {
     String token = await StorageManager.readData("userToken");
+    String baseUrl = await StorageManager.readData("apiServer");
+
     File imageFile = File(image);
     var stream = http.ByteStream(imageFile.openRead());
     var length = await imageFile.length();
     try {
-      var url = APIEndPoint.BASE_URL + APIEndPoint.UPLOAD_IMAGE;
+      var url = baseUrl + APIEndPoint.UPLOAD_IMAGE;
       var uri = Uri.parse(url);
       var request = http.MultipartRequest("POST", uri);
       var mimeContent = lookupMimeType(

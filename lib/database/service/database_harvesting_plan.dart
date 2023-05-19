@@ -35,10 +35,13 @@ class DatabaseTHarvestingPlan {
   Future<int> insertTHarvestingPlan(List<THarvestingPlanSchema> object) async {
     Database db = await DatabaseHelper().database;
     int count = 0;
+    List<THarvestingPlanSchema> listTHarvesting = await selectTHarvestingPlan();
     for (int i = 0; i < object.length; i++) {
-      int saved =
-          await db.insert(tHarvestingPlanSchemaTable, object[i].toJson());
-      count = count + saved;
+      if(!(listTHarvesting.contains(object[i]))) {
+        int saved =
+        await db.insert(tHarvestingPlanSchemaTable, object[i].toJson());
+        count = count + saved;
+      }
     }
     return count;
   }

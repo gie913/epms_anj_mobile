@@ -5,6 +5,7 @@ import 'package:epms/base/ui/style.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/screen/kerani_kirim/edit_spb/edit_spb_notifier.dart';
+import 'package:epms/screen/qr_reader/qr_reader_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -202,9 +203,17 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                       Container(
                         width: 160,
                         child: TextFormField(
-                          onFieldSubmitted: (value) {},
+                          onFieldSubmitted: (value) {
+                            editSPB.checkVehicle(context, editSPB.vehicleNumber.text);
+                          },
+                          onChanged: (value) {
+                            if(value.length >= 8) {
+                              editSPB.checkVehicle(context, value);
+                            }
+                          },
                           controller: editSPB.vehicleNumber,
                           textAlign: TextAlign.center,
+                          textCapitalization: TextCapitalization.characters,
                           decoration:
                               InputDecoration(hintText: "Tulis No Kendaraan"),
                           validator: (value) {
@@ -218,7 +227,20 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () async {
+                            String? result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        QRReaderScreen()));
+                            if (result != null) {
+                              setState(() {
+                                editSPB.vehicleNumber =
+                                    TextEditingController(
+                                        text: result);
+                              });
+                            }
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -294,7 +316,7 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Sisa kapasitas truk (kg):"),
-                    Text("${editSPB.mvraSchema?.vraMaxCap ?? 0}")
+                    Text("${editSPB.globalSPB.spbCapacityTonnage ?? 0}")
                   ]),
             ),
             Padding(

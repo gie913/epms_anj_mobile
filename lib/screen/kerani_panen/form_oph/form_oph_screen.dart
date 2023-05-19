@@ -14,6 +14,7 @@ class FormOPHScreen extends StatefulWidget {
 }
 
 class _FormOPHScreenState extends State<FormOPHScreen> {
+
   @override
   void initState() {
     context.read<FormOPHNotifier>().generateVariable();

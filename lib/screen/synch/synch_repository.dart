@@ -37,6 +37,7 @@ class SynchRepository extends APIConfiguration {
     String? lastSynchTime = await StorageManager.readData("lastSynchTime");
     String? lastSynchDate = await StorageManager.readData("lastSynchDate");
     String? estateCodeSaved = await StorageManager.readData("estateCode");
+    String? userRolesSaved = await StorageManager.readData("userRoles");
     try {
       var url = baseUrl + APIEndPoint.SYNCH_ENDPOINT;
       var uri = Uri.parse(url);
@@ -45,11 +46,15 @@ class SynchRepository extends APIConfiguration {
       if (estateCode != estateCodeSaved) {
         deleteMasterData(context);
       } else {
-        if (lastSynchDate != null) {
-          map['last_synch_date'] = lastSynchDate;
-        }
-        if (lastSynchTime != null) {
-          map['last_synch_time'] = lastSynchTime;
+        if (userRolesSaved == "Supervisi_spb") {
+          deleteMasterData(context);
+        } else {
+          if (lastSynchDate != null) {
+            map['last_synch_date'] = lastSynchDate;
+          }
+          if (lastSynchTime != null) {
+            map['last_synch_time'] = lastSynchTime;
+          }
         }
       }
 
@@ -79,28 +84,36 @@ class SynchRepository extends APIConfiguration {
     }
   }
 
-  deleteMasterData(BuildContext context) {
-    DatabaseMActivitySchema().deleteMActivitySchema();
-    DatabaseMCOPHSchema().deleteMCOPHSchema();
-    DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
-    DatabaseMCostControlSchema().deleteMCostControlSchema();
-    DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
-    DatabaseMDivisionSchema().deleteMDivisionSchema();
-    DatabaseMDestinationSchema().deleteMDestinationSchema();
-    DatabaseMMaterialSchema().deleteMMaterialSchema();
-    DatabaseMTPHSchema().deleteMTPHSchema();
-    DatabaseMVRASchema().deleteMVRASchema();
-    DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
-    DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
-    DatabaseTABWSchema().deleteUser();
-    DatabaseTHarvestingPlan().deleteTHarvestingPlan();
-    DatabaseLaporanRestan().deleteLaporanRestan();
-    DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
-    DatabaseMVendorSchema().deleteMVendorSchema();
-    DatabaseMEstateSchema().deleteMEstateSchema();
-    DatabaseMEmployeeSchema().deleteMEmployeeSchema();
-    DatabaseAttendance().deleteEmployeeAttendance();
-    DatabaseMAttendance().deleteEmployeeAttendance();
-    DatabaseMBlockSchema().deleteMBlockSchema();
+  Future<bool> deleteMasterData(BuildContext context) async {
+   try {
+     StorageManager.deleteData("lastSynchTime");
+     StorageManager.deleteData("lastSynchDate");
+     StorageManager.deleteData("estateCode");
+     DatabaseMEmployeeSchema().deleteMEmployeeSchema();
+     DatabaseMActivitySchema().deleteMActivitySchema();
+     DatabaseMCOPHSchema().deleteMCOPHSchema();
+     DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
+     DatabaseMCostControlSchema().deleteMCostControlSchema();
+     DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
+     DatabaseMDivisionSchema().deleteMDivisionSchema();
+     DatabaseMDestinationSchema().deleteMDestinationSchema();
+     DatabaseMMaterialSchema().deleteMMaterialSchema();
+     DatabaseMTPHSchema().deleteMTPHSchema();
+     DatabaseMVRASchema().deleteMVRASchema();
+     DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
+     DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+     DatabaseTABWSchema().deleteTABWSchema();
+     DatabaseTHarvestingPlan().deleteTHarvestingPlan();
+     DatabaseLaporanRestan().deleteLaporanRestan();
+     DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
+     DatabaseMVendorSchema().deleteMVendorSchema();
+     DatabaseMEstateSchema().deleteMEstateSchema();
+     DatabaseAttendance().deleteEmployeeAttendance();
+     DatabaseMAttendance().deleteEmployeeAttendance();
+     DatabaseMBlockSchema().deleteMBlockSchema();
+     return true;
+   } catch (e) {
+     return false;
+   }
   }
 }

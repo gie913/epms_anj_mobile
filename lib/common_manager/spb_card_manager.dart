@@ -1,5 +1,6 @@
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/model/spb.dart';
+import 'package:epms/model/spb_detail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -8,8 +9,8 @@ import 'encryption_manager.dart';
 class SPBCardManager {
   ValueNotifier<dynamic> resultNFC = ValueNotifier(null);
 
-  writeSPBCard(BuildContext context, SPB spb, onSuccess, onError) {
-    String spbTag = ValueService.spbCardTag(spb);
+  writeSPBCard(BuildContext context, SPB spb, List<SPBDetail> listSPBDetail, onSuccess, onError) {
+    String spbTag = ValueService.spbCardTag(spb, listSPBDetail);
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       var ndef = Ndef.from(tag);
       if (ndef == null || !ndef.isWritable) {
@@ -25,9 +26,6 @@ class SPBCardManager {
       try {
         await ndef.write(message);
         resultNFC.value = 'Success to "Ndef Write"';
-        Future.delayed(const Duration(seconds: 2), () {
-          NfcManager.instance.stopSession();
-        });
         onSuccess(context);
       } catch (e) {
         resultNFC.value = e;
@@ -49,7 +47,7 @@ class SPBCardManager {
             for (int i = 0; i < split.length; i++) i: split[i]
           };
           SPB spbTemp = SPB();
-          spbTemp.spbCardId = values[0];
+          spbTemp.spbCardId = values[0]?.substring(1);
           spbTemp.spbId = values[1];
           spbTemp.spbType = int.parse(values[2]!);
           spbTemp.spbKeraniTransportEmployeeCode = values[3];
@@ -67,9 +65,6 @@ class SPBCardManager {
           spbTemp.createdTime = values[15];
           spbTemp.spbEstateVendorCode = values[16];
           onSuccess(context, spbTemp);
-          Future.delayed(const Duration(seconds: 2), () {
-            NfcManager.instance.stopSession();
-          });
         } else {
           onError(context, "Bukan Kartu SPB");
         }

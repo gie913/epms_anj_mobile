@@ -4,12 +4,12 @@ class MEstateSchema {
   String? estateCode;
   String? estateName;
   String? estatePlantCode;
-  String? createdBy;
-  String? createdDate;
-  String? createdTime;
-  String? updatedBy;
-  String? updatedDate;
-  String? updatedTime;
+  // String? createdBy;
+  // String? createdDate;
+  // String? createdTime;
+  // String? updatedBy;
+  // String? updatedDate;
+  // String? updatedTime;
   String? estateVendorCode;
 
   MEstateSchema(
@@ -18,12 +18,12 @@ class MEstateSchema {
       this.estateCode,
       this.estateName,
       this.estatePlantCode,
-      this.createdBy,
-      this.createdDate,
-      this.createdTime,
-      this.updatedBy,
-      this.updatedDate,
-      this.updatedTime,
+      // this.createdBy,
+      // this.createdDate,
+      // this.createdTime,
+      // this.updatedBy,
+      // this.updatedDate,
+      // this.updatedTime,
       this.estateVendorCode});
 
   MEstateSchema.fromJson(Map<String, dynamic> json) {
@@ -32,12 +32,12 @@ class MEstateSchema {
     estateCode = json['estate_code'];
     estateName = json['estate_name'];
     estatePlantCode = json['estate_plant_code'];
-    createdBy = json['created_by'];
-    createdDate = json['created_date'];
-    createdTime = json['created_time'];
-    updatedBy = json['updated_by'];
-    updatedDate = json['updated_date'];
-    updatedTime = json['updated_time'];
+    // createdBy = json['created_by'];
+    // createdDate = json['created_date'];
+    // createdTime = json['created_time'];
+    // updatedBy = json['updated_by'];
+    // updatedDate = json['updated_date'];
+    // updatedTime = json['updated_time'];
     estateVendorCode = json['estate_vendor_code'];
   }
 
@@ -48,12 +48,12 @@ class MEstateSchema {
     data['estate_code'] = this.estateCode;
     data['estate_name'] = this.estateName;
     data['estate_plant_code'] = this.estatePlantCode;
-    data['created_by'] = this.createdBy;
-    data['created_date'] = this.createdDate;
-    data['created_time'] = this.createdTime;
-    data['updated_by'] = this.updatedBy;
-    data['updated_date'] = this.updatedDate;
-    data['updated_time'] = this.updatedTime;
+    // data['created_by'] = this.createdBy;
+    // data['created_date'] = this.createdDate;
+    // data['created_time'] = this.createdTime;
+    // data['updated_by'] = this.updatedBy;
+    // data['updated_date'] = this.updatedDate;
+    // data['updated_time'] = this.updatedTime;
     data['estate_vendor_code'] = this.estateVendorCode;
     return data;
   }

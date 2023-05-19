@@ -4,7 +4,7 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/screen/kerani_kirim/form_spb/form_spb_detail_tab.dart';
 import 'package:epms/screen/kerani_kirim/form_spb/form_spb_notifier.dart';
 import 'package:epms/screen/kerani_kirim/form_spb/form_spb_oph_tab.dart';
-import 'package:epms/screen/kerani_kirim/form_spb/form_spn_loader_tab.dart';
+import 'package:epms/screen/kerani_kirim/form_spb/form_spb_loader_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

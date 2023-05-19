@@ -21,7 +21,7 @@ class _SearchEmployeeScreenState extends State<SearchEmployeeScreen> {
 
   TextEditingController typeAssignmentController = TextEditingController();
 
-  bool isFiltered = false;
+  bool isFiltered = true;
   String? valFarmer;
   bool isLoading = true;
   ScrollController? scrollController;
@@ -101,7 +101,7 @@ class _SearchEmployeeScreenState extends State<SearchEmployeeScreen> {
                         controller: typeAssignmentController,
                         decoration: InputDecoration(
                             hintText: "Pencarian", border: InputBorder.none),
-                        onChanged: onSearchTextChanged,
+                        onChanged: onSearchTextChangedTUserAssignment,
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.cancel),

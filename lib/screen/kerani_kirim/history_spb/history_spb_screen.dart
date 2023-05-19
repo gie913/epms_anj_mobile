@@ -103,14 +103,22 @@ class _HistorySPBScreenState extends State<HistorySPBScreen> {
                                                 Text(
                                                     "${historySPB.listSPB[index].spbTotalLooseFruit}")
                                               ]),
-                                          Row(
+                                          historySPB.listSPB[index].spbType != 1 ? Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text("Vendor:"),
                                                 Text(
-                                                    "${historySPB.listSPB[index].spbEstateVendorCode ?? ""}")
-                                              ]),
+                                                    "${historySPB.listSPB[index].spbDriverEmployeeName ?? ""}")
+                                              ]) : Container(),
+                                          historySPB.listSPB[index].spbType == 1 ? Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text("Supir:"),
+                                                Text(
+                                                    "${historySPB.listSPB[index].spbDriverEmployeeName ?? ""}")
+                                              ]) : Container(),
                                           Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.spaceBetween,

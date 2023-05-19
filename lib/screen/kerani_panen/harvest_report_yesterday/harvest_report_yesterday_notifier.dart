@@ -1,12 +1,23 @@
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
+import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/model/laporan_panen_kemarin.dart';
 import 'package:flutter/material.dart';
 
 class HarvestReportYesterdayNotifier extends ChangeNotifier {
-  List<LaporanPanenKemarin> _listLaporanPanen = [];
+  List<LaporanPanenKemarin> _listLaporanPanenKemarin = [];
 
-  List<LaporanPanenKemarin> get listLaporanPanen => _listLaporanPanen;
+  List<LaporanPanenKemarin> get listLaporanPanenKemarin =>
+      _listLaporanPanenKemarin;
+
+  List<LaporanPanenKemarin> _listLaporanPanenHariIni = [];
+
+  List<LaporanPanenKemarin> get listLaporanPanenHariIni =>
+      _listLaporanPanenHariIni;
+
+  List<LaporanPanenKemarin> _listResult = [];
+
+  List<LaporanPanenKemarin> get listResult => _listResult;
 
   List<String> _dateFilter = ["Hari ini"];
 
@@ -60,27 +71,13 @@ class HarvestReportYesterdayNotifier extends ChangeNotifier {
     DateTime now = DateTime.now();
     var yesterday = new DateTime(now.year, now.month, now.day - 1);
     String date = TimeManager.dateWithDash(yesterday);
-    _listLaporanPanen = await DatabaseLaporanPanenKemarin().selectLaporanPanenKemarinByDate(date);
-    if(_listLaporanPanen.isEmpty) {
-      var yesterday = new DateTime(now.year, now.month, now.day);
-      String date = TimeManager.dateWithDash(yesterday);
-      _listLaporanPanen = await DatabaseLaporanPanenKemarin().selectLaporanPanenKemarinByDate(date);
-      _listLaporanPanen.forEach((element) {
-        _totalBunches = _totalBunches + element.bunchesTotal;
-        _totalLooseFruits = _totalLooseFruits + element.looseFruits;
-        _totalBunchesRipe = _totalBunchesRipe + element.bunchesRipe;
-        _totalBunchesOverRipe = _totalBunchesOverRipe + element.bunchesOverripe;
-        _totalBunchesHalfRipe = _totalBunchesHalfRipe + element.bunchesHalfripe;
-        _totalBunchesUnRipe = _totalBunchesUnRipe + element.bunchesUnripe;
-        _totalBunchesAbnormal = _totalBunchesAbnormal + element.bunchesAbnormal;
-        _totalBunchesEmpty = _totalBunchesEmpty + element.bunchesEmpty;
-        _totalBunchesNotSent = _totalBunchesNotSent + element.bunchesNotSent;
-      });
-      _totalHarvester = _listLaporanPanen.length;
+    _listLaporanPanenHariIni = await DatabaseOPH().selectLaporanHarian();
+    _listLaporanPanenKemarin = await DatabaseLaporanPanenKemarin()
+        .selectLaporanPanenKemarinByDate(date);
+    if (_listLaporanPanenKemarin.isEmpty) {
       _dateFilterValue = "Hari ini";
-    } else {
-      _listLaporanPanen = await DatabaseLaporanPanenKemarin().selectLaporanPanenKemarinByDate(date);
-      _listLaporanPanen.forEach((element) {
+      _listResult = _listLaporanPanenHariIni;
+      _listResult.forEach((element) {
         _totalBunches = _totalBunches + element.bunchesTotal;
         _totalLooseFruits = _totalLooseFruits + element.looseFruits;
         _totalBunchesRipe = _totalBunchesRipe + element.bunchesRipe;
@@ -90,17 +87,29 @@ class HarvestReportYesterdayNotifier extends ChangeNotifier {
         _totalBunchesAbnormal = _totalBunchesAbnormal + element.bunchesAbnormal;
         _totalBunchesEmpty = _totalBunchesEmpty + element.bunchesEmpty;
         _totalBunchesNotSent = _totalBunchesNotSent + element.bunchesNotSent;
+        _totalHarvester = listResult.length;
       });
-      _totalHarvester = _listLaporanPanen.length;
-      _dateFilter.insert(0, _listLaporanPanen[0].createdDate!);
-      _dateFilterValue = _listLaporanPanen[0].createdDate!;
+    } else {
+      _dateFilter.insert(0, _listLaporanPanenKemarin[0].createdDate!);
+      _dateFilterValue = _listLaporanPanenKemarin[0].createdDate!;
+      _listResult = _listLaporanPanenKemarin;
+      _listResult.forEach((element) {
+        _totalBunches = _totalBunches + element.bunchesTotal;
+        _totalLooseFruits = _totalLooseFruits + element.looseFruits;
+        _totalBunchesRipe = _totalBunchesRipe + element.bunchesRipe;
+        _totalBunchesOverRipe = _totalBunchesOverRipe + element.bunchesOverripe;
+        _totalBunchesHalfRipe = _totalBunchesHalfRipe + element.bunchesHalfripe;
+        _totalBunchesUnRipe = _totalBunchesUnRipe + element.bunchesUnripe;
+        _totalBunchesAbnormal = _totalBunchesAbnormal + element.bunchesAbnormal;
+        _totalBunchesEmpty = _totalBunchesEmpty + element.bunchesEmpty;
+        _totalBunchesNotSent = _totalBunchesNotSent + element.bunchesNotSent;
+        _totalHarvester = listResult.length;
+      });
     }
-
     notifyListeners();
   }
 
   onSetDateFilter(String value) async {
-    _listLaporanPanen.clear();
     _dateFilterValue = value;
     _totalBunches = 0;
     _totalLooseFruits = 0;
@@ -113,11 +122,8 @@ class HarvestReportYesterdayNotifier extends ChangeNotifier {
     _totalBunchesNotSent = 0;
     _totalHarvester = 0;
     if (value == "Hari ini") {
-      DateTime now = DateTime.now();
-      String date = TimeManager.dateWithDash(now);
-      List<LaporanPanenKemarin> list = await DatabaseLaporanPanenKemarin()
-          .selectLaporanPanenKemarinByDate(date);
-      list.forEach((element) {
+      _listResult = _listLaporanPanenHariIni;
+      _listResult.forEach((element) {
         _totalBunches = _totalBunches + element.bunchesTotal;
         _totalLooseFruits = _totalLooseFruits + element.looseFruits;
         _totalBunchesRipe = _totalBunchesRipe + element.bunchesRipe;
@@ -127,17 +133,12 @@ class HarvestReportYesterdayNotifier extends ChangeNotifier {
         _totalBunchesAbnormal = _totalBunchesAbnormal + element.bunchesAbnormal;
         _totalBunchesEmpty = _totalBunchesEmpty + element.bunchesEmpty;
         _totalBunchesNotSent = _totalBunchesNotSent + element.bunchesNotSent;
-        _totalHarvester = list.length;
-        _listLaporanPanen.add(element);
+        _totalHarvester = _listLaporanPanenHariIni.length;
       });
       notifyListeners();
     } else {
-      DateTime now = DateTime.now();
-      var yesterday = new DateTime(now.year, now.month, now.day - 1);
-      String date = TimeManager.dateWithDash(yesterday);
-      List<LaporanPanenKemarin> list = await DatabaseLaporanPanenKemarin()
-          .selectLaporanPanenKemarinByDate(date);
-      list.forEach((element) {
+      _listResult = _listLaporanPanenKemarin;
+      _listResult.forEach((element) {
         _totalBunches = _totalBunches + element.bunchesTotal;
         _totalLooseFruits = _totalLooseFruits + element.looseFruits;
         _totalBunchesRipe = _totalBunchesRipe + element.bunchesRipe;
@@ -147,8 +148,7 @@ class HarvestReportYesterdayNotifier extends ChangeNotifier {
         _totalBunchesAbnormal = _totalBunchesAbnormal + element.bunchesAbnormal;
         _totalBunchesEmpty = _totalBunchesEmpty + element.bunchesEmpty;
         _totalBunchesNotSent = _totalBunchesNotSent + element.bunchesNotSent;
-        _totalHarvester = list.length;
-        _listLaporanPanen.add(element);
+        _totalHarvester = _listLaporanPanenKemarin.length;
       });
       notifyListeners();
       return;

@@ -8,6 +8,7 @@ import 'package:epms/model/menu_entities.dart';
 import 'package:epms/model/supervisor.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/kerani_kirim/kerani_kirim_menu/kerani_kirim_notifier.dart';
+import 'package:epms/screen/kerani_panen/kerani_panen_menu/kerani_panen_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,7 +55,9 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                             activeColor: Palette.greenColor,
                             value: theme.status ?? true,
                             onChanged: (value) {
-                              value ? theme.setDarkMode() : theme.setLightMode();
+                              value
+                                  ? theme.setDarkMode()
+                                  : theme.setLightMode();
                             }),
                       ))
             ],
@@ -69,8 +72,8 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                     padding: const EdgeInsets.all(10.0),
                     child: index == 0
                         ? Padding(
-                            padding:
-                                EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                            padding: EdgeInsets.only(
+                                left: 10, right: 10, bottom: 10),
                             child: Image.asset(
                               ImageAssets.ANJ_LOGO,
                               height: 60,
@@ -113,11 +116,36 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                                           style: Style.textBold14,
                                         ),
                                         SizedBox(height: 30),
+                                        Card(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: InkWell(
+                                              child: Text("Synch Ulang"),
+                                              onTap: () {
+                                                KeraniPanenNotifier().reSynch();
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Card(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: InkWell(
+                                              child: Text("Export Json"),
+                                              onTap: () {
+                                                KeraniKirimNotifier()
+                                                    .exportJson(context);
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                         Divider(),
                                         Column(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Image.asset(
                                                 ImageAssets.ANJ_LOGO,
                                                 height: 25,
@@ -131,18 +159,19 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                                   )
                                 : TextButton(
                                     style: TextButton.styleFrom(
+                                      foregroundColor: Colors.white,
                                       backgroundColor:
                                           colorCodesDelivery[index - 2],
                                       minimumSize: Size(
-                                          MediaQuery.of(context).size.width, 50),
+                                          MediaQuery.of(context).size.width,
+                                          50),
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(5.0),
                                           side: BorderSide(
-                                              color:
-                                                  colorCodesDelivery[index - 2])),
+                                              color: colorCodesDelivery[
+                                                  index - 2])),
                                       padding: const EdgeInsets.all(16.0),
-                                      primary: Colors.white,
                                       textStyle: const TextStyle(
                                           fontSize: 20, color: Colors.white),
                                     ),
@@ -168,7 +197,8 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
                                                     ? Container()
                                                     : Row(children: [
                                                         Icon(Icons.warning,
-                                                            color: Colors.yellow),
+                                                            color:
+                                                                Colors.yellow),
                                                         SizedBox(width: 10),
                                                         Text("$countRestan",
                                                             style: TextStyle(

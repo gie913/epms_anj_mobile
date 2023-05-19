@@ -17,6 +17,8 @@ class LaporanSPBKemarin {
   int? spbTotalBunches;
   int? spbTotalOph;
   int? spbTotalLooseFruit;
+  String? createdDate;
+  String? createdTime;
   dynamic spbCapacityTonnage;
   dynamic spbEstimateTonnage;
   String? spbActualWeightDate;
@@ -62,6 +64,8 @@ class LaporanSPBKemarin {
         this.spbIsClosed,
         this.spbPhoto,
         this.spbCertificateId,
+        this.createdDate,
+        this.createdTime,
         this.certificationCertNoRspo,
         this.certificationCertNoIspo,
         this.certificationCertNoIscc,
@@ -99,6 +103,8 @@ class LaporanSPBKemarin {
     spbIsClosed = json['spb_is_closed'];
     spbPhoto = json['spb_photo'];
     spbCertificateId = json['spb_certificate_id'];
+    createdDate = json['created_date'];
+    createdTime = json['created_time'];
     certificationCertNoRspo = json['certification_cert_no_rspo'];
     certificationCertNoIspo = json['certification_cert_no_ispo'];
     certificationCertNoIscc = json['certification_cert_no_iscc'];
@@ -127,6 +133,8 @@ class LaporanSPBKemarin {
         this.spbKeraniTransportEmployeeCode;
     data['spb_kerani_transport_employee_name'] =
         this.spbKeraniTransportEmployeeName;
+    data['created_date'] = this.createdDate;
+    data['created_time'] = this.createdTime;
     data['spb_driver_employee_code'] = this.spbDriverEmployeeCode;
     data['spb_driver_employee_name'] = this.spbDriverEmployeeName;
     data['spb_total_bunches'] = this.spbTotalBunches;

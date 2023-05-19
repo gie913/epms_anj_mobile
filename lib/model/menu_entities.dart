@@ -72,8 +72,11 @@ final List<String> supervisorMenuEntries = <String>[
 
 final List<String> supervisorSPBMenuEntries = <String>[
   'SUPERVISI SPB',
+  // 'SUPERVISI TBS LUAR',
+  'HISTORY GRADING TBS LUAR',
   'HISTORY SUPERVISI SPB',
   'BACA KARTU SPB',
+  'BACA KARTU TBS LUAR',
   'UPLOAD DATA',
   'KELUAR'
 ];
@@ -119,6 +122,9 @@ final List<Color> colorCodesSupervisor = <Color>[
 ];
 
 final List<Color> colorCodesSupervisorSPB = <Color>[
+  Palette.primaryColorProd,
+  Palette.primaryColorProd,
+  // Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,

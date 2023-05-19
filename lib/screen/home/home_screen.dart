@@ -23,14 +23,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<HomeNotifier>(builder: (context, notifier, child) {
       return WillPopScope(
         onWillPop: () async => false,
-        child: notifier.role != null
-            ? MediaQuery(
-          data: Style.mediaQueryText(context),
-              child: Scaffold(
-                  body: ValueService.getMenuFromRoles(notifier.role),
-                ),
-            )
-            : Container(),
+        child: Scaffold(
+          body: notifier.role != null
+              ? MediaQuery(
+                  data: Style.mediaQueryText(context),
+                  child: Scaffold(
+                    body: ValueService.getMenuFromRoles(notifier.role),
+                  ),
+                )
+              : Container(),
+        ),
       );
     });
   }

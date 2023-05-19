@@ -7,28 +7,44 @@ import '../helper/database_helper.dart';
 
 class DatabaseMVendorSchema {
   void createTableMVendorSchema(Database db) async {
+    // await db.execute('''
+    //   CREATE TABLE $mVendorSchemaTable(
+    //    ${MVendorEntity.vendorId} INT NOT NULL,
+    //    ${MVendorEntity.vendorCode} TEXT,
+    //    ${MVendorEntity.vendorName} TEXT,
+    //    ${MVendorEntity.createdBy} TEXT,
+    //    ${MVendorEntity.createdDate} TEXT,
+    //    ${MVendorEntity.createdTime} TEXT,
+    //    ${MVendorEntity.updatedBy} TEXT,
+    //    ${MVendorEntity.updatedDate} TEXT,
+    //    ${MVendorEntity.updatedTime} TEXT)
+    // ''');
     await db.execute('''
       CREATE TABLE $mVendorSchemaTable(
        ${MVendorEntity.vendorId} INT NOT NULL,
        ${MVendorEntity.vendorCode} TEXT,
-       ${MVendorEntity.vendorName} TEXT,
-       ${MVendorEntity.createdBy} TEXT,
-       ${MVendorEntity.createdDate} TEXT,
-       ${MVendorEntity.createdTime} TEXT,
-       ${MVendorEntity.updatedBy} TEXT,
-       ${MVendorEntity.updatedDate} TEXT,
-       ${MVendorEntity.updatedTime} TEXT)
+       ${MVendorEntity.vendorName} TEXT)
     ''');
   }
 
   Future<int> insertMVendorSchema(List<MVendorSchema> object) async {
     Database db = await DatabaseHelper().database;
-    int count = 0;
-    for (int i = 0; i < object.length; i++) {
-        int saved = await db.insert(mVendorSchemaTable, object[i].toJson());
-        count = count + saved;
-    }
-    return count;
+    // List<MVendorSchema> listVendor  = await selectMVendorSchema();
+    // int count = 0;
+    // for (int i = 0; i < object.length; i++) {
+    //    if(!(listVendor.contains(object[i]))) {
+    //      int saved = await db.insert(mVendorSchemaTable, object[i].toJson());
+    //      count = count + saved;
+    //    }
+    // }
+    // return count;
+    Batch batch = db.batch();
+    object.forEach((val) {
+      MVendorSchema mVendorSchema =  val;
+      batch.insert(mVendorSchemaTable, mVendorSchema.toJson());
+    });
+    List<Object?> i = await batch.commit();
+    return i.length;
   }
 
   Future<List<MVendorSchema>> selectMVendorSchema() async {

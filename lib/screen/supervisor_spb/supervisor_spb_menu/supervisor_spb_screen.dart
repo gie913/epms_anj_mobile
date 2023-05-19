@@ -4,6 +4,7 @@ import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/model/menu_entities.dart';
 import 'package:epms/screen/home/home_notifier.dart';
+import 'package:epms/screen/kerani_panen/kerani_panen_menu/kerani_panen_notifier.dart';
 import 'package:epms/screen/supervisor_spb/supervisor_spb_menu/supervisor_spb_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -100,11 +101,38 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                               style: Style.textBold14,
                                             ),
                                             SizedBox(height: 20),
-                                            Text(
-                                              "Estate ${login.configSchema.estateCode}",
-                                              style: Style.textBold14,
-                                            ),
+                                            // Text(
+                                            //   "Estate ${login.configSchema.estateCode}",
+                                            //   style: Style.textBold14,
+                                            // ),
                                             SizedBox(height: 30),
+                                            Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: InkWell(
+                                                  child: Text("Synch Ulang"),
+                                                  onTap: () {
+                                                    KeraniPanenNotifier()
+                                                        .reSynch();
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: InkWell(
+                                                  child: Text("Export Json"),
+                                                  onTap: () {
+                                                    SupervisorSPBNotifier()
+                                                        .exportJson(context);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
                                             Divider(),
                                             Column(
                                               children: [
@@ -128,6 +156,7 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                               .onClickMenu(index);
                                         },
                                         style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
                                           backgroundColor:
                                               colorCodesSupervisorSPB[
                                                   index - 2],
@@ -142,7 +171,6 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                                       colorCodesSupervisorSPB[
                                                           index - 2])),
                                           padding: const EdgeInsets.all(16.0),
-                                          primary: Colors.white,
                                           textStyle: const TextStyle(
                                               fontSize: 20,
                                               color: Colors.white),

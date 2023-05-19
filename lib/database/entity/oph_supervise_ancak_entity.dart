@@ -3,7 +3,7 @@ class OPHSuperviseAncakEntity {
   static String supervisiAncakEstateCode = "supervisi_ancak_estate_code";
   static String supervisiAncakBlockCode = "supervisi_ancak_block_code";
   static String supervisiAncakLat = "supervisi_ancak_lat";
-  static String supervisiAncakLon = "supervisi_ancak_lon";
+  static String supervisiAncakLong = "supervisi_ancak_long";
   static String supervisiAncakLatEnd = "supervisi_ancak_lat_end";
   static String supervisiAncakLongEnd = "supervisi_ancak_long_end";
   static String supervisiAncakMandorEmployeeCode = "supervisi_ancak_mandor_employee_code";

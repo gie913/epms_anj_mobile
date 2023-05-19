@@ -42,8 +42,15 @@ class SPBDetail extends Equatable {
   }
 
   @override
-  List<Object> get props => [spbId!, ophCardId!];
+  List<Object> get props => [spbId!, ophId!];
 
   @override
   bool get stringify => false;
 }
+//add ari
+class SPBDetCombine  {
+  String? ophBlockCode;
+  int? ophBunchesDelivered;
+  int? ophLooseFruitDelivered;
+}
+//add ari

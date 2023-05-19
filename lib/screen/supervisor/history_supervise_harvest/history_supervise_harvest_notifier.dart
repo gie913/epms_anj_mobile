@@ -40,7 +40,9 @@ class HistorySuperviseHarvestNotifier extends ChangeNotifier {
     for(int i=0; i < _listOPHSupervise.length; i++) {
       _totalBunches += _listOPHSupervise[i].bunchesTotal!;
       _totalLooseFruits += _listOPHSupervise[i].looseFruits!;
-      _listDivision.add(_listOPHSupervise[i].supervisiDivisionCode!);
+      if(!listDivision.contains(listOPHSupervise[i].supervisiDivisionCode)) {
+        _listDivision.add(_listOPHSupervise[i].supervisiDivisionCode!);
+      }
     }
     notifyListeners();
   }

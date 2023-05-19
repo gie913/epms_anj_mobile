@@ -64,10 +64,11 @@ class SupervisorFormNotifier extends ChangeNotifier {
     _navigationService.pop();
   }
 
-
   getSupervisi() async {
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
-    setDefaultSupervisor();
+    if(_mConfigSchema != null) {
+      setDefaultSupervisor();
+    }
     notifyListeners();
   }
 
@@ -108,7 +109,7 @@ class SupervisorFormNotifier extends ChangeNotifier {
             supervisor.keraniKirimName = _keraniKirimValue?.employeeName!;
             supervisor.keraniKirimCode = _keraniKirimValue?.employeeCode!;
             int saved = 0;
-            if(_isEdit) {
+            if (_isEdit) {
               saved = await DatabaseSupervisor().updateSupervisor(supervisor);
             } else {
               saved = await DatabaseSupervisor().insertSupervisor(supervisor);

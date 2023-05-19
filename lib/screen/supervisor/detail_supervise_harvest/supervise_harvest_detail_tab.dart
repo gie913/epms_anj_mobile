@@ -38,7 +38,7 @@ class _SuperviseHarvestDetailTabState extends State<SuperviseHarvestDetailTab> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("ID OPH:"),
+                      Text("ID Supervisi:"),
                       Text("${notifier.ophSupervise?.ophSupervisiId}",
                           style: Style.textBold16)
                     ]),
@@ -260,6 +260,27 @@ class _SuperviseHarvestDetailTabState extends State<SuperviseHarvestDetailTab> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Divisi:"),
+                    Text("${notifier.ophSupervise?.supervisiDivisionCode}")
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("OPH ID:"),
+                    Text("${notifier.ophSupervise?.ophId}")
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
               notifier.ophSupervise?.supervisiPhoto != null
                   ? Image.file(File("${notifier.ophSupervise?.supervisiPhoto}"),
                       height: 400)
@@ -284,19 +305,20 @@ class _SuperviseHarvestDetailTabState extends State<SuperviseHarvestDetailTab> {
                                 "FOTO HASIL PANEN",
                                 style: Style.whiteBold14,
                                 textAlign: TextAlign.center,
-                              ),
+                              )
                             ),
                           ),
                         ),
                       ),
                     )
                   : Container(),
+              SizedBox(height: 10),
               notifier.onEdit
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: () {
-                          notifier.onUpdateOPHSupervise(context);
+                          notifier.showDialogQuestion(context);
                         },
                         child: Card(
                           color: Palette.primaryColorProd,
