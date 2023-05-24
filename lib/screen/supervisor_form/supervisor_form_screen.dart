@@ -72,8 +72,8 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.6,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.6,
                                       child: Column(
                                         children: [
                                           Text(
@@ -101,7 +101,9 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     SearchEmployeeScreen()));
-                                    supervisor.onSetSupervisi(mEmployee!);
+                                    if (mEmployee != null) {
+                                      supervisor.onSetSupervisi(mEmployee);
+                                    }
                                   },
                                 ),
                               ],
@@ -118,8 +120,8 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.6,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.6,
                                       child: Column(
                                         children: [
                                           Text(
@@ -146,7 +148,9 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     SearchEmployeeScreen()));
-                                    supervisor.onSetSupervisi1(mEmployee!);
+                                    if (mEmployee != null) {
+                                      supervisor.onSetSupervisi1(mEmployee);
+                                    }
                                   },
                                 ),
                               ],
@@ -161,8 +165,8 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.6,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.6,
                                       child: Column(
                                         children: [
                                           Text(
@@ -190,7 +194,9 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     SearchEmployeeScreen()));
-                                    supervisor.onSetKeraniPanen(mEmployee!);
+                                    if (mEmployee != null) {
+                                      supervisor.onSetKeraniPanen(mEmployee);
+                                    }
                                   },
                                 ),
                               ],
@@ -205,8 +211,8 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.6,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.6,
                                       child: Column(
                                         children: [
                                           Text(
@@ -234,7 +240,9 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     SearchEmployeeScreen()));
-                                    supervisor.onSetKeraniKirim(mEmployee!);
+                                    if (mEmployee != null) {
+                                      supervisor.onSetKeraniKirim(mEmployee);
+                                    }
                                   },
                                 ),
                               ],
@@ -264,7 +272,7 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height:10),
+                            SizedBox(height: 10),
                             widget.form == "Home"
                                 ? InkWell(
                                     onTap: () {
@@ -274,11 +282,13 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                       color: Palette.redColorLight,
                                       elevation: 2,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                       ),
                                       child: Container(
                                         padding: EdgeInsets.all(14),
-                                        width: MediaQuery.of(context).size.width,
+                                        width:
+                                            MediaQuery.of(context).size.width,
                                         child: Text(
                                           "KEMBALI",
                                           style: TextStyle(
@@ -323,8 +333,8 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                                   children: [
                                     Text(
                                       "${Constanta.APP_VERSION}",
-                                      style:
-                                          TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 )),

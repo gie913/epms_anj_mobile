@@ -19,7 +19,6 @@ class SupervisorFormTab extends StatefulWidget {
 class _SupervisorFormTabState extends State<SupervisorFormTab> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -84,7 +83,9 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         SearchEmployeeScreen()));
-                            notifier.onSetKemandoran(mEmployee!);
+                            if (mEmployee != null) {
+                              notifier.onSetKemandoran(mEmployee);
+                            }
                           },
                           child: Card(
                             child: Padding(
@@ -144,7 +145,9 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           SearchEmployeeScreen()));
-                              notifier.onSetKeraniPanen(mEmployee!);
+                              if (mEmployee != null) {
+                                notifier.onSetKeraniPanen(mEmployee);
+                              }
                             },
                             child: Card(
                               child: Padding(
@@ -203,7 +206,9 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           SearchEmployeeScreen()));
-                              notifier.onSetPemanen(mEmployee!);
+                              if (mEmployee != null) {
+                                notifier.onSetPemanen(mEmployee);
+                              }
                             },
                             child: Card(
                               child: Padding(
@@ -286,8 +291,7 @@ class _SupervisorFormTabState extends State<SupervisorFormTab> {
                         }
                       },
                       controller: notifier.tphCode,
-                      textCapitalization:
-                      TextCapitalization.characters,
+                      textCapitalization: TextCapitalization.characters,
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(hintText: "Tulis Nomor TPH"),

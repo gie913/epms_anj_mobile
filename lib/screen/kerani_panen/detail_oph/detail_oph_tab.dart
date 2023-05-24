@@ -180,11 +180,8 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Divisi:"),
-                  Container(
-                    width: 200,
-                    child: Text("${notifier.oph.ophDivisionCode ?? ""}",
-                        textAlign: TextAlign.end),
-                  )
+                  Text("${notifier.oph.ophDivisionCode ?? ""}",
+                      textAlign: TextAlign.end)
                 ],
               ),
             ),
@@ -230,12 +227,10 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Blok:"),
-                        Container(
-                            width: 200,
-                            child: Text(
-                              "${notifier.oph.ophBlockCode ?? ""}",
-                              textAlign: TextAlign.end,
-                            ))
+                        Text(
+                          "${notifier.oph.ophBlockCode ?? ""}",
+                          textAlign: TextAlign.end,
+                        )
                       ],
                     ),
                   ),
@@ -245,12 +240,10 @@ class _DetailOPHTabState extends State<DetailOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Estimasi berat OPH (Kg):"),
-                  Container(
-                      width: 200,
-                      child: Text(
-                        "${notifier.oph.ophEstimateTonnage ?? ""}",
-                        textAlign: TextAlign.end,
-                      ))
+                  Text(
+                    "${notifier.oph.ophEstimateTonnage ?? ""}",
+                    textAlign: TextAlign.end,
+                  )
                 ],
               ),
             ),

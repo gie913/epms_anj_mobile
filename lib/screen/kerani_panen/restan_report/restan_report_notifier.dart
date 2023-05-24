@@ -58,6 +58,7 @@ class RestanReportNotifier extends ChangeNotifier {
     List<String> listBlockTemp = [];
     List<String> listDivisionTemp = [];
     _listRestan = await DatabaseLaporanRestan().selectLaporanRestan();
+    print('cek total list : ${_listRestan.length}');
     _listRestan.forEach((element) {
       _totalBunches = _totalBunches + element.bunchesTotal;
       _totalLooseFruits = _totalLooseFruits + element.looseFruits;
@@ -66,6 +67,7 @@ class RestanReportNotifier extends ChangeNotifier {
           print(element.ophId);
         } else {
           listBlockTemp.add(element.ophBlockCode!);
+          print('add element block : ${element.ophBlockCode}');
           listBlockTemp.sort((a, b) => a.toString().compareTo(b.toString()));
         }
       }
@@ -74,6 +76,7 @@ class RestanReportNotifier extends ChangeNotifier {
           print(element.ophId);
         } else {
           listDivisionTemp.add(element.ophDivisionCode!);
+          print('add element division : ${element.ophDivisionCode}');
           listDivisionTemp.sort((a, b) => a.toString().compareTo(b.toString()));
         }
       }
@@ -81,6 +84,7 @@ class RestanReportNotifier extends ChangeNotifier {
     _listBlock.addAll(listBlockTemp);
     _listDivision.addAll(listDivisionTemp);
     _countOPHRestan = listRestan.length;
+    _listRestanResult.addAll(_listRestan);
     notifyListeners();
   }
 
@@ -92,6 +96,110 @@ class RestanReportNotifier extends ChangeNotifier {
       OPH oph = OPH.fromJson(jsonDecode(json));
       _navigationService.push(Routes.OPH_DETAIL_PAGE,
           arguments: {"method": method, "oph": oph, "restan": true});
+    }
+  }
+
+  // azis
+  setDivisionValue(String value) {
+    _divisionValue = value;
+    filterRestan();
+    notifyListeners();
+  }
+
+  // azis
+  setBlockValue(String value) {
+    _blockValue = value;
+    filterRestan();
+    notifyListeners();
+  }
+
+  // azis
+  filterRestan() {
+    List<LaporanRestan> listRestanTemp = [];
+    if (_divisionValue != 'Semua' && _blockValue != 'Semua') {
+      print('filter divisi & block');
+      listRestanTemp.clear();
+      _totalBunches = 0;
+      _totalLooseFruits = 0;
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i]
+                .ophDivisionCode!
+                .toLowerCase()
+                .contains(_divisionValue.toLowerCase()) &&
+            _listRestan[i]
+                .ophBlockCode!
+                .toLowerCase()
+                .contains(_blockValue.toLowerCase())) {
+          listRestanTemp.add(_listRestan[i]);
+        }
+      }
+      _listRestanResult.clear();
+      _listRestanResult.addAll(listRestanTemp);
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
+      _countOPHRestan = _listRestanResult.length;
+      notifyListeners();
+    } else if (_divisionValue != 'Semua' && _blockValue == 'Semua') {
+      print('filter divisi only');
+      listRestanTemp.clear();
+      _totalBunches = 0;
+      _totalLooseFruits = 0;
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i]
+            .ophDivisionCode!
+            .toLowerCase()
+            .contains(_divisionValue.toLowerCase())) {
+          listRestanTemp.add(_listRestan[i]);
+        }
+      }
+      _listRestanResult.clear();
+      _listRestanResult.addAll(listRestanTemp);
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
+      _countOPHRestan = _listRestanResult.length;
+      notifyListeners();
+    } else if (_divisionValue == 'Semua' && _blockValue != 'Semua') {
+      print('filter block only');
+      listRestanTemp.clear();
+      _totalBunches = 0;
+      _totalLooseFruits = 0;
+      for (int i = 0; i < _listRestan.length; i++) {
+        if (_listRestan[i]
+            .ophBlockCode!
+            .toLowerCase()
+            .contains(_blockValue.toLowerCase())) {
+          listRestanTemp.add(_listRestan[i]);
+        }
+      }
+      _listRestanResult.clear();
+      _listRestanResult.addAll(listRestanTemp);
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
+      _countOPHRestan = _listRestanResult.length;
+      notifyListeners();
+    } else {
+      print('filter semua');
+      listRestanTemp.clear();
+      _listRestanResult.clear();
+      _totalBunches = 0;
+      _totalLooseFruits = 0;
+      _listRestanResult.addAll(_listRestan);
+      _countOPHRestan = _listRestanResult.length;
+      for (int i = 0; i < _listRestanResult.length; i++) {
+        _totalBunches = _totalBunches + _listRestanResult[i].bunchesTotal;
+        _totalLooseFruits =
+            _totalLooseFruits + _listRestanResult[i].looseFruits;
+      }
+      notifyListeners();
     }
   }
 

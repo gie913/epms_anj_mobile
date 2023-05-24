@@ -17,6 +17,7 @@ class OPHCardManager {
         NfcManager.instance.stopSession(errorMessage: resultNFC.value);
         return;
       }
+      print('cek oph : ${oph.ophBlockCode}');
 
       NdefMessage message = NdefMessage([
         NdefRecord.createText(EncryptionManager.encryptData(ophTag)),
@@ -69,6 +70,7 @@ class OPHCardManager {
             ophTemp.createdTime = values[22];
             ophTemp.ophEstimateTonnage = double.parse(values[23]!);
             onSuccess(context, ophTemp);
+            print('cek oph baca: ${ophTemp.ophBlockCode}');
           } else {
             onError(context, "Bukan Kartu OPH");
           }
@@ -80,76 +82,80 @@ class OPHCardManager {
   }
 
   readWriteOPHCard(BuildContext context, OPH oph, onSuccess, onError) {
-    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-      try {
-        ValueService.tagReader(tag).then((value) {
-          String decryptData = EncryptionManager.decryptData(value);
-          if (decryptData.characters.first == "O") {
-            final split = decryptData.split(',');
-            final Map<int, String> values = {
-              for (int i = 0; i < split.length; i++) i: split[i]
-            };
-            OPH ophTemp = OPH();
-            ophTemp.ophCardId = values[0]?.substring(1);
-            ophTemp.ophId = values[1];
-            ophTemp.ophHarvestingMethod = int.parse(values[2]!);
-            ophTemp.ophHarvestingType = int.parse(values[3]!);
-            ophTemp.mandorEmployeeCode = values[4];
-            ophTemp.employeeCode = values[5];
-            ophTemp.mandor1EmployeeCode = values[6];
-            ophTemp.ophEstateCode = values[7];
-            ophTemp.ophDivisionCode = values[8];
-            ophTemp.ophBlockCode = values[9];
-            ophTemp.ophTphCode = values[10];
-            ophTemp.bunchesRipe = int.parse(values[11]!);
-            ophTemp.bunchesOverripe = int.parse(values[12]!);
-            ophTemp.bunchesHalfripe = int.parse(values[13]!);
-            ophTemp.bunchesUnripe = int.parse(values[14]!);
-            ophTemp.bunchesAbnormal = int.parse(values[15]!);
-            ophTemp.bunchesEmpty = int.parse(values[16]!);
-            ophTemp.looseFruits = int.parse(values[17]!);
-            ophTemp.bunchesTotal = int.parse(values[18]!);
-            ophTemp.bunchesNotSent = int.parse(values[19]!);
-            ophTemp.isRestantPermanent = int.parse(values[20]!);
-            ophTemp.createdDate = values[21];
-            ophTemp.createdTime = values[22];
-            ophTemp.ophEstimateTonnage = double.parse(values[23]!);
-            String ophTag = ValueService.ophCardTag(oph);
-            if (oph.ophId == ophTemp.ophId) {
-              NfcManager.instance.stopSession();
-              NfcManager.instance.startSession(
-                  onDiscovered: (NfcTag tag) async {
-                var ndef = Ndef.from(tag);
-                if (ndef == null || !ndef.isWritable) {
-                  resultNFC.value = 'Tag is not ndef writable';
-                  NfcManager.instance
-                      .stopSession(errorMessage: resultNFC.value);
-                  return;
-                }
+    NfcManager.instance.startSession(
+      onDiscovered: (NfcTag tag) async {
+        try {
+          ValueService.tagReader(tag).then((value) {
+            String decryptData = EncryptionManager.decryptData(value);
+            if (decryptData.characters.first == "O") {
+              final split = decryptData.split(',');
+              final Map<int, String> values = {
+                for (int i = 0; i < split.length; i++) i: split[i]
+              };
+              OPH ophTemp = OPH();
+              ophTemp.ophCardId = values[0]?.substring(1);
+              ophTemp.ophId = values[1];
+              ophTemp.ophHarvestingMethod = int.parse(values[2]!);
+              ophTemp.ophHarvestingType = int.parse(values[3]!);
+              ophTemp.mandorEmployeeCode = values[4];
+              ophTemp.employeeCode = values[5];
+              ophTemp.mandor1EmployeeCode = values[6];
+              ophTemp.ophEstateCode = values[7];
+              ophTemp.ophDivisionCode = values[8];
+              ophTemp.ophBlockCode = values[9];
+              ophTemp.ophTphCode = values[10];
+              ophTemp.bunchesRipe = int.parse(values[11]!);
+              ophTemp.bunchesOverripe = int.parse(values[12]!);
+              ophTemp.bunchesHalfripe = int.parse(values[13]!);
+              ophTemp.bunchesUnripe = int.parse(values[14]!);
+              ophTemp.bunchesAbnormal = int.parse(values[15]!);
+              ophTemp.bunchesEmpty = int.parse(values[16]!);
+              ophTemp.looseFruits = int.parse(values[17]!);
+              ophTemp.bunchesTotal = int.parse(values[18]!);
+              ophTemp.bunchesNotSent = int.parse(values[19]!);
+              ophTemp.isRestantPermanent = int.parse(values[20]!);
+              ophTemp.createdDate = values[21];
+              ophTemp.createdTime = values[22];
+              ophTemp.ophEstimateTonnage = double.parse(values[23]!);
+              print('cek oph edit : ${ophTemp.ophBlockCode}');
+              String ophTag = ValueService.ophCardTag(oph);
+              if (oph.ophId == ophTemp.ophId) {
+                NfcManager.instance.stopSession();
+                NfcManager.instance.startSession(
+                    onDiscovered: (NfcTag tag) async {
+                  var ndef = Ndef.from(tag);
+                  if (ndef == null || !ndef.isWritable) {
+                    resultNFC.value = 'Tag is not ndef writable';
+                    NfcManager.instance
+                        .stopSession(errorMessage: resultNFC.value);
+                    return;
+                  }
 
-                NdefMessage message = NdefMessage([
-                  NdefRecord.createText(EncryptionManager.encryptData(ophTag)),
-                ]);
+                  NdefMessage message = NdefMessage([
+                    NdefRecord.createText(
+                        EncryptionManager.encryptData(ophTag)),
+                  ]);
 
-                try {
-                  await ndef.write(message);
-                  resultNFC.value = 'Success to Write';
-                  onSuccess(context, oph);
-                } catch (e) {
-                  resultNFC.value = e;
-                  onError(context, "Gagal Memasukkan Data");
-                }
-              });
+                  try {
+                    await ndef.write(message);
+                    resultNFC.value = 'Success to Write';
+                    onSuccess(context, oph);
+                  } catch (e) {
+                    resultNFC.value = e;
+                    onError(context, "Gagal Memasukkan Data");
+                  }
+                });
+              } else {
+                onError(context, "Bukan Kartu OPH yang sama");
+              }
             } else {
-              onError(context, "Bukan Kartu OPH yang sama");
+              onError(context, "Bukan Kartu OPH");
             }
-          } else {
-            onError(context, "Bukan Kartu OPH");
-          }
-        });
-      } catch (e) {
-        onError(context, "Gagal Membaca Kartu OPH");
-      }
-    });
+          });
+        } catch (e) {
+          onError(context, "Gagal Membaca Kartu OPH");
+        }
+      },
+    );
   }
 }

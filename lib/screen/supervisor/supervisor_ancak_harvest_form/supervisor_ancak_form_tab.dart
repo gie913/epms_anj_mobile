@@ -94,7 +94,9 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         SearchEmployeeScreen()));
-                            notifier.onSetKemandoran(mEmployee!);
+                            if (mEmployee != null) {
+                              notifier.onSetKemandoran(mEmployee);
+                            }
                           },
                           child: Card(
                             child: Padding(
@@ -154,7 +156,9 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           SearchEmployeeScreen()));
-                              notifier.onSetPemanen(mEmployee!);
+                              if (mEmployee != null) {
+                                notifier.onSetPemanen(mEmployee);
+                              }
                             },
                             child: Card(
                               child: Padding(
@@ -206,12 +210,15 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                           Text("Assign To:"),
                           InkWell(
                             onTap: () async {
-                              MAncakEmployee? mAncakEmployee = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          SearchAncakEmployeeScreen()));
-                              notifier.onSetAncakEmployee(mAncakEmployee!);
+                              MAncakEmployee? mAncakEmployee =
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SearchAncakEmployeeScreen()));
+                              if (mAncakEmployee != null) {
+                                notifier.onSetAncakEmployee(mAncakEmployee);
+                              }
                             },
                             child: Card(
                               child: Padding(
@@ -223,33 +230,32 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                         ]),
                     notifier.ancakEmployee != null
                         ? Table(border: TableBorder.all(), children: [
-                      TableRow(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child:
-                          Text("User ID", textAlign: TextAlign.center),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child:
-                          Text('Nama', textAlign: TextAlign.center),
-                        ),
-                      ]),
-                      TableRow(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                              "${notifier.ancakEmployee?.userId}",
-                              textAlign: TextAlign.center),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                              "${notifier.ancakEmployee?.userName}",
-                              textAlign: TextAlign.center),
-                        ),
-                      ]),
-                    ])
+                            TableRow(children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("User ID",
+                                    textAlign: TextAlign.center),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child:
+                                    Text('Nama', textAlign: TextAlign.center),
+                              ),
+                            ]),
+                            TableRow(children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("${notifier.ancakEmployee?.userId}",
+                                    textAlign: TextAlign.center),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                    "${notifier.ancakEmployee?.userName}",
+                                    textAlign: TextAlign.center),
+                              ),
+                            ]),
+                          ])
                         : Container()
                   ]),
             ),
@@ -279,7 +285,7 @@ class _SupervisorAncakFormTabState extends State<SupervisorAncakFormTab> {
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(hintText: "Tulis blok"),
                           onChanged: (value) {
-                            if(value.length >= 3) {
+                            if (value.length >= 3) {
                               notifier.blockNumberCheck(context, value);
                             }
                           },

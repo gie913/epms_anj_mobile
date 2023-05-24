@@ -216,6 +216,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
       _blockNumber.text = _oph.ophBlockCode.toString();
+      print('cek oph baca first : ${_oph.ophBlockCode}');
       _isExist = true;
     } else {
       _oph = oph;
@@ -263,9 +264,12 @@ class DetailOPHNotifier extends ChangeNotifier {
 
   onSaveChangeCard(BuildContext context) {
     if (_oph.ophCardId != ophNumber.text) {
+      print('cek kebenaran 1 : ${_oph.ophCardId != ophNumber.text}');
       if (_restan) {
+        print('doWriteRestanDialog');
         doWriteRestanDialog();
       } else {
+        print('onUpdateOPHClicked');
         onUpdateOPHClicked(context);
       }
     } else {
@@ -285,13 +289,17 @@ class DetailOPHNotifier extends ChangeNotifier {
     _oph.looseFruits = int.tryParse(looseFruits.text);
     _oph.bunchesTotal = int.tryParse(bunchesTotal.text);
     _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
-    if(_onEdit) {
+    // azis
+    _oph.ophBlockCode = blockNumber.text;
+    if (_onEdit) {
+      print('onEdit : true');
       OPHCardManager().readWriteOPHCard(
           _navigationService.navigatorKey.currentContext!,
           _oph,
           onSuccessWrite,
           onErrorWrite);
     } else {
+      print('onEdit : false');
       OPHCardManager().writeOPHCard(
           _navigationService.navigatorKey.currentContext!,
           _oph,

@@ -20,7 +20,6 @@ class SuperviseHarvestDetailTab extends StatefulWidget {
 class _SuperviseHarvestDetailTabState extends State<SuperviseHarvestDetailTab> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -300,13 +299,12 @@ class _SuperviseHarvestDetailTabState extends State<SuperviseHarvestDetailTab> {
                             ),
                             color: Colors.green,
                             child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "FOTO HASIL PANEN",
-                                style: Style.whiteBold14,
-                                textAlign: TextAlign.center,
-                              )
-                            ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "FOTO HASIL PANEN",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                )),
                           ),
                         ),
                       ),

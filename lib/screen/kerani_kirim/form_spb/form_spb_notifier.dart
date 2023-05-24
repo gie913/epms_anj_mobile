@@ -249,12 +249,14 @@ class FormSPBNotifier extends ChangeNotifier {
 
   onInitFormSPB() async {
     generateVariable();
-    _driverNameList = await DatabaseMEmployeeSchema().selectMEmployeeSchemaDriver();
+    _driverNameList =
+        await DatabaseMEmployeeSchema().selectMEmployeeSchemaDriver();
     _listLoader = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
-    _destinationList = await DatabaseMDestinationSchema().selectMDestinationSchema();
+    _destinationList =
+        await DatabaseMDestinationSchema().selectMDestinationSchema();
     _vendorList = await DatabaseMVendorSchema().selectMVendorSchema();
     _listLoader.forEach((element) {
-      if(element.employeeCode == _mConfigSchema?.employeeCode) {
+      if (element.employeeCode == _mConfigSchema?.employeeCode) {
         spbCardNumber.text = element.employeeDivisionCode!;
       }
     });
@@ -278,16 +280,15 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   addOPH() {
-    for(int i=0; i < 100; i++) {
+    for (int i = 0; i < 100; i++) {
       SPBDetail spbDetail = SPBDetail(
-          spbId : "01100110011010${i}M",
-          ophId : "02020202020010${i}M",
-          ophBunchesDelivered : 10,
-          ophLooseFruitDelivered : 20,
-          ophBlockCode : "C10",
-          ophTphCode : '10',
-          ophCardId : 'A001'
-      );
+          spbId: "01100110011010${i}M",
+          ophId: "02020202020010${i}M",
+          ophBunchesDelivered: 10,
+          ophLooseFruitDelivered: 20,
+          ophBlockCode: "C10",
+          ophTphCode: '10',
+          ophCardId: 'A001');
       listSPBDetail.add(spbDetail);
     }
   }
@@ -347,8 +348,11 @@ class FormSPBNotifier extends ChangeNotifier {
   checkVehicle(BuildContext context, String vehicleNumber) async {
     if (vehicleNumber.isNotEmpty) {
       if (_typeDeliverValue != "Kontrak") {
-        _mvraSchema = await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
-        _mvraSchema ?? FlushBarManager.showFlushBarWarning(context, "Nomor Kendaraan", "Tidak sesuai");
+        _mvraSchema =
+            await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
+        _mvraSchema ??
+            FlushBarManager.showFlushBarWarning(
+                context, "Nomor Kendaraan", "Tidak sesuai");
         _totalCapacityTruck = _mvraSchema!.vraMaxCap!.toDouble();
         if (_mvraSchema != null) {
           _totalCapacityTruck = _totalCapacityTruck - _totalWeightEstimation;
@@ -434,26 +438,28 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   onCheckOPHExist(BuildContext context, OPH oph) async {
-    SPBDetail? ophExist = await DatabaseSPBDetail().selectSPBDetailByOPHID(oph.ophId!);
+    SPBDetail? ophExist =
+        await DatabaseSPBDetail().selectSPBDetailByOPHID(oph.ophId!);
     SPBDetail spbDetail = SPBDetail();
 
-   // print('test spb');
-  //  print(json.encode(spbDetail));
+    // print('test spb');
+    //  print(json.encode(spbDetail));
 
-   print('test oph');
+    print('test oph');
     print(json.encode(oph));
 
-
-    _mDivisionCode = oph.ophDivisionCode;
-    _estateCode = oph.ophEstateCode;
-    _mEstateSchema = await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(oph.ophEstateCode!);
+    // _mDivisionCode = oph.ophDivisionCode;
+    // _estateCode = oph.ophEstateCode;
+    // _mEstateSchema = await DatabaseMEstateSchema()
+    //     .selectMEstateSchemaByEstateCode(oph.ophEstateCode!);
     spbDetail.spbId = _spbID;
     spbDetail.ophCardId = oph.ophCardId;
     spbDetail.ophId = oph.ophId;
     spbDetail.ophBlockCode = oph.ophBlockCode;
     spbDetail.ophTphCode = oph.ophTphCode;
     spbDetail.ophLooseFruitDelivered = oph.looseFruits;
-    spbDetail.ophBunchesDelivered = calculateJanjangSent(oph.bunchesTotal!, oph.bunchesNotSent!);
+    spbDetail.ophBunchesDelivered =
+        calculateJanjangSent(oph.bunchesTotal!, oph.bunchesNotSent!);
     if (ophExist != null) {
       FlushBarManager.showFlushBarWarning(
           context, "Scan OPH", "OPH ini sudah pernah discan");
@@ -463,20 +469,28 @@ class FormSPBNotifier extends ChangeNotifier {
         FlushBarManager.showFlushBarWarning(
             context, "Scan OPH", "OPH ini sudah masuk SPB");
       } else {
-      //  print("spb");
-       // print(json.encode(spbDetail));
+        //  print("spb");
+        // print(json.encode(spbDetail));
         _listSPBDetail.add(spbDetail);
         _listOPHScanned.add(oph);
-
-       print(json.encode(_listSPBDetail));// check : ok
-      //  print("oph");
+        print(json.encode(_listSPBDetail)); // check : ok
+        //  print("oph");
         print(json.encode(_listOPHScanned)); //check : ok
         _lastOPH = _listSPBDetail.last.ophCardId!;
         _countOPH = _listSPBDetail.length;
+        // azis
+        _estateCode =
+            getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length);
+        _mDivisionCode = getMDivisionCode(_listOPHScanned, _estateCode!);
+        _mEstateSchema = await DatabaseMEstateSchema()
+            .selectMEstateSchemaByEstateCode(getMostEstateCodeValue(
+                _listOPHScanned, _listOPHScanned.length));
         /*  original */
         _totalBunches = _totalBunches + spbDetail.ophBunchesDelivered!;
-        _totalLooseFruits = _totalLooseFruits + spbDetail.ophLooseFruitDelivered!;
-        _totalWeightEstimation = _totalWeightEstimation + oph.ophEstimateTonnage!;
+        _totalLooseFruits =
+            _totalLooseFruits + spbDetail.ophLooseFruitDelivered!;
+        _totalWeightEstimation =
+            _totalWeightEstimation + oph.ophEstimateTonnage!;
 
         /*_totalBunches = _totalBunches + oph.bunchesTotal!;
         _totalLooseFruits = _totalLooseFruits + oph.looseFruits!;
@@ -510,13 +524,25 @@ class FormSPBNotifier extends ChangeNotifier {
     return total - tidakDikirim;
   }
 
-  onDeleteOPH(int index) {
+  onDeleteOPH(int index) async {
     _totalBunches = _totalBunches - listSPBDetail[index].ophBunchesDelivered!;
     _totalLooseFruits =
         _totalLooseFruits - listSPBDetail[index].ophLooseFruitDelivered!;
     _listSPBDetail.removeAt(index);
+    _listOPHScanned.removeAt(index);
     _lastOPH = _listSPBDetail.isNotEmpty ? _listSPBDetail.last.ophCardId! : "";
     _countOPH = _listSPBDetail.length;
+    // azis
+    _estateCode = _listSPBDetail.isNotEmpty
+        ? getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length)
+        : '';
+    _mDivisionCode = _listSPBDetail.isNotEmpty
+        ? getMDivisionCode(_listOPHScanned, _estateCode!)
+        : '';
+    _mEstateSchema = _listSPBDetail.isNotEmpty
+        ? await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(
+            getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length))
+        : MEstateSchema();
     if (_mvraSchema != null) {
       _totalWeightEstimation =
           _totalWeightEstimation - _listOPHScanned[index].ophEstimateTonnage!;
@@ -721,7 +747,8 @@ class FormSPBNotifier extends ChangeNotifier {
       }
     }
     spbTemp.spbEstateVendorCode = _mEstateSchema?.estateVendorCode;
-    spbTemp.spbLicenseNumber = _mvraSchema?.vraLicenseNumber ?? vehicleNumber.text;
+    spbTemp.spbLicenseNumber =
+        _mvraSchema?.vraLicenseNumber ?? vehicleNumber.text;
     spbTemp.spbCardId = _mcspbCardSchema?.spbCardId;
     spbTemp.spbTotalOph = _countOPH;
     spbTemp.spbEstateCode = _estateCode;
@@ -998,8 +1025,7 @@ class FormSPBNotifier extends ChangeNotifier {
     print(json.encode(_listSPBDetail));
     int countSaved = await DatabaseSPB().insertSPB(_globalSPB);
     if (countSaved > 0) {
-      for (int
-      i = 0; i < _listSPBDetail.length; i++) {
+      for (int i = 0; i < _listSPBDetail.length; i++) {
         await DatabaseSPBDetail().insertSPBDetail(_listSPBDetail[i]);
       }
       for (int i = 0; i < _spbLoaderList.length; i++) {
@@ -1016,5 +1042,37 @@ class FormSPBNotifier extends ChangeNotifier {
       FlushBarManager.showFlushBarWarning(
           context, "Simpan SPB", "Gagal menyimpan SPB");
     }
+  }
+
+  // azis
+  String getMostEstateCodeValue(List<OPH> list, int listLength) {
+    int maxCount = 0;
+    String maxFreq = '';
+
+    for (int i = 0; i < listLength; i++) {
+      int count = 0;
+      for (int j = 0; j < listLength; j++) {
+        if (list[i].ophEstateCode == list[j].ophEstateCode) {
+          count++;
+        }
+      }
+
+      if (count > maxCount) {
+        maxCount = count;
+        maxFreq = list[i].ophEstateCode!;
+      }
+    }
+    return maxFreq;
+  }
+
+  String getMDivisionCode(List<OPH> list, String estateCode) {
+    String mDivisionCode = '';
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].ophEstateCode! == estateCode) {
+        mDivisionCode = list[i].ophDivisionCode!;
+        break;
+      }
+    }
+    return mDivisionCode;
   }
 }

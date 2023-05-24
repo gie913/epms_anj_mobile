@@ -17,11 +17,14 @@ import 'package:nfc_manager/nfc_manager.dart';
 class ValueService {
   static Future<String> tagReader(NfcTag tag) async {
     var ndef = Ndef.from(tag);
-    NdefMessage? ndefMessage = await ndef?.read();
-    Uint8List? uInt8list = ndefMessage?.records[0].payload;
-    String string = String.fromCharCodes(uInt8list!);
-    String message = string.replaceAll("\n", "").substring(3);
-    return message;
+    if (ndef != null) {
+      final ndefMessage = await ndef.read();
+      Uint8List? uInt8list = ndefMessage.records[0].payload;
+      String string = String.fromCharCodes(uInt8list);
+      String message = string.replaceAll("\n", "").substring(3);
+      return message;
+    }
+    return '';
   }
 
   static String ophCardTag(OPH oph) {
