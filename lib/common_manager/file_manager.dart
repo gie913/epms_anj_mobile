@@ -23,10 +23,11 @@ import 'package:path_provider/path_provider.dart';
 class FileManagerJson {
   Future<File?> writeFileJsonOPH() async {
     List<OPH> _listOPH = await DatabaseOPH().selectOPH();
-    List<TAttendanceSchema> _listAttendance = await DatabaseAttendance().selectEmployeeAttendance();
+    List<TAttendanceSchema> _listAttendance =
+        await DatabaseAttendance().selectEmployeeAttendance();
     List<String> mapListOPH = [];
     List<String> mapListAttendance = [];
-    if(_listOPH.isNotEmpty) {
+    if (_listOPH.isNotEmpty) {
       for (int i = 0; i < _listOPH.length; i++) {
         String jsonString = jsonEncode(_listOPH[i]);
         mapListOPH.add("\"$i\":$jsonString");
@@ -77,7 +78,7 @@ class FileManagerJson {
     List<String> mapListSPBDetail = [];
     List<String> mapListSPBLoader = [];
 
-    if(_listSPB.isNotEmpty) {
+    if (_listSPB.isNotEmpty) {
       for (int i = 0; i < _listSPB.length; i++) {
         String jsonString = jsonEncode(_listSPB[i]);
         mapListSPB.add("\"$i\":$jsonString");
@@ -128,6 +129,99 @@ class FileManagerJson {
     }
   }
 
+  Future<File?> writeFileJsonKerani() async {
+    List<OPH> _listOPH = await DatabaseOPH().selectOPH();
+    List<TAttendanceSchema> _listAttendance =
+        await DatabaseAttendance().selectEmployeeAttendance();
+    List<String> mapListOPH = [];
+    List<String> mapListAttendance = [];
+
+    List<SPB> _listSPB = await DatabaseSPB().selectSPB();
+    List<SPBDetail> _listSPBDetail =
+        await DatabaseSPBDetail().selectSPBDetail();
+    List<SPBLoader> _listSPBLoader =
+        await DatabaseSPBLoader().selectSPBLoader();
+    List<String> mapListSPB = [];
+    List<String> mapListSPBDetail = [];
+    List<String> mapListSPBLoader = [];
+
+    String token = await StorageManager.readData("userToken");
+    final mapKR = {};
+
+    if (_listOPH.isNotEmpty) {
+      for (int i = 0; i < _listOPH.length; i++) {
+        String jsonString = jsonEncode(_listOPH[i]);
+        mapListOPH.add("\"$i\":$jsonString");
+      }
+
+      for (int i = 0; i < _listAttendance.length; i++) {
+        String jsonString = jsonEncode(_listAttendance[i]);
+        mapListAttendance.add("\"$i\":$jsonString");
+      }
+      var stringListOPH = mapListOPH.join(",");
+      var stringListAttendance = mapListAttendance.join(",");
+      String listOPH = "{$stringListOPH}";
+      String listAttendance = "{$stringListAttendance}";
+      Map<String, dynamic> newMapOPH = jsonDecode(listOPH);
+      Map<String, dynamic> newMapAttendance = jsonDecode(listAttendance);
+
+      final mapBC = {
+        'BC': {
+          'T_OPH_Schema_List': newMapOPH,
+          'T_Attendance_Schema_List_Panen': newMapAttendance
+        }
+      };
+      mapKR.addAll(mapBC);
+    }
+
+    if (_listSPB.isNotEmpty) {
+      for (int i = 0; i < _listSPB.length; i++) {
+        String jsonString = jsonEncode(_listSPB[i]);
+        mapListSPB.add("\"$i\":$jsonString");
+      }
+      for (int i = 0; i < _listSPBDetail.length; i++) {
+        String jsonString = jsonEncode(_listSPBDetail[i]);
+        mapListSPBDetail.add("\"$i\":$jsonString");
+      }
+
+      for (int i = 0; i < _listSPBLoader.length; i++) {
+        String jsonString = jsonEncode(_listSPBLoader[i]);
+        mapListSPBLoader.add("\"$i\":$jsonString");
+      }
+
+      var stringListSPB = mapListSPB.join(",");
+      var stringListSPBDetail = mapListSPBDetail.join(",");
+      var stringListSPBLoader = mapListSPBLoader.join(",");
+
+      String listSPB = "{$stringListSPB}";
+      String listSPBDetail = "{$stringListSPBDetail}";
+      String listSPBLoader = "{$stringListSPBLoader}";
+
+      Map<String, dynamic> newMapSPB = jsonDecode(listSPB);
+      Map<String, dynamic> newMapSPBDetail = jsonDecode(listSPBDetail);
+      Map<String, dynamic> newMapSPBLoader = jsonDecode(listSPBLoader);
+
+      final mapTP = {
+        'TP': {
+          'T_SPB_Schema_List': newMapSPB,
+          'T_SPB_Detail_Schema_List': newMapSPBDetail,
+          'T_SPB_Loader_Schema_List': newMapSPBLoader
+        }
+      };
+      mapKR.addAll(mapTP);
+    }
+
+    var epmsData = Map<String, dynamic>();
+    var jsonMap = jsonEncode(mapKR);
+    epmsData['epms_data'] = jsonMap;
+    epmsData['user_token'] = token;
+
+    var json = jsonEncode(epmsData);
+    Directory? tempDir = await getExternalStorageDirectory();
+    File fileResult = File('${tempDir?.path}/Kerani.json')..writeAsString(json);
+    return fileResult;
+  }
+
   Future<File?> writeFileJsonSupervisi() async {
     List<OPHSupervise> _listOPHSupervise =
         await DatabaseOPHSupervise().selectOPHSupervise();
@@ -137,7 +231,7 @@ class FileManagerJson {
     List<String> mapListOPHSupervise = [];
     List<String> mapListOPHAncak = [];
 
-    if(_listOPHSupervise.isNotEmpty || _listOPHAncak.isNotEmpty) {
+    if (_listOPHSupervise.isNotEmpty || _listOPHAncak.isNotEmpty) {
       if (_listOPHSupervise.isNotEmpty) {
         for (int i = 0; i < _listOPHSupervise.length; i++) {
           String jsonString = jsonEncode(_listOPHSupervise[i]);
@@ -210,7 +304,7 @@ class FileManagerJson {
 
     List<String> mapListOPHSupervise = [];
 
-    if(_listOPHSupervise.isNotEmpty) {
+    if (_listOPHSupervise.isNotEmpty) {
       for (int i = 0; i < _listOPHSupervise.length; i++) {
         String jsonString = jsonEncode(_listOPHSupervise[i]);
         mapListOPHSupervise.add("\"$i\":$jsonString");

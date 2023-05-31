@@ -1,4 +1,3 @@
-
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
@@ -63,6 +62,18 @@ class HomeNotifier extends ChangeNotifier {
     } else if (_role == "TP") {
       mapList = await DatabaseSPB().selectSPB();
       if (mapList.isEmpty) {
+        _dialogService.showLoadingDialog(title: "Logging Out");
+        LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
+      } else {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Upload data",
+            "Anda belum mengupload data");
+      }
+    } else if (_role == "KR") {
+      mapList = await DatabaseOPH().selectOPH();
+      mapList2 = await DatabaseSPB().selectSPB();
+      if (mapList.isEmpty && mapList2.isEmpty) {
         _dialogService.showLoadingDialog(title: "Logging Out");
         LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
       } else {

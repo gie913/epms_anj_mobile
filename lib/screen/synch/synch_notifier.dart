@@ -112,138 +112,239 @@ class SynchNotifier extends ChangeNotifier {
             notifyListeners();
             DatabaseMActivitySchema()
                 .insertMActivitySchema(
-                globals.globalRevamp.mActivitySchema ?? [])
+                    globals.globalRevamp.mActivitySchema ?? [])
                 .then((value) {
               _dataText = "Synch data Cost Control";
               notifyListeners();
               DatabaseMCostControlSchema()
                   .insertMCostControlSchema(
-                  globals.globalRevamp.mCostControlSchema ?? [])
+                      globals.globalRevamp.mCostControlSchema ?? [])
                   .then((value) {
                 _dataText = "Synch data Customer";
                 notifyListeners();
                 DatabaseMCustomerCodeSchema()
                     .insertMCustomerCodeSchema(
-                    globals.globalRevamp.mCustomerCodeSchema ?? [])
+                        globals.globalRevamp.mCustomerCodeSchema ?? [])
                     .then((value) {
                   _dataText = "Synch data Divisi";
                   notifyListeners();
                   DatabaseMDivisionSchema()
                       .insertMDivisionSchema(
-                      globals.globalRevamp.mDivisionSchema ?? [])
+                          globals.globalRevamp.mDivisionSchema ?? [])
                       .then((value) {
                     _dataText = "Synch data Material";
                     notifyListeners();
                     DatabaseMMaterialSchema()
                         .insertMMaterialSchema(
-                        globals.globalRevamp.mMaterialSchema ?? [])
+                            globals.globalRevamp.mMaterialSchema ?? [])
                         .then((value) {
                       _dataText = "Synch data Blok";
                       notifyListeners();
                       DatabaseMBlockSchema()
                           .insertMBlockSchema(
-                          globals.globalRevamp.mBlockSchema ?? [])
+                              globals.globalRevamp.mBlockSchema ?? [])
                           .then((value) {
                         _dataText = "Synch data Kartu OPH";
                         notifyListeners();
                         DatabaseMCOPHSchema()
                             .insertMCOPHSchema(
-                            globals.globalRevamp.mCOPHCardSchema ?? [])
+                                globals.globalRevamp.mCOPHCardSchema ?? [])
                             .then((value) {
                           _dataText = "Synch data TPH";
                           notifyListeners();
                           DatabaseMTPHSchema()
-                              .insertMTPHSchema(globals.globalRevamp.mTPHSchema ?? [])
+                              .insertMTPHSchema(
+                                  globals.globalRevamp.mTPHSchema ?? [])
                               .then((value) {
                             _dataText = "Synch data Penugasan";
                             notifyListeners();
                             DatabaseTUserAssignment()
-                                .insertTUserAssignment(
-                                globals.globalRevamp.tUserAssignmentSchema ?? [])
+                                .insertTUserAssignment(globals
+                                        .globalRevamp.tUserAssignmentSchema ??
+                                    [])
                                 .then((value) {
                               _dataText = "Synch data Kartu SPB";
                               notifyListeners();
                               DatabaseMCSPBCardSchema()
                                   .insertMCSPBCardSchema(
-                                  globals.globalRevamp.mCSPBCardSchema ??
-                                      [])
+                                      globals.globalRevamp.mCSPBCardSchema ??
+                                          [])
                                   .then((value) {
                                 _dataText = "Synch data Absensi";
                                 notifyListeners();
                                 DatabaseMAttendance()
-                                    .insertAttendance(globals.globalRevamp.mAttendanceSchema ?? [])
+                                    .insertAttendance(globals
+                                            .globalRevamp.mAttendanceSchema ??
+                                        [])
                                     .then((value) {
                                   _dataText = "Synch data Tujuan";
                                   notifyListeners();
                                   DatabaseMDestinationSchema()
-                                      .insertMDestinationSchema(
-                                      globals.globalRevamp.mDestinationSchema ?? [])
+                                      .insertMDestinationSchema(globals
+                                              .globalRevamp
+                                              .mDestinationSchema ??
+                                          [])
                                       .then((value) {
                                     _dataText = "Synch data Kehadiran";
                                     notifyListeners();
                                     DatabaseAttendance()
-                                        .insertAttendance(
-                                        globals.globalRevamp.tAttendanceSchema ?? [])
+                                        .insertAttendance(globals.globalRevamp
+                                                .tAttendanceSchema ??
+                                            [])
                                         .then((value) {
                                       _dataText = "Synch data Kendaraan";
                                       notifyListeners();
                                       DatabaseMVRASchema()
-                                          .insertMVRASchema(globals.globalRevamp.mVRASchema ?? [])
+                                          .insertMVRASchema(
+                                              globals.globalRevamp.mVRASchema ??
+                                                  [])
                                           .then((value) {
                                         if (synchResponse.keraniPanen != null) {
-                                          _dataText = "Synch data Laporan Panen Kemarin";
+                                          _dataText =
+                                              "Synch data Laporan Panen Kemarin";
                                           notifyListeners();
-                                          DatabaseLaporanPanenKemarin().insertLaporanPanenKemarin(
-                                              synchResponse.keraniPanen?.laporanPanenKemarin ?? []);
-                                          _dataText = "Synch data Estimasi Berat";
+                                          DatabaseLaporanPanenKemarin()
+                                              .insertLaporanPanenKemarin(
+                                                  synchResponse.keraniPanen
+                                                          ?.laporanPanenKemarin ??
+                                                      []);
+                                          _dataText =
+                                              "Synch data Estimasi Berat";
                                           notifyListeners();
                                           DatabaseTABWSchema().insertTABWSchema(
-                                              synchResponse.keraniPanen!.tABWSchema ?? []);
-                                          _dataText = "Synch data Rencana Panen";
+                                              synchResponse.keraniPanen!
+                                                      .tABWSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Rencana Panen";
                                           notifyListeners();
-                                          DatabaseTHarvestingPlan().insertTHarvestingPlan(
-                                              synchResponse.keraniPanen?.tHarvestingPlanSchema ?? []);
-                                          _dataText = "Synch data Laporan Restan";
+                                          DatabaseTHarvestingPlan()
+                                              .insertTHarvestingPlan(synchResponse
+                                                      .keraniPanen
+                                                      ?.tHarvestingPlanSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan Restan";
                                           notifyListeners();
-                                          DatabaseLaporanRestan().insertLaporanRestan(
-                                              synchResponse.keraniPanen?.laporanRestan ?? []);
-                                        } else if (synchResponse.keraniKirim != null) {
-                                          _dataText = "Synch data Laporan Restan";
+                                          DatabaseLaporanRestan()
+                                              .insertLaporanRestan(synchResponse
+                                                      .keraniPanen
+                                                      ?.laporanRestan ??
+                                                  []);
+                                        } else if (synchResponse.keraniKirim !=
+                                            null) {
+                                          _dataText =
+                                              "Synch data Laporan Restan";
                                           notifyListeners();
-                                          DatabaseLaporanRestan().insertLaporanRestan(
-                                              synchResponse.keraniKirim?.laporanRestan ?? []);
-                                          _dataText = "Synch data Laporan SPB Kemarin";
+                                          DatabaseLaporanRestan()
+                                              .insertLaporanRestan(synchResponse
+                                                      .keraniKirim
+                                                      ?.laporanRestan ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan SPB Kemarin";
                                           notifyListeners();
-                                          DatabaseLaporanSPBKemarin().insertLaporanSPBKemarin(
-                                              synchResponse.keraniKirim?.laporanSPBKemarin ?? []);
-                                        } else if (synchResponse.supervisi != null) {
-                                          _dataText = "Synch data Pekerja Ancak";
+                                          DatabaseLaporanSPBKemarin()
+                                              .insertLaporanSPBKemarin(
+                                                  synchResponse.keraniKirim
+                                                          ?.laporanSPBKemarin ??
+                                                      []);
+                                        } else if (synchResponse.kerani !=
+                                            null) {
+                                          _dataText =
+                                              "Synch data Laporan Panen Kemarin";
                                           notifyListeners();
-                                          DatabaseMAncakEmployee().insertMAncakEmployeeSchema(
-                                              synchResponse.supervisi?.mAncakEmployee ?? []);
-                                          _dataText = "Synch data Rencana Panen";
+                                          DatabaseLaporanPanenKemarin()
+                                              .insertLaporanPanenKemarin(
+                                                  synchResponse.kerani
+                                                          ?.laporanPanenKemarin ??
+                                                      []);
+                                          _dataText =
+                                              "Synch data Estimasi Berat";
                                           notifyListeners();
-                                          DatabaseTHarvestingPlan().insertTHarvestingPlan(
-                                              synchResponse.supervisi?.tHarvestingPlanSchema ?? []);
-                                          _dataText = "Synch data Rencana Kerja";
+                                          DatabaseTABWSchema().insertTABWSchema(
+                                              synchResponse
+                                                      .kerani!.tAbwSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Rencana Panen";
                                           notifyListeners();
-                                          DatabaseTWorkplanSchema().insertTWorkPlan(
-                                              synchResponse.supervisi?.tWorkplanSchema ?? []);
-                                          _dataText = "Synch data Laporan Restan";
+                                          DatabaseTHarvestingPlan()
+                                              .insertTHarvestingPlan(synchResponse
+                                                      .kerani
+                                                      ?.tHarvestingPlanSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan Restan";
                                           notifyListeners();
-                                          DatabaseLaporanRestan().insertLaporanRestan(
-                                              synchResponse.supervisi?.laporanRestan ?? []);
-                                          _dataText = "Synch data Laporan Panen Kemarin";
+                                          DatabaseLaporanRestan()
+                                              .insertLaporanRestan(synchResponse
+                                                      .kerani?.laporanRestan ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan SPB Kemarin";
                                           notifyListeners();
-                                          DatabaseLaporanPanenKemarin().insertLaporanPanenKemarin(
-                                              synchResponse.supervisi?.laporanPanenKemarin ?? []);
-                                        } else if (synchResponse.supervisi3rdParty != null) {
-                                          _dataText = "Synch data Grading TBS Luar";
+                                          DatabaseLaporanSPBKemarin()
+                                              .insertLaporanSPBKemarin(
+                                                  synchResponse.kerani
+                                                          ?.laporanSpbKemarin ??
+                                                      []);
+                                        } else if (synchResponse.supervisi !=
+                                            null) {
+                                          _dataText =
+                                              "Synch data Pekerja Ancak";
                                           notifyListeners();
-                                          DatabaseTBSLuarOneMonth().insertTBSLuarOneMonth(
-                                              synchResponse.supervisi3rdParty ?? []);
-                                          }
-                                        onSuccessSaveLocal(context, synchResponse);
+                                          DatabaseMAncakEmployee()
+                                              .insertMAncakEmployeeSchema(
+                                                  synchResponse.supervisi
+                                                          ?.mAncakEmployee ??
+                                                      []);
+                                          _dataText =
+                                              "Synch data Rencana Panen";
+                                          notifyListeners();
+                                          DatabaseTHarvestingPlan()
+                                              .insertTHarvestingPlan(synchResponse
+                                                      .supervisi
+                                                      ?.tHarvestingPlanSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Rencana Kerja";
+                                          notifyListeners();
+                                          DatabaseTWorkplanSchema()
+                                              .insertTWorkPlan(synchResponse
+                                                      .supervisi
+                                                      ?.tWorkplanSchema ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan Restan";
+                                          notifyListeners();
+                                          DatabaseLaporanRestan()
+                                              .insertLaporanRestan(synchResponse
+                                                      .supervisi
+                                                      ?.laporanRestan ??
+                                                  []);
+                                          _dataText =
+                                              "Synch data Laporan Panen Kemarin";
+                                          notifyListeners();
+                                          DatabaseLaporanPanenKemarin()
+                                              .insertLaporanPanenKemarin(
+                                                  synchResponse.supervisi
+                                                          ?.laporanPanenKemarin ??
+                                                      []);
+                                        } else if (synchResponse
+                                                .supervisi3rdParty !=
+                                            null) {
+                                          _dataText =
+                                              "Synch data Grading TBS Luar";
+                                          notifyListeners();
+                                          DatabaseTBSLuarOneMonth()
+                                              .insertTBSLuarOneMonth(
+                                                  synchResponse
+                                                          .supervisi3rdParty ??
+                                                      []);
+                                        }
+                                        onSuccessSaveLocal(
+                                            context, synchResponse);
                                       });
                                     });
                                   });

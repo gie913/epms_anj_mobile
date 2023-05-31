@@ -1,5 +1,6 @@
 import 'package:epms/model/global.dart';
 import 'package:epms/model/kerani_kirim.dart';
+import 'package:epms/model/kerani_model.dart';
 import 'package:epms/model/kerani_panen.dart';
 import 'package:epms/model/supervisi.dart';
 import 'package:epms/model/supervisi_3rd_party.dart';
@@ -9,6 +10,7 @@ class SynchResponse {
   Global? global;
   KeraniPanen? keraniPanen;
   KeraniKirim? keraniKirim;
+  KeraniModel? kerani;
   Supervisi? supervisi;
   List<Supervisi3rdParty>? supervisi3rdParty;
 
@@ -17,6 +19,7 @@ class SynchResponse {
       this.global,
       this.keraniPanen,
       this.keraniKirim,
+      this.kerani,
       this.supervisi,
       this.supervisi3rdParty});
 
@@ -29,6 +32,9 @@ class SynchResponse {
         : null;
     keraniKirim = json['kerani_kirim'] != null
         ? new KeraniKirim.fromJson(json['kerani_kirim'])
+        : null;
+    kerani = json['kerani'] != null
+        ? new KeraniModel.fromJson(json['kerani'])
         : null;
     supervisi = json['supervisi'] != null
         ? new Supervisi.fromJson(json['supervisi'])
@@ -52,6 +58,9 @@ class SynchResponse {
     }
     if (this.keraniKirim != null) {
       data['kerani_kirim'] = this.keraniKirim!.toJson();
+    }
+    if (this.kerani != null) {
+      data['kerani'] = this.kerani!.toJson();
     }
     if (this.supervisi != null) {
       data['supervisi'] = this.supervisi!.toJson();

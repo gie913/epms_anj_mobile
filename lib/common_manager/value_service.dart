@@ -6,6 +6,7 @@ import 'package:epms/model/oph.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/tbs_luar.dart';
+import 'package:epms/screen/kerani/kerani_menu/kerani_screen.dart';
 import 'package:epms/screen/kerani_kirim/kerani_kirim_menu/kerani_kirim_screen.dart';
 import 'package:epms/screen/kerani_panen/kerani_panen_menu/kerani_panen_screen.dart';
 import 'package:epms/screen/supervisor/supervisor_menu/supervisor_screen.dart';
@@ -314,6 +315,9 @@ class ValueService {
         break;
       case "TP":
         widget = KeraniKirimScreen();
+        break;
+      case "KR":
+        widget = KeraniScreen();
         break;
       case "Supervisi":
         widget = SupervisorScreen();
