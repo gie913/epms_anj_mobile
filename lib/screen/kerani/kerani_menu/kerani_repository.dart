@@ -54,11 +54,12 @@ class KeraniRepository extends APIConfiguration {
       //   uri,
       //   body: epmsData,
       // );
-      print(response.body);
       if (response.statusCode == 200) {
-        onSuccess(response);
+        final responseSuccess = jsonDecode(response.body);
+        onSuccess(responseSuccess);
       } else {
-        onError(response);
+        final responseFailed = jsonDecode(response.body)['message'];
+        onError(responseFailed);
       }
     } on SocketException {
       onError('No Internet');

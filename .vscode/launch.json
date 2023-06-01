@@ -4,11 +4,37 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        // {
+        //     "name": "PRODUCTION",
+        //     "type": "dart",
+        //     "request": "launch",
+        //     "program": "C:/projects/epms_anj_mobile/lib/main.dart",
+        //     "args":[		
+        //         "--flavor",
+        //         "prod",
+        //         "--debug",
+        //         "--verbose",
+        //         "--warning-mode all"
+		// 	]
+        // },
+        // {
+        //     "name": "DEVELOPMENT",
+        //     "type": "dart",
+        //     "request": "launch",
+        //     "program": "C:/projects/epms_anj_mobile/lib/main_dev.dart",
+        //     "args":[
+        //         "--flavor",
+        //         "dev",
+        //         "--debug",
+        //         "--verbose",
+        //         "--warning-mode all"
+		// 	]
+        // },
         {
             "name": "PRODUCTION",
             "type": "dart",
             "request": "launch",
-            "program": "C:/projects/epms_anj_mobile/lib/main.dart",
+            "program": "lib/main.dart",
             "args":[		
                 "--flavor",
                 "prod",
@@ -21,7 +47,7 @@
             "name": "DEVELOPMENT",
             "type": "dart",
             "request": "launch",
-            "program": "C:/projects/epms_anj_mobile/lib/main_dev.dart",
+            "program": "lib/main_dev.dart",
             "args":[
                 "--flavor",
                 "dev",

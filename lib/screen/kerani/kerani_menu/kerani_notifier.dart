@@ -120,17 +120,18 @@ class KeraniNotifier extends ChangeNotifier {
       FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
           "Upload Data",
-          "Belum Ada OPH yang dibuat");
+          "Belum Ada OPH dan SPB yang dibuat");
     }
   }
 
   onSuccessUploadKerani(response) {
+    print('response success upload data kerani : $response');
     uploadImageOPH(_navigationService.navigatorKey.currentContext!);
     uploadImageSPB(_navigationService.navigatorKey.currentContext!);
   }
 
   onErrorUploadKerani(response) {
-    _dialogService.popDialog();
+    print('response failed upload data kerani : $response');
     print('$response');
     FlushBarManager.showFlushBarWarning(
         _navigationService.navigatorKey.currentContext!,
@@ -392,7 +393,7 @@ class KeraniNotifier extends ChangeNotifier {
           context, "Export Json Berhasil", "${fileExport.path}");
     } else {
       FlushBarManager.showFlushBarWarning(
-          context, "Export Json", "Belum ada transaksi OPH");
+          context, "Export Json", "Belum ada transaksi OPH dan SPB");
     }
   }
 }

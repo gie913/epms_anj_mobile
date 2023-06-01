@@ -333,7 +333,7 @@ class ValueService {
 
   static String getMenuFirst(String roles) {
     String widget = Routes.HOME_PAGE;
-    if (roles == "BC") {
+    if (roles == "BC" || roles == 'KR') {
       widget = Routes.SUPERVISOR_FORM_PAGE;
     } else {
       widget = Routes.HOME_PAGE;
