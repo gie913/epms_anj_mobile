@@ -10,6 +10,7 @@ import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/oph_card_manager.dart';
 import 'package:epms/common_manager/spb_card_manager.dart';
+import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/service/database_destination.dart';
@@ -30,6 +31,7 @@ import 'package:epms/model/m_estate_schema.dart';
 import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/model/m_vras_schema.dart';
 import 'package:epms/model/oph.dart';
+import 'package:epms/model/oph_history_model.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
@@ -442,6 +444,18 @@ class FormSPBNotifier extends ChangeNotifier {
         await DatabaseSPBDetail().selectSPBDetailByOPHID(oph.ophId!);
     SPBDetail spbDetail = SPBDetail();
 
+    final dataOphHistory = await StorageManager.readData('ophHistory');
+    bool isOPhHistoryExist = false;
+    List<OphHistoryModel> ophHistory = [];
+    if (dataOphHistory != null) {
+      final ophHistoryDecode = jsonDecode(dataOphHistory);
+      ophHistory = List<OphHistoryModel>.from(
+          (ophHistoryDecode as List).map((e) => OphHistoryModel(ophId: e)));
+      for (int i = 0; i < ophHistory.length; i++) {
+        isOPhHistoryExist = ophHistory[i].ophId!.contains(oph.ophId!);
+      }
+    }
+
     // print('test spb');
     //  print(json.encode(spbDetail));
 
@@ -460,7 +474,12 @@ class FormSPBNotifier extends ChangeNotifier {
     spbDetail.ophLooseFruitDelivered = oph.looseFruits;
     spbDetail.ophBunchesDelivered =
         calculateJanjangSent(oph.bunchesTotal!, oph.bunchesNotSent!);
-    if (ophExist != null) {
+
+    if (isOPhHistoryExist) {
+      _dialogService.popDialog();
+      FlushBarManager.showFlushBarWarning(
+          context, "Scan OPH", "OPH sudah dimuat di SPB Lain");
+    } else if (ophExist != null) {
       FlushBarManager.showFlushBarWarning(
           context, "Scan OPH", "OPH ini sudah pernah discan");
     } else {

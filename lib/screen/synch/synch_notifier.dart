@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/constants/globals.dart' as globals;
@@ -33,6 +35,7 @@ import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:epms/model/m_config_schema.dart';
+import 'package:epms/model/oph_history_model.dart';
 import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
@@ -379,8 +382,30 @@ class SynchNotifier extends ChangeNotifier {
     StorageManager.saveData("lastSynchTime", TimeManager.timeWithColon(now));
     StorageManager.saveData("lastSynchDate", TimeManager.dateWithDash(now));
     getEstateCode();
+    saveOphHistory(
+      synchResponse.global!.rolesSchema![0].userRoles!,
+      synchResponse.ophHistory,
+    );
+    // final dataOphHistoryDummy = List<OphHistoryModel>.from(
+    //     ophHistoryDummy.map((e) => OphHistoryModel(ophId: e)));
+    // saveOphHistory(
+    //   synchResponse.global!.rolesSchema![0].userRoles!,
+    //   dataOphHistoryDummy,
+    // );
     _navigationService.push(ValueService.getMenuFirst(
         synchResponse.global!.rolesSchema![0].userRoles!));
+  }
+
+  Future<void> saveOphHistory(
+      String role, List<OphHistoryModel>? ophHistory) async {
+    if (role == 'KR' || role == 'TP') {
+      final data = jsonEncode(
+        ophHistory != null
+            ? List<String>.from(ophHistory.map((e) => e.ophId))
+            : [],
+      );
+      StorageManager.saveData('ophHistory', data);
+    }
   }
 
   getEstateCode() async {
