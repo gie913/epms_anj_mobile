@@ -227,7 +227,10 @@ class FormOPHNotifier extends ChangeNotifier {
     String number = formatterNumber.format(mConfigSchema.userId);
     _date = TimeManager.dateWithDash(now);
     _time = TimeManager.timeWithColon(now);
-    _ophID = "${mConfigSchema.estateCode}" + ValueService.generateIDFromDateTime(now) + "$number" + "M";
+    _ophID = "${mConfigSchema.estateCode}" +
+        ValueService.generateIDFromDateTime(now) +
+        "$number" +
+        "M";
     _mConfigSchema = mConfigSchema;
     bunchesRipe.text = "0";
     bunchesOverRipe.text = "0";
@@ -243,14 +246,17 @@ class FormOPHNotifier extends ChangeNotifier {
 
   onInitFormOPH(BuildContext context) async {
     _listEmployee = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
-    _listMandorKontrak = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
+    _listMandorKontrak =
+        await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     _listEstate = await DatabaseMEstateSchema().selectMEstateSchema();
     _listVendor = await DatabaseMVendorSchema().selectMVendorSchema();
     _supervisor = await DatabaseSupervisor().selectSupervisor();
-    _listMCustomer = await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
-    _listHarvestingPlan = await DatabaseTHarvestingPlan().selectTHarvestingPlan();
+    _listMCustomer =
+        await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
+    _listHarvestingPlan =
+        await DatabaseTHarvestingPlan().selectTHarvestingPlan();
     _listEmployee.forEach((element) {
-      if(element.employeeCode == _mConfigSchema?.employeeCode) {
+      if (element.employeeCode == _mConfigSchema?.employeeCode) {
         ophNumber.text = element.employeeDivisionCode!;
       }
     });
@@ -315,8 +321,9 @@ class FormOPHNotifier extends ChangeNotifier {
         TABWSchema? tabwSchema = await DatabaseTABWSchema()
             .selectTABWSchemaByBlock(_mBlockSchema!.blockCode!,
                 _valueMCustomer!.customerPlantCode!.substring(2));
-        _ophEstimationWeight =
-            (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
+        _ophEstimationWeight = (tabwSchema?.bunchWeight != null
+            ? tabwSchema?.bunchWeight
+            : 0.0 * int.parse(_bunchesTotal.text));
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -324,8 +331,9 @@ class FormOPHNotifier extends ChangeNotifier {
         TABWSchema? tabwSchema = await DatabaseTABWSchema()
             .selectTABWSchemaByBlock(
                 _mBlockSchema!.blockCode!, _mConfigSchema!.estateCode!);
-        _ophEstimationWeight =
-            (tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text));
+        _ophEstimationWeight = (tabwSchema?.bunchWeight != null
+            ? tabwSchema?.bunchWeight
+            : 0.0 * int.parse(_bunchesTotal.text));
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -359,7 +367,7 @@ class FormOPHNotifier extends ChangeNotifier {
       if (_employeeType == "Pinjam") {
         block.toUpperCase();
         _mBlockSchema = await ValidationService.checkBlockSchema(
-             block, _valueMCustomer!.customerPlantCode!.substring(2));
+            block, _valueMCustomer!.customerPlantCode!.substring(2));
         _mBlockSchema ??
             FlushBarManager.showFlushBarWarning(
                 context, "Kode Blok", "Tidak sesuai dengan estate");
@@ -407,6 +415,7 @@ class FormOPHNotifier extends ChangeNotifier {
           .toString();
       getEstimationTonnage();
     } catch (e) {
+      print('cek error $e');
       print(e);
     }
   }

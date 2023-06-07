@@ -31,7 +31,6 @@ import 'package:epms/model/m_estate_schema.dart';
 import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/model/m_vras_schema.dart';
 import 'package:epms/model/oph.dart';
-import 'package:epms/model/oph_history_model.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
@@ -445,16 +444,15 @@ class FormSPBNotifier extends ChangeNotifier {
     SPBDetail spbDetail = SPBDetail();
 
     final dataOphHistory = await StorageManager.readData('ophHistory');
+    print('cek ophHistory : ${jsonDecode(dataOphHistory)}');
     bool isOPhHistoryExist = false;
-    List<OphHistoryModel> ophHistory = [];
+
     if (dataOphHistory != null) {
       final ophHistoryDecode = jsonDecode(dataOphHistory);
-      ophHistory = List<OphHistoryModel>.from(
-          (ophHistoryDecode as List).map((e) => OphHistoryModel(ophId: e)));
-      for (int i = 0; i < ophHistory.length; i++) {
-        isOPhHistoryExist = ophHistory[i].ophId!.contains(oph.ophId!);
-      }
+      final ophHistory = ophHistoryDecode as List;
+      isOPhHistoryExist = ophHistory.contains(oph.ophId);
     }
+    print('cek isOPHHistoryExist : $isOPhHistoryExist');
 
     // print('test spb');
     //  print(json.encode(spbDetail));

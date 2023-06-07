@@ -76,7 +76,8 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("Total Janjang:"),
-                            Text("${ValueService.thousandSeparator(historyOPH.totalBunches)}")
+                            Text(
+                                "${ValueService.thousandSeparator(historyOPH.totalBunches)}")
                           ],
                         ),
                         SizedBox(height: 14),
@@ -84,7 +85,8 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("Total Brondolan (Kg):"),
-                            Text("${ValueService.thousandSeparator(historyOPH.totalLooseFruits)}")
+                            Text(
+                                "${ValueService.thousandSeparator(historyOPH.totalLooseFruits)}")
                           ],
                         ),
                       ],
@@ -103,11 +105,13 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                           ? Flexible(
                               child: ListView.builder(
                                   itemCount: historyOPH.listOPHResult.length,
-                                  itemBuilder: (BuildContext context, int index) {
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
                                     return InkWell(
                                       onTap: () {
                                         historyOPH.onSelectedOPH(
-                                            historyOPH.listOPHResult[index], widget.method);
+                                            historyOPH.listOPHResult[index],
+                                            widget.method);
                                       },
                                       child: Card(
                                         child: Padding(
@@ -134,8 +138,12 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                                                         .spaceBetween,
                                                 children: [
                                                   Text("Pekerja:"),
-                                                  Text(
-                                                      "${historyOPH.listOPHResult[index].employeeCode ?? ""} ${historyOPH.listOPHResult[index].employeeName ?? ""}"),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "${historyOPH.listOPHResult[index].employeeCode ?? ""} ${historyOPH.listOPHResult[index].employeeName ?? ""}",
+                                                      textAlign: TextAlign.end,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                               SizedBox(height: 8),
@@ -174,11 +182,13 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                           : Flexible(
                               child: ListView.builder(
                                   itemCount: historyOPH.listOPH.length,
-                                  itemBuilder: (BuildContext context, int index) {
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
                                     return InkWell(
                                       onTap: () {
                                         historyOPH.onSelectedOPH(
-                                            historyOPH.listOPH[index], widget.method);
+                                            historyOPH.listOPH[index],
+                                            widget.method);
                                       },
                                       child: Card(
                                         child: Padding(
@@ -205,8 +215,12 @@ class _HistoryOPHScreenState extends State<HistoryOPHScreen> {
                                                         .spaceBetween,
                                                 children: [
                                                   Text("Pekerja:"),
-                                                  Text(
-                                                      "${historyOPH.listOPH[index].employeeCode ?? ""} ${historyOPH.listOPH[index].employeeName ?? ""}"),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "${historyOPH.listOPH[index].employeeCode ?? ""} ${historyOPH.listOPH[index].employeeName ?? ""}",
+                                                      textAlign: TextAlign.end,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                               SizedBox(height: 8),

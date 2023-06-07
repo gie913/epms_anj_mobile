@@ -35,7 +35,6 @@ import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:epms/model/m_config_schema.dart';
-import 'package:epms/model/oph_history_model.dart';
 import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
@@ -386,24 +385,19 @@ class SynchNotifier extends ChangeNotifier {
       synchResponse.global!.rolesSchema![0].userRoles!,
       synchResponse.ophHistory,
     );
-    // final dataOphHistoryDummy = List<OphHistoryModel>.from(
-    //     ophHistoryDummy.map((e) => OphHistoryModel(ophId: e)));
+
+    // using data dummy
     // saveOphHistory(
     //   synchResponse.global!.rolesSchema![0].userRoles!,
-    //   dataOphHistoryDummy,
+    //   ophHistoryDummy,
     // );
     _navigationService.push(ValueService.getMenuFirst(
         synchResponse.global!.rolesSchema![0].userRoles!));
   }
 
-  Future<void> saveOphHistory(
-      String role, List<OphHistoryModel>? ophHistory) async {
+  Future<void> saveOphHistory(String role, List? ophHistory) async {
     if (role == 'KR' || role == 'TP') {
-      final data = jsonEncode(
-        ophHistory != null
-            ? List<String>.from(ophHistory.map((e) => e.ophId))
-            : [],
-      );
+      final data = jsonEncode(ophHistory != null ? ophHistory : []);
       StorageManager.saveData('ophHistory', data);
     }
   }

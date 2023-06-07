@@ -2,7 +2,6 @@ import 'package:epms/model/global.dart';
 import 'package:epms/model/kerani_kirim.dart';
 import 'package:epms/model/kerani_model.dart';
 import 'package:epms/model/kerani_panen.dart';
-import 'package:epms/model/oph_history_model.dart';
 import 'package:epms/model/supervisi.dart';
 import 'package:epms/model/supervisi_3rd_party.dart';
 
@@ -14,7 +13,7 @@ class SynchResponse {
   KeraniModel? kerani;
   Supervisi? supervisi;
   List<Supervisi3rdParty>? supervisi3rdParty;
-  List<OphHistoryModel>? ophHistory;
+  List? ophHistory;
 
   SynchResponse({
     this.message,
@@ -49,10 +48,7 @@ class SynchResponse {
         supervisi3rdParty!.add(new Supervisi3rdParty.fromJson(v));
       });
     }
-    ophHistory = json['oph_history'] != null
-        ? List<OphHistoryModel>.from((json['oph_history'] as List<String>)
-            .map((e) => OphHistoryModel(ophId: e)))
-        : [];
+    ophHistory = json['oph_history'] != null ? json['oph_history'] : [];
   }
 
   Map<String, dynamic> toJson() {
@@ -78,7 +74,7 @@ class SynchResponse {
           this.supervisi3rdParty!.map((v) => v.toJson()).toList();
     }
     if (this.ophHistory != null) {
-      data['oph_history'] = this.ophHistory!.map((e) => e.ophId).toList();
+      data['oph_history'] = this.ophHistory!.map((e) => e).toList();
     }
     return data;
   }
