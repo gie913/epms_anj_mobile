@@ -333,6 +333,7 @@ class ValueService {
 
   static String getMenuFirst(String roles) {
     String widget = Routes.HOME_PAGE;
+    print('cek role : $roles');
     if (roles == "BC" || roles == 'KR') {
       widget = Routes.SUPERVISOR_FORM_PAGE;
     } else {

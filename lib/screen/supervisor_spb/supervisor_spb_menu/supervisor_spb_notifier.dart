@@ -18,6 +18,7 @@ import 'package:epms/model/tbs_luar.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_supervisi_spb_repository.dart';
+import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
 
 class SupervisorSPBNotifier extends ChangeNotifier {
@@ -36,9 +37,29 @@ class SupervisorSPBNotifier extends ChangeNotifier {
         onPress: _dialogService.popDialog);
   }
 
+  void _showDialogApprovalTbsLuar(BuildContext context) {
+    _dialogService.popDialog();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return DialogApprovalTbsLuar(
+          title: 'Approval Manager',
+          labelButton: 'SUBMIT',
+          hintText: 'Masukkan PIN',
+          onPress: (value) {
+            print('cek ini :$value');
+            doUpload();
+          },
+        );
+      },
+    );
+  }
+
   doUpload() async {
     _dialogService.popDialog();
-    List<SPBSupervise> _listOPHSupervise = await DatabaseSPBSupervise().selectSPBSupervise();
+    List<SPBSupervise> _listOPHSupervise =
+        await DatabaseSPBSupervise().selectSPBSupervise();
     List<TBSLuar> _listTBSLuarGrading = await DatabaseTBSLuar().selectTBSLuar();
 
     if (_listOPHSupervise.isNotEmpty || _listTBSLuarGrading.isNotEmpty) {
@@ -89,8 +110,7 @@ class SupervisorSPBNotifier extends ChangeNotifier {
   uploadImage(BuildContext context) async {
     List<SPBSupervise> listSPB =
         await DatabaseSPBSupervise().selectSPBSupervise();
-    List<TBSLuar> listTBSLuar=
-    await DatabaseTBSLuar().selectTBSLuar();
+    List<TBSLuar> listTBSLuar = await DatabaseTBSLuar().selectTBSLuar();
     for (int i = 0; i < listSPB.length; i++) {
       if (listSPB[i].supervisiSpbPhoto != null) {
         UploadImageOPHRepository().doUploadPhoto(
@@ -195,6 +215,10 @@ class SupervisorSPBNotifier extends ChangeNotifier {
             buttonTextYes: "Ya",
             buttonTextNo: "Tidak",
             onPressYes: doUpload,
+            // onPressYes: () {
+            //   _showDialogApprovalTbsLuar(
+            //       _navigationService.navigatorKey.currentContext!);
+            // },
             onPressNo: _dialogService.popDialog);
         break;
     }
