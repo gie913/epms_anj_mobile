@@ -156,6 +156,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       looseFruits.text = _oph.looseFruits.toString();
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
+      _blockNumber.text = _oph.ophBlockCode!;
     } else {
       _oph = oph;
       notesOPH.text = _oph.ophNotes ?? "";
@@ -197,6 +198,10 @@ class DetailOPHNotifier extends ChangeNotifier {
   void onChangeCardEdit() {
     _onChangeCard = true;
     _isChangeCard = false;
+    print('cek kartu oph : ${_oph.ophCardId}');
+    print('cek blok oph : ${_oph.ophBlockCode}');
+    print('cek blok oph text: ${blockNumber.text}');
+
     ophNumber.text = _oph.ophCardId!;
     notifyListeners();
   }
