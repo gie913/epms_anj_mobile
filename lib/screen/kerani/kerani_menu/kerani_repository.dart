@@ -46,6 +46,7 @@ class KeraniRepository extends APIConfiguration {
       epmsData['epms_data'] = jsonMap;
       epmsData['user_token'] = token;
       await FileManagerJson().writeFileJsonKerani();
+      print('cek body upload role KR : $epmsData');
       var response = await ioClient!.post(
         uri,
         body: epmsData,
@@ -69,6 +70,7 @@ class KeraniRepository extends APIConfiguration {
       onError('Invalid Response format');
     } catch (exception) {
       onError(exception.toString());
+      rethrow;
     }
   }
 }

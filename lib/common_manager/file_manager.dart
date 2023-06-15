@@ -219,6 +219,7 @@ class FileManagerJson {
     var json = jsonEncode(epmsData);
     Directory? tempDir = await getExternalStorageDirectory();
     File fileResult = File('${tempDir?.path}/Kerani.json')..writeAsString(json);
+    print('cek direktori file json upload : ${tempDir?.path}/Kerani.json');
     return fileResult;
   }
 

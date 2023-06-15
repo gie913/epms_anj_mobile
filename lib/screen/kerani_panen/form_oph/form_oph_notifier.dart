@@ -260,7 +260,13 @@ class FormOPHNotifier extends ChangeNotifier {
         ophNumber.text = element.employeeDivisionCode!;
       }
     });
-    getOPHLast();
+    final userRoles = await StorageManager.readData("userRoles");
+    if (userRoles != null) {
+      if (userRoles != 'KR') {
+        getOPHLast();
+      }
+    }
+
     notifyListeners();
   }
 

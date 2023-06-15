@@ -455,13 +455,61 @@ class _KeraniScreenState extends State<KeraniScreen> {
                         ),
                         onPressed: () {
                           KeraniNotifier()
-                              .onClickedMenu(context, 'UPLOAD DATA');
+                              .onClickedMenu(context, 'UPLOAD DATA OPH');
                         },
-                        child: Text("UPLOAD DATA",
+                        child: Text("UPLOAD DATA OPH",
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.bold)),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.green,
+                          minimumSize:
+                              Size(MediaQuery.of(context).size.width, 50),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                              side: BorderSide(color: Colors.green)),
+                          padding: const EdgeInsets.all(16.0),
+                          textStyle: const TextStyle(
+                              fontSize: 20, color: Colors.white),
+                        ),
+                        onPressed: () {
+                          KeraniNotifier()
+                              .onClickedMenu(context, 'UPLOAD DATA SPB');
+                        },
+                        child: Text("UPLOAD DATA SPB",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: TextButton(
+                    //     style: TextButton.styleFrom(
+                    //       foregroundColor: Colors.white,
+                    //       backgroundColor: Colors.green,
+                    //       minimumSize:
+                    //           Size(MediaQuery.of(context).size.width, 50),
+                    //       shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(5.0),
+                    //           side: BorderSide(color: Colors.green)),
+                    //       padding: const EdgeInsets.all(16.0),
+                    //       textStyle: const TextStyle(
+                    //           fontSize: 20, color: Colors.white),
+                    //     ),
+                    //     onPressed: () {
+                    //       KeraniNotifier()
+                    //           .onClickedMenu(context, 'UPLOAD DATA');
+                    //     },
+                    //     child: Text("UPLOAD DATA",
+                    //         style: TextStyle(
+                    //             fontSize: 14, fontWeight: FontWeight.bold)),
+                    //   ),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextButton(

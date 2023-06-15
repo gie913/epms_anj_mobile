@@ -29,6 +29,8 @@ import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/kerani/kerani_menu/kerani_repository.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
+import 'package:epms/screen/upload/upload_oph_repository.dart';
+import 'package:epms/screen/upload/upload_spb_repository.dart';
 import 'package:flutter/material.dart';
 
 class KeraniNotifier extends ChangeNotifier {
@@ -39,6 +41,109 @@ class KeraniNotifier extends ChangeNotifier {
   DialogService _dialogService = locator<DialogService>();
 
   DialogService get dialogService => _dialogService;
+
+  doUploadOph() async {
+    _dialogService.popDialog();
+    List<OPH> _listOPH = await DatabaseOPH().selectOPH();
+    List<TAttendanceSchema> _listAttendance =
+        await DatabaseAttendance().selectEmployeeAttendance();
+    if (_listOPH.isNotEmpty) {
+      List<OPH> photo = await DatabaseOPH().selectOPHPhoto();
+      if (photo.isNotEmpty) {
+        onErrorUploadImageEmpty(_navigationService.navigatorKey.currentContext!,
+            "${photo[0].ophId}");
+      } else {
+        _dialogService.showLoadingDialog(title: "Upload OPH");
+        List<String> mapListOPH = [];
+        List<String> mapListAttendance = [];
+
+        for (int i = 0; i < _listOPH.length; i++) {
+          String jsonString = jsonEncode(_listOPH[i]);
+          mapListOPH.add("\"$i\":$jsonString");
+        }
+
+        for (int i = 0; i < _listAttendance.length; i++) {
+          String jsonString = jsonEncode(_listAttendance[i]);
+          mapListAttendance.add("\"$i\":$jsonString");
+        }
+        var stringListOPH = mapListOPH.join(",");
+        var stringListAttendance = mapListAttendance.join(",");
+        String listOPH = "{$stringListOPH}";
+        String listAttendance = "{$stringListAttendance}";
+        UploadOPHRepository().doPostUploadOPH(
+            listOPH, listAttendance, onSuccessUploadOPH, onErrorUploadOPH);
+      }
+    } else if (_listAttendance.isNotEmpty) {
+      _dialogService.showLoadingDialog(title: "Upload OPH");
+      List<String> mapListAttendance = [];
+      List<TAttendanceSchema> _listAttendance =
+          await DatabaseAttendance().selectEmployeeAttendance();
+      for (int i = 0; i < _listAttendance.length; i++) {
+        String jsonString = jsonEncode(_listAttendance[i]);
+        mapListAttendance.add("\"$i\":$jsonString");
+      }
+      var stringListAttendance = mapListAttendance.join(",");
+      String listOPH = "{}";
+      String listAttendance = "{$stringListAttendance}";
+      UploadOPHRepository().doPostUploadOPH(
+          listOPH, listAttendance, onSuccessUploadOPH, onErrorUploadOPH);
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Upload Data",
+          "Belum Ada OPH yang dibuat");
+    }
+  }
+
+  doUploadSpb() async {
+    _dialogService.popDialog();
+    List<SPB> _listSPB = await DatabaseSPB().selectSPB();
+    List<SPBDetail> _listSPBDetail =
+        await DatabaseSPBDetail().selectSPBDetail();
+    List<SPBLoader> _listSPBLoader =
+        await DatabaseSPBLoader().selectSPBLoader();
+    if (_listSPB.isNotEmpty) {
+      List<String> mapListSPB = [];
+      List<String> mapListSPBDetail = [];
+      List<String> mapListSPBLoader = [];
+
+      for (int i = 0; i < _listSPB.length; i++) {
+        String jsonString = jsonEncode(_listSPB[i]);
+        mapListSPB.add("\"$i\":$jsonString");
+      }
+      for (int i = 0; i < _listSPBDetail.length; i++) {
+        String jsonString = jsonEncode(_listSPBDetail[i]);
+        mapListSPBDetail.add("\"$i\":$jsonString");
+      }
+
+      for (int i = 0; i < _listSPBLoader.length; i++) {
+        String jsonString = jsonEncode(_listSPBLoader[i]);
+        mapListSPBLoader.add("\"$i\":$jsonString");
+      }
+
+      var stringListSPB = mapListSPB.join(",");
+      var stringListSPBDetail = mapListSPBDetail.join(",");
+      var stringListSPBLoader = mapListSPBLoader.join(",");
+
+      String listSPB = "{$stringListSPB}";
+      String listSPBDetail = "{$stringListSPBDetail}";
+      String listSPBLoader = "{$stringListSPBLoader}";
+
+      _dialogService.showLoadingDialog(title: "Mengupload SPB");
+      UploadSPBRepository().doPostUploadSPB(
+          _navigationService.navigatorKey.currentContext!,
+          listSPB,
+          listSPBDetail,
+          listSPBLoader,
+          onSuccessUploadSPB,
+          onErrorUploadSPB);
+    } else {
+      FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Upload SPB",
+          "Belum ada SPB dibuat");
+    }
+  }
 
   doUpload() async {
     _dialogService.popDialog();
@@ -124,6 +229,32 @@ class KeraniNotifier extends ChangeNotifier {
     }
   }
 
+  onSuccessUploadOPH(response) {
+    print('response success upload data OPH : $response');
+    uploadImageOPH(_navigationService.navigatorKey.currentContext!);
+  }
+
+  onErrorUploadOPH(String response) {
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarWarning(
+        _navigationService.navigatorKey.currentContext!,
+        "Upload OPH",
+        response);
+  }
+
+  onSuccessUploadSPB(response) {
+    print('response success upload data spb : $response');
+    uploadImageSPB(_navigationService.navigatorKey.currentContext!);
+  }
+
+  onErrorUploadSPB(String response) {
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarError(
+        _navigationService.navigatorKey.currentContext!,
+        "Upload SPB",
+        response);
+  }
+
   onSuccessUploadKerani(response) {
     print('response success upload data kerani : $response');
     uploadImageOPH(_navigationService.navigatorKey.currentContext!);
@@ -133,6 +264,7 @@ class KeraniNotifier extends ChangeNotifier {
   onErrorUploadKerani(response) {
     print('response failed upload data kerani : $response');
     print('$response');
+    _dialogService.popDialog();
     FlushBarManager.showFlushBarWarning(
         _navigationService.navigatorKey.currentContext!,
         "Upload Data",
@@ -296,6 +428,24 @@ class KeraniNotifier extends ChangeNotifier {
         } else {
           dialogReLogin();
         }
+        break;
+      case "UPLOAD DATA OPH":
+        _dialogService.showOptionDialog(
+            title: "Upload Data",
+            subtitle: "Anda yakin ingin mengupload data?",
+            buttonTextYes: "Ya",
+            buttonTextNo: "Tidak",
+            onPressYes: doUploadOph,
+            onPressNo: _dialogService.popDialog);
+        break;
+      case "UPLOAD DATA SPB":
+        _dialogService.showOptionDialog(
+            title: "Upload Data",
+            subtitle: "Anda yakin ingin mengupload data?",
+            buttonTextYes: "Ya",
+            buttonTextNo: "Tidak",
+            onPressYes: doUploadSpb,
+            onPressNo: _dialogService.popDialog);
         break;
       case "UPLOAD DATA":
         _dialogService.showOptionDialog(

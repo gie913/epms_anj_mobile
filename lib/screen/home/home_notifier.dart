@@ -73,14 +73,44 @@ class HomeNotifier extends ChangeNotifier {
     } else if (_role == "KR") {
       mapList = await DatabaseOPH().selectOPH();
       mapList2 = await DatabaseSPB().selectSPB();
-      if (mapList.isEmpty && mapList2.isEmpty) {
-        _dialogService.showLoadingDialog(title: "Logging Out");
-        LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
-      } else {
+      // if (mapList.isEmpty && mapList2.isEmpty) {
+      //   _dialogService.showLoadingDialog(title: "Logging Out");
+      //   LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
+      // } else {
+      //   FlushBarManager.showFlushBarWarning(
+      //       _navigationService.navigatorKey.currentContext!,
+      //       "Upload data",
+      //       "Anda belum mengupload data");
+      // }
+      // pengecekan logout dua tombol upload OPH dan SPB
+      if (mapList.isNotEmpty && mapList2.isNotEmpty) {
         FlushBarManager.showFlushBarWarning(
             _navigationService.navigatorKey.currentContext!,
             "Upload data",
-            "Anda belum mengupload data");
+            "Anda belum mengupload data OPH dan data SPB");
+        return;
+      }
+
+      if (mapList.isNotEmpty) {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Upload data",
+            "Anda belum mengupload data OPH");
+        return;
+      }
+
+      if (mapList2.isNotEmpty) {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Upload data",
+            "Anda belum mengupload data SPB");
+        return;
+      }
+
+      if (mapList.isEmpty && mapList2.isEmpty) {
+        _dialogService.showLoadingDialog(title: "Logging Out");
+        LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
+        return;
       }
     } else if (_role == "Supervisi") {
       mapList = await DatabaseOPHSupervise().selectOPHSupervise();
