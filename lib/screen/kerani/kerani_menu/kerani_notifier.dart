@@ -242,12 +242,12 @@ class KeraniNotifier extends ChangeNotifier {
         response);
   }
 
-  onSuccessUploadSPB(response) {
-    print('response success upload data spb : $response');
-    uploadImageSPB(_navigationService.navigatorKey.currentContext!);
+  onSuccessUploadSPB(BuildContext context, response) {
+    uploadImageSPB(context);
   }
 
-  onErrorUploadSPB(String response) {
+  onErrorUploadSPB(BuildContext context, String response) {
+    print(response);
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
         _navigationService.navigatorKey.currentContext!,
@@ -310,6 +310,7 @@ class KeraniNotifier extends ChangeNotifier {
   }
 
   onErrorUploadImage(BuildContext context, String response) {
+    print('error upload image SPB');
     _dialogService.popDialog();
     // FlushBarManager.showFlushBarWarning(
     //     _navigationService.navigatorKey.currentContext!,
