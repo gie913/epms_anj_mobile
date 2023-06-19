@@ -296,6 +296,7 @@ class DetailOPHNotifier extends ChangeNotifier {
     _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
     // azis
     _oph.ophBlockCode = blockNumber.text;
+    _oph.ophCardId = ophNumber.text;
     if (_onEdit) {
       print('onEdit : true');
       OPHCardManager().readWriteOPHCard(

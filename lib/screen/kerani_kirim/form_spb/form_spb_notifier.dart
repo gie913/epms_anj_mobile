@@ -435,6 +435,7 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   onSuccessRead(BuildContext context, OPH oph) {
+    print('cek oph card id : ${oph.ophCardId}');
     onCheckOPHExist(context, oph);
   }
 
