@@ -70,13 +70,17 @@ class DetailSPBNotifier extends ChangeNotifier {
       }
     } else {
       _spb = spb;
-      if(spb.spbType == 3) {
-        MVendorSchema? mVendorSchema = _listMVendorSchema.firstWhereOrNull((element) => element.vendorCode == spb.spbDriverEmployeeCode);
-        if(mVendorSchema != null) {
+      if (spb.spbType == 3) {
+        MVendorSchema? mVendorSchema = _listMVendorSchema.firstWhereOrNull(
+            (element) => element.vendorCode == spb.spbDriverEmployeeCode);
+        if (mVendorSchema != null) {
           _spb?.spbDriverEmployeeName = mVendorSchema.vendorName;
         }
       } else {
-        _spb?.spbDriverEmployeeName = _listDriver.firstWhere((element) => element.employeeCode == spb.spbDriverEmployeeCode).employeeName;
+        _spb?.spbDriverEmployeeName = _listDriver
+            .firstWhere(
+                (element) => element.employeeCode == spb.spbDriverEmployeeCode)
+            .employeeName;
       }
     }
     Future.delayed(Duration(seconds: 1), () {
@@ -231,7 +235,7 @@ class DetailSPBNotifier extends ChangeNotifier {
 
   onClickSaveSPB(BuildContext context) {
     if (spbNumber.text.isNotEmpty) {
-      if(_spb?.spbCardId != spbNumber.text) {
+      if (_spb?.spbCardId != spbNumber.text) {
         if (_mcspbCardSchema != null) {
           showDialogQuestion(context);
         } else {

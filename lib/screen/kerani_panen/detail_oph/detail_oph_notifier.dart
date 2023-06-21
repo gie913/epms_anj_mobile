@@ -268,6 +268,7 @@ class DetailOPHNotifier extends ChangeNotifier {
   }
 
   onSaveChangeCard(BuildContext context) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_oph.ophCardId != ophNumber.text) {
       print('cek kebenaran 1 : ${_oph.ophCardId != ophNumber.text}');
       if (_restan) {
@@ -296,7 +297,9 @@ class DetailOPHNotifier extends ChangeNotifier {
     _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
     // azis
     _oph.ophBlockCode = blockNumber.text;
-    _oph.ophCardId = ophNumber.text;
+    if (ophNumber.text.isNotEmpty) {
+      _oph.ophCardId = ophNumber.text;
+    }
     if (_onEdit) {
       print('onEdit : true');
       OPHCardManager().readWriteOPHCard(

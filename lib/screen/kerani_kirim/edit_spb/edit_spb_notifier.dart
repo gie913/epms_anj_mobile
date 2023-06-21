@@ -271,7 +271,7 @@ class EditSPBNotifier extends ChangeNotifier {
     _driverNameList = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     _mConfigSchema = await DatabaseMConfig().selectMConfig();
     checkVehicle(context, spb.spbLicenseNumber!);
-    if(spb.spbType == 1) {
+    if (spb.spbType == 1) {
       _driverNameValue = MEmployeeSchema(
           employeeCode: spb.spbDriverEmployeeCode,
           employeeName: spb.spbDriverEmployeeName);
@@ -538,7 +538,8 @@ class EditSPBNotifier extends ChangeNotifier {
   }
 
   void saveSPBtoDatabase(BuildContext context) async {
-    List<SPBLoader> existListLoader = await DatabaseSPBLoader().selectSPBLoaderBySPBID(_globalSPB);
+    List<SPBLoader> existListLoader =
+        await DatabaseSPBLoader().selectSPBLoaderBySPBID(_globalSPB);
     int countSaved = await DatabaseSPB().updateSPBByID(_globalSPB);
     if (countSaved > 0) {
       for (int i = 0; i < _spbLoaderList.length; i++) {
