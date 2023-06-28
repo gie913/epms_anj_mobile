@@ -35,9 +35,12 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("ID SPB:"),
-                    Text(
-                      "${formSPB.spbID ?? ""}",
-                      style: Style.textBold16,
+                    Expanded(
+                      child: Text(
+                        "${formSPB.spbID ?? ""}",
+                        style: Style.textBold16,
+                        textAlign: TextAlign.end,
+                      ),
                     )
                   ],
                 ),
@@ -46,7 +49,12 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text("Tanggal:"), Text("${formSPB.date ?? ""}")],
+                  children: [
+                    Text("Tanggal:"),
+                    Expanded(
+                        child: Text("${formSPB.date ?? ""}",
+                            textAlign: TextAlign.end)),
+                  ],
                 ),
               ),
               Padding(
@@ -55,7 +63,11 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("GPS Geolocation:"),
-                    Text("${formSPB.gpsLocation}")
+                    Expanded(
+                        child: Text(
+                      "${formSPB.gpsLocation}",
+                      textAlign: TextAlign.end,
+                    ))
                   ],
                 ),
               ),
@@ -91,27 +103,22 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Tujuan:"),
-                    Row(
-                      children: [
-                        Container(
-                          width: 180,
-                          child: DropdownButton(
-                            isExpanded: true,
-                            hint: Text("Pilih tujuan"),
-                            value: formSPB.destinationValue,
-                            items: formSPB.destinationList.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(value.destinationName!),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (MDestinationSchema? value) {
-                              formSPB.onChangeDestination(value!);
-                            },
-                          ),
-                        ),
-                      ],
+                    Expanded(child: Text("Tujuan:")),
+                    Expanded(
+                      child: DropdownButton(
+                        isExpanded: true,
+                        hint: Text("Pilih tujuan"),
+                        value: formSPB.destinationValue,
+                        items: formSPB.destinationList.map((value) {
+                          return DropdownMenuItem(
+                            child: Text(value.destinationName!),
+                            value: value,
+                          );
+                        }).toList(),
+                        onChanged: (MDestinationSchema? value) {
+                          formSPB.onChangeDestination(value!);
+                        },
+                      ),
                     )
                   ],
                 ),
@@ -144,20 +151,23 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
                                     },
                                   ),
                                 ),
-                                InkWell(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 2.0),
-                                    child: Icon(Icons.search),
+                                Expanded(
+                                  child: InkWell(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 2.0),
+                                      child: Icon(Icons.search),
+                                    ),
+                                    onTap: () async {
+                                      MEmployeeSchema? mEmployee =
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SearchDriverScreen()));
+                                      formSPB.onChangeDriver(mEmployee!);
+                                    },
                                   ),
-                                  onTap: () async {
-                                    MEmployeeSchema? mEmployee =
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SearchDriverScreen()));
-                                    formSPB.onChangeDriver(mEmployee!);
-                                  },
                                 ),
                               ],
                             ),
@@ -239,136 +249,142 @@ class _FormSPBDetailTabState extends State<FormSPBDetailTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    children: [
-                      Text("No. Kendaraan"),
-                      Container(
-                        width: 160,
-                        child: Focus(
-                          onFocusChange: (hasFocus) {
-                            if (!hasFocus) {
-                              formSPB.checkVehicle(
-                                  context, formSPB.vehicleNumber.text);
-                            }
-                          },
-                          child: TextFormField(
-                            onChanged: (value) {
-                              if (value.length >= 8) {
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text("No. Kendaraan"),
+                        Container(
+                          width: 160,
+                          child: Focus(
+                            onFocusChange: (hasFocus) {
+                              if (!hasFocus) {
+                                formSPB.checkVehicle(
+                                    context, formSPB.vehicleNumber.text);
+                              }
+                            },
+                            child: TextFormField(
+                              onChanged: (value) {
+                                if (value.length >= 8) {
+                                  formSPB.checkVehicle(context, value);
+                                }
+                              },
+                              onFieldSubmitted: (value) {
                                 formSPB.checkVehicle(context, value);
-                              }
-                            },
-                            onFieldSubmitted: (value) {
-                              formSPB.checkVehicle(context, value);
-                            },
-                            controller: formSPB.vehicleNumber,
-                            textCapitalization: TextCapitalization.characters,
-                            textAlign: TextAlign.center,
-                            decoration:
-                                InputDecoration(hintText: "Tulis No Kendaraan"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
+                              },
+                              controller: formSPB.vehicleNumber,
+                              textCapitalization: TextCapitalization.characters,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                  hintText: "Tulis No Kendaraan"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => QRReaderScreen()));
-                            if (result != null) {
-                              setState(() {
-                                formSPB.vehicleNumber =
-                                    TextEditingController(text: result);
-                              });
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "BACA QR Truk",
-                                style: Style.whiteBold14,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () async {
+                              String? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => QRReaderScreen()));
+                              if (result != null) {
+                                setState(() {
+                                  formSPB.vehicleNumber =
+                                      TextEditingController(text: result);
+                                });
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "BACA QR Truk",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: 16,
                   ),
-                  Column(
-                    children: [
-                      Text("Kartu SPB"),
-                      Container(
-                        width: 160,
-                        child: Focus(
-                          child: TextFormField(
-                            controller: formSPB.spbCardNumber,
-                            textAlign: TextAlign.center,
-                            textCapitalization: TextCapitalization.characters,
-                            onChanged: (value) {
-                              if (value.length >= 4) {
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text("Kartu SPB"),
+                        Container(
+                          width: 160,
+                          child: Focus(
+                            child: TextFormField(
+                              controller: formSPB.spbCardNumber,
+                              textAlign: TextAlign.center,
+                              textCapitalization: TextCapitalization.characters,
+                              onChanged: (value) {
+                                if (value.length >= 4) {
+                                  formSPB.checkSPBCard(context, value);
+                                }
+                              },
+                              onFieldSubmitted: (value) {
                                 formSPB.checkSPBCard(context, value);
-                              }
-                            },
-                            onFieldSubmitted: (value) {
-                              formSPB.checkSPBCard(context, value);
-                            },
-                            decoration:
-                                InputDecoration(hintText: "Tulis Kartu SPB"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
+                              },
+                              decoration:
+                                  InputDecoration(hintText: "Tulis Kartu SPB"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => QRReaderScreen()));
-                            if (result != null) {
-                              setState(() {
-                                formSPB.spbCardNumber =
-                                    TextEditingController(text: result);
-                              });
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "BACA QR KARTU",
-                                style: Style.whiteBold14,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () async {
+                              String? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => QRReaderScreen()));
+                              if (result != null) {
+                                setState(() {
+                                  formSPB.spbCardNumber =
+                                      TextEditingController(text: result);
+                                });
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "BACA QR KARTU",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),

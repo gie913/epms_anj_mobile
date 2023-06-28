@@ -70,7 +70,7 @@ class _KeraniScreenState extends State<KeraniScreen> {
             ],
           ),
           body: Padding(
-            padding: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+            padding: EdgeInsets.only(bottom: 10, left: 5, right: 5),
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(18),
@@ -373,20 +373,24 @@ class _KeraniScreenState extends State<KeraniScreen> {
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold)),
-                              SizedBox(width: 10),
-                              Row(children: [
-                                countRestan == 0
-                                    ? Container()
-                                    : Row(children: [
+                              SizedBox(width: 4),
+                              countRestan == 0
+                                  ? const SizedBox()
+                                  : Expanded(
+                                      child: Row(children: [
                                         Icon(Icons.warning,
-                                            color: Colors.yellow),
-                                        SizedBox(width: 10),
-                                        Text("$countRestan",
-                                            style: TextStyle(
+                                            color: Colors.yellow, size: 18),
+                                        SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text("$countRestan",
+                                              style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
-                                      ])
-                              ])
+                                                fontWeight: FontWeight.bold,
+                                                overflow: TextOverflow.ellipsis,
+                                              )),
+                                        ),
+                                      ]),
+                                    ),
                             ]),
                       ),
                     ),

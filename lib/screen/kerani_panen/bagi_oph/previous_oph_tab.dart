@@ -28,7 +28,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("ID OPH:"),
-                  Text("${bagiOPH.oph.ophId ?? ""}", style: Style.textBold20)
+                  Expanded(
+                      child: Text(
+                    "${bagiOPH.oph.ophId ?? ""}",
+                    style: Style.textBold20,
+                    textAlign: TextAlign.end,
+                  ))
                 ],
               ),
             ),
@@ -38,8 +43,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Tanggal:"),
-                    Text(
-                        "${bagiOPH.oph.createdDate ?? ""} ${bagiOPH.oph.createdTime ?? ""}")
+                    Expanded(
+                      child: Text(
+                        "${bagiOPH.oph.createdDate ?? ""} ${bagiOPH.oph.createdTime ?? ""}",
+                        textAlign: TextAlign.end,
+                      ),
+                    )
                   ]),
             ),
             Padding(
@@ -48,8 +57,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Jenis Pekerja:"),
-                    Text(
-                        "${ValueService.typeOfFormToText(bagiOPH.oph.ophHarvestingType ?? 1)}")
+                    Expanded(
+                      child: Text(
+                        "${ValueService.typeOfFormToText(bagiOPH.oph.ophHarvestingType ?? 1)}",
+                        textAlign: TextAlign.end,
+                      ),
+                    )
                   ]),
             ),
             Padding(
@@ -58,8 +71,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Apakah Panen Mekanis?"),
-                    Text(
-                        "${ValueService.harvestingType(bagiOPH.oph.ophHarvestingMethod ?? 1)}")
+                    Expanded(
+                      child: Text(
+                        "${ValueService.harvestingType(bagiOPH.oph.ophHarvestingMethod ?? 1)}",
+                        textAlign: TextAlign.end,
+                      ),
+                    )
                   ]),
             ),
             Padding(
@@ -68,11 +85,13 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Kemandoran:"),
-                    Container(
-                      width: 200,
-                      child: Text(
-                          "${bagiOPH.oph.mandorEmployeeCode ?? ""}  ${bagiOPH.oph.mandorEmployeeName ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text(
+                            "${bagiOPH.oph.mandorEmployeeCode ?? ""}  ${bagiOPH.oph.mandorEmployeeName ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -82,11 +101,13 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Pekerja:"),
-                    Container(
-                        width: 200,
-                        child: Text(
-                            "${bagiOPH.oph.employeeCode ?? ""}  ${bagiOPH.oph.employeeName ?? ""}",
-                            textAlign: TextAlign.end))
+                    Expanded(
+                      child: Container(
+                          width: 200,
+                          child: Text(
+                              "${bagiOPH.oph.employeeCode ?? ""}  ${bagiOPH.oph.employeeName ?? ""}",
+                              textAlign: TextAlign.end)),
+                    )
                   ]),
             ),
             Padding(
@@ -95,10 +116,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Customer:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.oph.ophCustomerCode ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.oph.ophCustomerCode ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -108,10 +131,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Estate:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.oph.ophEstateCode ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.oph.ophEstateCode ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -121,11 +146,13 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Divisi:"),
-                    Container(
-                      width: 200,
-                      child: Text(
-                          "${bagiOPH.oph.ophDivisionCode == null || bagiOPH.oph.ophDivisionCode == "null" ? "" : bagiOPH.oph.ophDivisionCode}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text(
+                            "${bagiOPH.oph.ophDivisionCode == null || bagiOPH.oph.ophDivisionCode == "null" ? "" : bagiOPH.oph.ophDivisionCode}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -135,10 +162,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Blok:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.oph.ophBlockCode ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.oph.ophBlockCode ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -148,10 +177,12 @@ class _PreviousOPHTabState extends State<PreviousOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Estimasi berat OPH (Kg):"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.oph.ophEstimateTonnage ?? 0}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.oph.ophEstimateTonnage ?? 0}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),

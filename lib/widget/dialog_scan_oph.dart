@@ -39,13 +39,16 @@ class _DialogScanOPHState extends State<DialogScanOPH> {
           child: Text("${widget.title}", style: Style.textBoldBlack14),
         ),
         content: Container(
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.34,
           child: Column(children: [
             Flexible(
               child: Center(
                 child: Container(
                   margin: EdgeInsets.only(bottom: 10),
-                  child: Text("Jumlah OPH : ${widget.ophCount}", style: Style.textBoldBlack12,),
+                  child: Text(
+                    "Jumlah OPH : ${widget.ophCount}",
+                    style: Style.textBoldBlack12,
+                  ),
                 ),
               ),
             ),
@@ -53,7 +56,10 @@ class _DialogScanOPHState extends State<DialogScanOPH> {
               child: Center(
                 child: Container(
                   margin: EdgeInsets.only(bottom: 10),
-                  child: Text("OPH terakhir yang di-scan : ${widget.lastOPH}", style: Style.textBoldBlack12,),
+                  child: Text(
+                    "OPH terakhir yang di-scan : ${widget.lastOPH}",
+                    style: Style.textBoldBlack12,
+                  ),
                 ),
               ),
             ),

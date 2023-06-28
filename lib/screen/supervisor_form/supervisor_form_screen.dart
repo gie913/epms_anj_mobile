@@ -68,21 +68,24 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${supervisor.mandorValue?.employeeCode ?? "Tidak ada data"}",
-                                            style: Style.textBold14,
-                                          ),
-                                          Text(
-                                              "${supervisor.mandorValue?.employeeName ?? "belum di mapping"}")
-                                        ],
+                                Expanded(
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "${supervisor.mandorValue?.employeeCode ?? "Tidak ada data"}",
+                                              style: Style.textBold14,
+                                            ),
+                                            Text(
+                                                "${supervisor.mandorValue?.employeeName ?? "belum di mapping"}")
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -116,21 +119,24 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${supervisor.mandorValue1?.employeeCode ?? "Tidak ada data"}",
-                                            style: Style.textBold14,
-                                          ),
-                                          Text(
-                                              "${supervisor.mandorValue1?.employeeName ?? "belum di mapping"}")
-                                        ],
+                                Expanded(
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "${supervisor.mandorValue1?.employeeCode ?? "Tidak ada data"}",
+                                              style: Style.textBold14,
+                                            ),
+                                            Text(
+                                                "${supervisor.mandorValue1?.employeeName ?? "belum di mapping"}")
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -161,21 +167,24 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${supervisor.keraniPanenValue?.employeeCode ?? "Tidak ada data"}",
-                                            style: Style.textBold14,
-                                          ),
-                                          Text(
-                                              "${supervisor.keraniPanenValue?.employeeName ?? "belum di mapping"}")
-                                        ],
+                                Expanded(
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "${supervisor.keraniPanenValue?.employeeCode ?? "Tidak ada data"}",
+                                              style: Style.textBold14,
+                                            ),
+                                            Text(
+                                                "${supervisor.keraniPanenValue?.employeeName ?? "belum di mapping"}")
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -207,21 +216,24 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.6,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${supervisor.keraniKirimValue?.employeeCode ?? "Tidak ada data"}",
-                                            style: Style.textBold14,
-                                          ),
-                                          Text(
-                                              "${supervisor.keraniKirimValue?.employeeName ?? "belum di mapping"}")
-                                        ],
+                                Expanded(
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "${supervisor.keraniKirimValue?.employeeCode ?? "Tidak ada data"}",
+                                              style: Style.textBold14,
+                                            ),
+                                            Text(
+                                                "${supervisor.keraniKirimValue?.employeeName ?? "belum di mapping"}")
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

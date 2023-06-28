@@ -49,7 +49,11 @@ class _FormOPHTabState extends State<FormOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("GPS Geolocation:"),
-                    Text("${notifier.gpsLocation}")
+                    Expanded(
+                        child: Text(
+                      "${notifier.gpsLocation}",
+                      textAlign: TextAlign.right,
+                    )),
                   ],
                 ),
               ),
@@ -184,20 +188,23 @@ class _FormOPHTabState extends State<FormOPHTab> {
                                     },
                                   ),
                                 ),
-                                InkWell(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 2.0),
-                                    child: Icon(Icons.search),
+                                Expanded(
+                                  child: InkWell(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 2.0),
+                                      child: Icon(Icons.search),
+                                    ),
+                                    onTap: () async {
+                                      MEmployeeSchema? mEmployee =
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SearchEmployeeScreen()));
+                                      notifier.onSetEmployee(mEmployee!);
+                                    },
                                   ),
-                                  onTap: () async {
-                                    MEmployeeSchema? mEmployee =
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SearchEmployeeScreen()));
-                                    notifier.onSetEmployee(mEmployee!);
-                                  },
                                 ),
                               ],
                             ),
@@ -238,33 +245,33 @@ class _FormOPHTabState extends State<FormOPHTab> {
                   : Container(),
               notifier.employeeType == "Kontrak"
                   ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(child: Text("Vendor:")),
-                    Flexible(
-                      child: Container(
-                        width: 180,
-                        child: DropdownButton(
-                          isExpanded: true,
-                          hint: Text("Pilih Vendor"),
-                          value: notifier.valueVendor,
-                          items: notifier.listVendor.map((value) {
-                            return DropdownMenuItem(
-                              child: Text(value.vendorName!),
-                              value: value,
-                            );
-                          }).toList(),
-                          onChanged: (MVendorSchema? value) {
-                            notifier.onSetVendor(value!);
-                          },
-                        ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(child: Text("Vendor:")),
+                          Flexible(
+                            child: Container(
+                              width: 180,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                hint: Text("Pilih Vendor"),
+                                value: notifier.valueVendor,
+                                items: notifier.listVendor.map((value) {
+                                  return DropdownMenuItem(
+                                    child: Text(value.vendorName!),
+                                    value: value,
+                                  );
+                                }).toList(),
+                                onChanged: (MVendorSchema? value) {
+                                  notifier.onSetVendor(value!);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              )
+                    )
                   : Container(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -273,7 +280,8 @@ class _FormOPHTabState extends State<FormOPHTab> {
                     children: [
                       Text("Estate:"),
                       notifier.employeeType == "Pinjam"
-                          ? Text("${notifier.valueMCustomer?.customerPlantCode!.substring(2) ?? "Belum memilih customer"}")
+                          ? Text(
+                              "${notifier.valueMCustomer?.customerPlantCode!.substring(2) ?? "Belum memilih customer"}")
                           : Text("${notifier.mConfigSchema?.estateCode}")
                     ]),
               ),
@@ -293,9 +301,10 @@ class _FormOPHTabState extends State<FormOPHTab> {
                             textCapitalization: TextCapitalization.characters,
                             decoration: InputDecoration(hintText: "Tulis blok"),
                             onChanged: (value) {
-                              if(value.length >= 3) {
+                              if (value.length >= 3) {
                                 notifier.blockNumberCheck(context, value);
-                              } if(value.isEmpty) {
+                              }
+                              if (value.isEmpty) {
                                 notifier.blockNumberCheck(context, value);
                               }
                             },
@@ -316,7 +325,8 @@ class _FormOPHTabState extends State<FormOPHTab> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(child: Text("Divisi:")),
-                          Text("${notifier.mBlockSchema?.blockDivisionCode ?? "Belum mengisi blok"}")
+                          Text(
+                              "${notifier.mBlockSchema?.blockDivisionCode ?? "Belum mengisi blok"}")
                         ],
                       ),
                     )
@@ -335,119 +345,125 @@ class _FormOPHTabState extends State<FormOPHTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    children: [
-                      Text("TPH"),
-                      Container(
-                        width: 160,
-                        child: Focus(
-                          child: TextFormField(
-                            controller: notifier.tphNumber,
-                            textAlign: TextAlign.center,
-                            textCapitalization: TextCapitalization.characters,
-                            decoration:
-                                InputDecoration(hintText: "Tulis Nomor TPH"),
-                            onChanged: (value) {
-                              if(value.length >= 1) {
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text("TPH"),
+                        Container(
+                          width: 160,
+                          child: Focus(
+                            child: TextFormField(
+                              controller: notifier.tphNumber,
+                              textAlign: TextAlign.center,
+                              textCapitalization: TextCapitalization.characters,
+                              decoration:
+                                  InputDecoration(hintText: "Tulis Nomor TPH"),
+                              onChanged: (value) {
+                                if (value.length >= 1) {
+                                  notifier.tPHNumberCheck(context, value);
+                                }
+                              },
+                              onFieldSubmitted: (value) {
                                 notifier.tPHNumberCheck(context, value);
-                              }
-                            },
-                            onFieldSubmitted: (value) {
-                              notifier.tPHNumberCheck(context, value);
-                            },
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => QRReaderScreen()));
-                            if (result != null) {
-                              setState(() {
-                                notifier.tphNumber =
-                                    TextEditingController(text: result);
-                                notifier.cardOPHNumberCheck(context, result);
-                              });
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "BACA QR TPH",
-                                style: Style.whiteBold14,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () async {
+                              String? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => QRReaderScreen()));
+                              if (result != null) {
+                                setState(() {
+                                  notifier.tphNumber =
+                                      TextEditingController(text: result);
+                                  notifier.cardOPHNumberCheck(context, result);
+                                });
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "BACA QR TPH",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: 16,
                   ),
-                  Column(
-                    children: [
-                      Text("Kartu OPH"),
-                      Container(
-                        width: 160,
-                        child: Focus(
-                          child: TextFormField(
-                            controller: notifier.ophNumber,
-                            textAlign: TextAlign.center,
-                            textCapitalization: TextCapitalization.characters,
-                            decoration:
-                                InputDecoration(hintText: "Tulis Kartu OPH"),
-                            onChanged: (value) {
-                              if(value.length >= 4) {
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text("Kartu OPH"),
+                        Container(
+                          width: 160,
+                          child: Focus(
+                            child: TextFormField(
+                              controller: notifier.ophNumber,
+                              textAlign: TextAlign.center,
+                              textCapitalization: TextCapitalization.characters,
+                              decoration:
+                                  InputDecoration(hintText: "Tulis Kartu OPH"),
+                              onChanged: (value) {
+                                if (value.length >= 4) {
+                                  notifier.cardOPHNumberCheck(context, value);
+                                }
+                              },
+                              onFieldSubmitted: (value) {
                                 notifier.cardOPHNumberCheck(context, value);
-                              }
-                            },
-                            onFieldSubmitted: (value) {
-                              notifier.cardOPHNumberCheck(context, value);
-                            },
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => QRReaderScreen()));
-                            if (result != null) {
-                              setState(() {
-                                notifier.ophNumber =
-                                    TextEditingController(text: result);
-                              });
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "BACA QR KARTU",
-                                style: Style.whiteBold14,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () async {
+                              String? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => QRReaderScreen()));
+                              if (result != null) {
+                                setState(() {
+                                  notifier.ophNumber =
+                                      TextEditingController(text: result);
+                                });
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "BACA QR KARTU",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),

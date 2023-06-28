@@ -33,7 +33,9 @@ class _NewOPHTabState extends State<NewOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("ID OPH:"),
-                  Text("${bagiOPH.newOPH.ophId}", style: Style.textBold20)
+                  Expanded(
+                      child: Text("${bagiOPH.newOPH.ophId}",
+                          textAlign: TextAlign.end, style: Style.textBold20))
                 ],
               ),
             ),
@@ -43,8 +45,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Tanggal:"),
-                  Text(
-                      "${bagiOPH.newOPH.createdDate} ${bagiOPH.newOPH.createdTime}")
+                  Expanded(
+                    child: Text(
+                      "${bagiOPH.newOPH.createdDate} ${bagiOPH.newOPH.createdTime}",
+                      textAlign: TextAlign.end,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -54,8 +60,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Jenis Pekerja:"),
-                  Text(
-                      "${ValueService.typeOfFormToText(bagiOPH.newOPH.ophHarvestingType ?? 1)}")
+                  Expanded(
+                    child: Text(
+                      "${ValueService.typeOfFormToText(bagiOPH.newOPH.ophHarvestingType ?? 1)}",
+                      textAlign: TextAlign.end,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -65,8 +75,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Apakah Panen Mekanis?"),
-                  Text(
-                      "${ValueService.harvestingType(bagiOPH.newOPH.ophHarvestingMethod ?? 1)}")
+                  Expanded(
+                    child: Text(
+                      "${ValueService.harvestingType(bagiOPH.newOPH.ophHarvestingMethod ?? 1)}",
+                      textAlign: TextAlign.end,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -76,10 +90,13 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Kemandoran:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.newOPH.mandorEmployeeCode} ${bagiOPH.newOPH.mandorEmployeeName ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text(
+                            "${bagiOPH.newOPH.mandorEmployeeCode} ${bagiOPH.newOPH.mandorEmployeeName ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -89,10 +106,13 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Pekerja:"),
-                    Container(
-                        width: 200,
-                        child: Text("${bagiOPH.newOPH.employeeCode} ${bagiOPH.newOPH.employeeName ?? ""}",
-                            textAlign: TextAlign.end))
+                    Expanded(
+                      child: Container(
+                          width: 200,
+                          child: Text(
+                              "${bagiOPH.newOPH.employeeCode} ${bagiOPH.newOPH.employeeName ?? ""}",
+                              textAlign: TextAlign.end)),
+                    )
                   ]),
             ),
             Padding(
@@ -101,10 +121,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Customer:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.newOPH.ophCustomerCode ?? ""}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.newOPH.ophCustomerCode ?? ""}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -114,10 +136,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Estate:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.newOPH.ophEstateCode}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.newOPH.ophEstateCode}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -127,10 +151,13 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Divisi:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.oph.ophDivisionCode == null || bagiOPH.oph.ophDivisionCode == "null" ? "" : bagiOPH.oph.ophDivisionCode}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text(
+                            "${bagiOPH.oph.ophDivisionCode == null || bagiOPH.oph.ophDivisionCode == "null" ? "" : bagiOPH.oph.ophDivisionCode}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -140,10 +167,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Blok:"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.newOPH.ophBlockCode}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.newOPH.ophBlockCode}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -153,10 +182,12 @@ class _NewOPHTabState extends State<NewOPHTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Estimasi berat OPH (Kg):"),
-                    Container(
-                      width: 200,
-                      child: Text("${bagiOPH.newOPH.ophEstimateTonnage ?? 0}",
-                          textAlign: TextAlign.end),
+                    Expanded(
+                      child: Container(
+                        width: 200,
+                        child: Text("${bagiOPH.newOPH.ophEstimateTonnage ?? 0}",
+                            textAlign: TextAlign.end),
+                      ),
                     )
                   ]),
             ),
@@ -175,7 +206,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text("${bagiOPH.newOPH.ophTphCode}",
-                              style: Style.textBold20),
+                                style: Style.textBold20),
                           )
                         ]),
                   ),
@@ -191,7 +222,7 @@ class _NewOPHTabState extends State<NewOPHTab> {
                         textAlign: TextAlign.center,
                         textCapitalization: TextCapitalization.characters,
                         onChanged: (value) {
-                          if(value.length >= 4) {
+                          if (value.length >= 4) {
                             bagiOPH.cardOPHNumberCheck(context, value);
                           }
                         },
@@ -206,20 +237,24 @@ class _NewOPHTabState extends State<NewOPHTab> {
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: () async {
-                         if(!(bagiOPH.isOldSaved || bagiOPH.isNewSaved) == true) {
-                           String? result = await Navigator.push(
-                               context,
-                               MaterialPageRoute(
-                                   builder: (context) => QRReaderScreen()));
-                           if (result != null) {
-                             setState(() {
-                               bagiOPH.ophNumber =
-                                   TextEditingController(text: result);
-                             });
-                           }
-                         } else {
-                           FlushBarManager.showFlushBarWarning(context, "OPH Sudah tersimpah", "OPH Sudah terbagi anda tidak boleh mengubah data");
-                         }
+                          if (!(bagiOPH.isOldSaved || bagiOPH.isNewSaved) ==
+                              true) {
+                            String? result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => QRReaderScreen()));
+                            if (result != null) {
+                              setState(() {
+                                bagiOPH.ophNumber =
+                                    TextEditingController(text: result);
+                              });
+                            }
+                          } else {
+                            FlushBarManager.showFlushBarWarning(
+                                context,
+                                "OPH Sudah tersimpah",
+                                "OPH Sudah terbagi anda tidak boleh mengubah data");
+                          }
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -283,7 +318,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               onChanged: (value) {
                                 bagiOPH.countBunches(
                                     context,
@@ -306,7 +342,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -329,7 +366,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -384,7 +422,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -407,7 +446,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -430,7 +470,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -504,7 +545,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp(r'[0-9]')),
@@ -527,7 +569,8 @@ class _NewOPHTabState extends State<NewOPHTab> {
                             width: 100,
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: TextFormField(
-                              enabled: !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
+                              enabled:
+                                  !(bagiOPH.isNewSaved || bagiOPH.isOldSaved),
                               controller: bagiOPH.bunchesNotSent,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
