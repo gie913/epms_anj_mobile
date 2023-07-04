@@ -30,9 +30,12 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("ID OPH:"),
-                  Text(
-                    "${editSPB.globalSPB.spbId ?? ""}",
-                    style: Style.textBold16,
+                  Expanded(
+                    child: Text(
+                      "${editSPB.globalSPB.spbId ?? ""}",
+                      style: Style.textBold16,
+                      textAlign: TextAlign.end,
+                    ),
                   )
                 ],
               ),
@@ -43,7 +46,11 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Tanggal:"),
-                  Text("${editSPB.globalSPB.createdDate ?? ""}")
+                  Expanded(
+                      child: Text(
+                    "${editSPB.globalSPB.createdDate ?? ""}",
+                    textAlign: TextAlign.end,
+                  ))
                 ],
               ),
             ),
@@ -53,8 +60,12 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("GPS Geolocation:"),
-                  Text(
-                      "${editSPB.globalSPB.spbLat}, ${editSPB.globalSPB.spbLong}")
+                  Expanded(
+                    child: Text(
+                      "${editSPB.globalSPB.spbLat}, ${editSPB.globalSPB.spbLong}",
+                      textAlign: TextAlign.end,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -91,8 +102,12 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Tujuan:"),
-                    Text(
-                        "${editSPB.globalSPB.spbDeliverToCode} ${editSPB.globalSPB.spbDeliverToName}")
+                    Expanded(
+                      child: Text(
+                        "${editSPB.globalSPB.spbDeliverToCode} ${editSPB.globalSPB.spbDeliverToName}",
+                        textAlign: TextAlign.end,
+                      ),
+                    )
                   ]),
             ),
             editSPB.typeDeliverValue == "Internal"
@@ -197,82 +212,86 @@ class _EditSPBDetailTabState extends State<EditSPBDetailTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    children: [
-                      Text("No. Kendaraan"),
-                      Container(
-                        width: 160,
-                        child: TextFormField(
-                          onFieldSubmitted: (value) {
-                            editSPB.checkVehicle(context, editSPB.vehicleNumber.text);
-                          },
-                          onChanged: (value) {
-                            if(value.length >= 8) {
-                              editSPB.checkVehicle(context, value);
-                            }
-                          },
-                          controller: editSPB.vehicleNumber,
-                          textAlign: TextAlign.center,
-                          textCapitalization: TextCapitalization.characters,
-                          decoration:
-                              InputDecoration(hintText: "Tulis No Kendaraan"),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            }
-                            return null;
-                          },
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text("No. Kendaraan"),
+                        Container(
+                          width: 160,
+                          child: TextFormField(
+                            onFieldSubmitted: (value) {
+                              editSPB.checkVehicle(
+                                  context, editSPB.vehicleNumber.text);
+                            },
+                            onChanged: (value) {
+                              if (value.length >= 8) {
+                                editSPB.checkVehicle(context, value);
+                              }
+                            },
+                            controller: editSPB.vehicleNumber,
+                            textAlign: TextAlign.center,
+                            textCapitalization: TextCapitalization.characters,
+                            decoration:
+                                InputDecoration(hintText: "Tulis No Kendaraan"),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter some text';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        QRReaderScreen()));
-                            if (result != null) {
-                              setState(() {
-                                editSPB.vehicleNumber =
-                                    TextEditingController(
-                                        text: result);
-                              });
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "BACA QR Truk",
-                                style: Style.whiteBold14,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: InkWell(
+                            onTap: () async {
+                              String? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => QRReaderScreen()));
+                              if (result != null) {
+                                setState(() {
+                                  editSPB.vehicleNumber =
+                                      TextEditingController(text: result);
+                                });
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "BACA QR Truk",
+                                  style: Style.whiteBold14,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: 16,
                   ),
-                  Column(children: [
-                    Text("Kartu SPB"),
-                    Container(
-                        width: 160,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            "${editSPB.globalSPB.spbCardId}",
-                            textAlign: TextAlign.center,
-                          ),
-                        )),
-                  ]),
+                  Expanded(
+                    child: Column(children: [
+                      Text("Kartu SPB"),
+                      Container(
+                          width: 160,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              "${editSPB.globalSPB.spbCardId}",
+                              textAlign: TextAlign.center,
+                            ),
+                          )),
+                    ]),
+                  ),
                 ]),
             Padding(
               padding: const EdgeInsets.all(8.0),

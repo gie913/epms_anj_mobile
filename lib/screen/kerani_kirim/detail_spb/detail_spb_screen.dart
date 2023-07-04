@@ -86,9 +86,12 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("ID SPB:"),
-                                  Text(
-                                    "${detailSPB.spb?.spbId ?? ""}",
-                                    style: Style.textBold16,
+                                  Expanded(
+                                    child: Text(
+                                      "${detailSPB.spb?.spbId ?? ""}",
+                                      style: Style.textBold16,
+                                      textAlign: TextAlign.end,
+                                    ),
                                   )
                                 ],
                               ),
@@ -100,7 +103,11 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Tanggal:"),
-                                  Text("${detailSPB.spb?.createdDate ?? ""}")
+                                  Expanded(
+                                      child: Text(
+                                    "${detailSPB.spb?.createdDate ?? ""}",
+                                    textAlign: TextAlign.end,
+                                  ))
                                 ],
                               ),
                             ),
@@ -111,8 +118,12 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("GPS Geolocation:"),
-                                  Text(
-                                      "${detailSPB.spb?.spbLat ?? ""}, ${detailSPB.spb?.spbLong ?? ""}")
+                                  Expanded(
+                                    child: Text(
+                                      "${detailSPB.spb?.spbLat ?? ""}, ${detailSPB.spb?.spbLong ?? ""}",
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
@@ -123,8 +134,12 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Jenis Pengangkutan:"),
-                                  Text(
-                                      "${ValueService.typeOfFormToText(detailSPB.spb?.spbType ?? 1)}")
+                                  Expanded(
+                                    child: Text(
+                                      "${ValueService.typeOfFormToText(detailSPB.spb?.spbType ?? 1)}",
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
@@ -135,7 +150,10 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Estate:"),
-                                  Text("${detailSPB.spb?.spbEstateCode ?? ""}")
+                                  Expanded(
+                                      child: Text(
+                                          "${detailSPB.spb?.spbEstateCode ?? ""}",
+                                          textAlign: TextAlign.end))
                                 ],
                               ),
                             ),
@@ -146,8 +164,11 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Tujuan:"),
-                                  Text(
-                                      "${detailSPB.spb?.spbDeliverToCode ?? ""} ${detailSPB.spb?.spbDeliverToName ?? ""}"),
+                                  Expanded(
+                                    child: Text(
+                                        "${detailSPB.spb?.spbDeliverToCode ?? ""} ${detailSPB.spb?.spbDeliverToName ?? ""}",
+                                        textAlign: TextAlign.end),
+                                  ),
                                 ],
                               ),
                             ),
@@ -160,11 +181,17 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                   detailSPB.spb?.spbType == 1
                                       ? Text("Supir:")
                                       : Text("Vendor:"),
-                                  detailSPB.spb?.spbVendorOthers == "1" ?Text(
-                                      "${detailSPB.spb?.spbDriverEmployeeName ?? ""}",textAlign: TextAlign.right)
-                                  : Text(
-                                      "${detailSPB.spb?.spbDriverEmployeeCode ?? ""} \n${detailSPB.spb?.spbDriverEmployeeName ?? ""}",textAlign: TextAlign.right)
-                                  ,
+                                  detailSPB.spb?.spbVendorOthers == "1"
+                                      ? Expanded(
+                                          child: Text(
+                                              "${detailSPB.spb?.spbDriverEmployeeName ?? ""}",
+                                              textAlign: TextAlign.end),
+                                        )
+                                      : Expanded(
+                                          child: Text(
+                                              "${detailSPB.spb?.spbDriverEmployeeCode ?? ""} \n${detailSPB.spb?.spbDriverEmployeeName ?? ""}",
+                                              textAlign: TextAlign.end),
+                                        ),
                                 ],
                               ),
                             ),
@@ -175,8 +202,11 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Divisi:"),
-                                  Text(
-                                      "${detailSPB.spb?.spbDivisionCode ?? ""}")
+                                  Expanded(
+                                    child: Text(
+                                        "${detailSPB.spb?.spbDivisionCode ?? ""}",
+                                        textAlign: TextAlign.end),
+                                  )
                                 ],
                               ),
                             ),
@@ -207,7 +237,9 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                             child: Focus(
                                               child: TextFormField(
                                                 controller: detailSPB.spbNumber,
-                                                textCapitalization: TextCapitalization.characters,
+                                                textCapitalization:
+                                                    TextCapitalization
+                                                        .characters,
                                                 textAlign: TextAlign.center,
                                                 onFieldSubmitted: (value) {
                                                   detailSPB.checkSPBCard(
@@ -626,7 +658,9 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
                                               children: [
                                                 Text("Nama Loader:"),
                                                 Text(
-                                                    "${detailSPB.listSPBLoader[index].loaderEmployeeCode}\n${detailSPB.listSPBLoader[index].loaderEmployeeName}", textAlign: TextAlign.right,),
+                                                  "${detailSPB.listSPBLoader[index].loaderEmployeeCode}\n${detailSPB.listSPBLoader[index].loaderEmployeeName}",
+                                                  textAlign: TextAlign.right,
+                                                ),
                                               ]),
                                           Row(
                                               mainAxisAlignment:
