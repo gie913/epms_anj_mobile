@@ -377,9 +377,15 @@ class SynchNotifier extends ChangeNotifier {
   }
 
   onSuccessSaveLocal(BuildContext context, SynchResponse synchResponse) {
-    DateTime now = DateTime.now();
-    StorageManager.saveData("lastSynchTime", TimeManager.timeWithColon(now));
-    StorageManager.saveData("lastSynchDate", TimeManager.dateWithDash(now));
+    final serverDateParse = DateTime.parse(synchResponse.serverDate!);
+    final serverTimeParse = DateTime.parse(
+        '${synchResponse.serverDate!} ${synchResponse.serverTime!}');
+    print('cek server date : $serverDateParse');
+    print('cek server time : $serverTimeParse');
+    StorageManager.saveData(
+        "lastSynchTime", TimeManager.timeWithColon(serverTimeParse));
+    StorageManager.saveData(
+        "lastSynchDate", TimeManager.dateWithDash(serverDateParse));
     getEstateCode();
     saveOphHistory(
       synchResponse.global!.rolesSchema![0].userRoles!,

@@ -20,6 +20,7 @@ import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_supervisi_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class SupervisorNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -94,9 +95,9 @@ class SupervisorNotifier extends ChangeNotifier {
         await DatabaseOPHSupervise().selectOPHSupervise();
     List<OPHSuperviseAncak> listSPBDetail =
         await DatabaseOPHSuperviseAncak().selectOPHSuperviseAncak();
-    if(listSPB.isNotEmpty) {
+    if (listSPB.isNotEmpty) {
       for (int i = 0; i < listSPB.length; i++) {
-        if(listSPB[i].supervisiPhoto != null) {
+        if (listSPB[i].supervisiPhoto != null) {
           UploadImageOPHRepository().doUploadPhoto(
               context,
               listSPB[i].supervisiPhoto!,
@@ -107,9 +108,9 @@ class SupervisorNotifier extends ChangeNotifier {
         }
       }
     }
-    if(listSPBDetail.isNotEmpty) {
+    if (listSPBDetail.isNotEmpty) {
       for (int i = 0; i < listSPBDetail.length; i++) {
-        if(listSPBDetail[i].supervisiAncakPhoto != null) {
+        if (listSPBDetail[i].supervisiAncakPhoto != null) {
           UploadImageOPHRepository().doUploadPhoto(
               context,
               listSPBDetail[i].supervisiAncakPhoto!,
@@ -142,9 +143,23 @@ class SupervisorNotifier extends ChangeNotifier {
         onPress: _dialogService.popDialog);
   }
 
+  dialogSettingDateTime() {
+    _dialogService.showNoOptionDialog(
+      title: "Format Tanggal Salah",
+      subtitle: "Mohon sesuaikan kembali tanggal di handphone Anda",
+      onPress: () {
+        _dialogService.popDialog();
+        OpenSettings.openDateSetting();
+      },
+    );
+  }
+
   void onClickMenu(int index) async {
-    String dateNow = TimeManager.dateWithDash(DateTime.now());
+    final now = DateTime.now();
+    String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
+    final dateLoginParse = DateTime.parse(dateLogin!);
+
     switch (supervisorMenuEntries[index - 2].toUpperCase()) {
       case "KELUAR":
         _dialogService.showOptionDialog(
@@ -158,6 +173,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "SUPERVISI PANEN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_SUPERVISI_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -165,6 +182,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "SUPERVISI ANCAK PANEN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_SUPERVISI_ANCAK_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -173,6 +192,8 @@ class SupervisorNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_DETAIL_PAGE,
               arguments: {"method": "BACA", "oph": OPH(), "restan": false});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -181,6 +202,8 @@ class SupervisorNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_DETAIL_PAGE,
               arguments: {"spb": SPB(), "method": 'BACA'});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -188,13 +211,17 @@ class SupervisorNotifier extends ChangeNotifier {
       case "LAPORAN SUPERVISI PANEN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_SUPERVISI_HISTORY_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
         break;
       case "LAPORAN SUPERVISI ANCAK PANEN":
         if (dateLogin == dateNow) {
-        _navigationService.push(Routes.OPH_SUPERVISI_ANCAK_HISTORY_PAGE);
+          _navigationService.push(Routes.OPH_SUPERVISI_ANCAK_HISTORY_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -202,6 +229,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "LAPORAN RESTAN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.RESTAN_REPORT, arguments: "LIHAT");
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -209,6 +238,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "LAPORAN PANEN HARIAN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.PANEN_KEMARIN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -216,6 +247,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "RENCANA PANEN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.HARVEST_PLAN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -223,6 +256,8 @@ class SupervisorNotifier extends ChangeNotifier {
       case "LIHAT WORKPLAN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.WORK_PLAN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -241,7 +276,7 @@ class SupervisorNotifier extends ChangeNotifier {
 
   exportJson(BuildContext context) async {
     File? fileExport = await FileManagerJson().writeFileJsonSupervisi();
-    if(fileExport != null) {
+    if (fileExport != null) {
       FlushBarManager.showFlushBarSuccess(
           context, "Export Json Berhasil", "${fileExport.path}");
     } else {

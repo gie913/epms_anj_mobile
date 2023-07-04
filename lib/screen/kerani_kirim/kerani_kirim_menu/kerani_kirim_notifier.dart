@@ -20,6 +20,7 @@ import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_spb_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class KeraniKirimNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -33,8 +34,10 @@ class KeraniKirimNotifier extends ChangeNotifier {
   doUpload() async {
     _dialogService.popDialog();
     List<SPB> _listSPB = await DatabaseSPB().selectSPB();
-    List<SPBDetail> _listSPBDetail = await DatabaseSPBDetail().selectSPBDetail();
-    List<SPBLoader> _listSPBLoader = await DatabaseSPBLoader().selectSPBLoader();
+    List<SPBDetail> _listSPBDetail =
+        await DatabaseSPBDetail().selectSPBDetail();
+    List<SPBLoader> _listSPBLoader =
+        await DatabaseSPBLoader().selectSPBLoader();
     if (_listSPB.isNotEmpty) {
       List<String> mapListSPB = [];
       List<String> mapListSPBDetail = [];
@@ -91,7 +94,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
   uploadImage(BuildContext context) async {
     List<SPB> listSPB = await DatabaseSPB().selectSPB();
     for (int i = 0; i < listSPB.length; i++) {
-      if(listSPB[i].spbPhoto != null) {
+      if (listSPB[i].spbPhoto != null) {
         UploadImageOPHRepository().doUploadPhoto(context, listSPB[i].spbPhoto!,
             listSPB[i].spbId!, "spb", onSuccessUploadImage, onErrorUploadImage);
       }
@@ -104,8 +107,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
         context, "Upload SPB", "Berhasil mengupload data");
   }
 
-  onSuccessUploadImage(BuildContext context, response) {
-  }
+  onSuccessUploadImage(BuildContext context, response) {}
 
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
@@ -120,14 +122,31 @@ class KeraniKirimNotifier extends ChangeNotifier {
         onPress: _dialogService.popDialog);
   }
 
+  dialogSettingDateTime() {
+    _dialogService.showNoOptionDialog(
+      title: "Format Tanggal Salah",
+      subtitle: "Mohon sesuaikan kembali tanggal di handphone Anda",
+      onPress: () {
+        _dialogService.popDialog();
+        OpenSettings.openDateSetting();
+      },
+    );
+  }
+
   onClickMenu(List<String> deliveryMenuEntries, int index) async {
-    String dateNow = TimeManager.dateWithDash(DateTime.now());
+    final now = DateTime.now();
+    String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
+    final dateLoginParse = DateTime.parse(dateLogin!);
+    print('dateNow : $dateNow');
+    print('dateLogin : $dateLogin');
 
     switch (deliveryMenuEntries[index - 2].toUpperCase()) {
       case "BUAT FORM SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -135,6 +154,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
       case "RIWAYAT SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_HISTORY_PAGE, arguments: "DETAIL");
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -142,6 +163,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
       case "LAPORAN SPB KEMARIN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.REPORT_SPB_KEMARIN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -149,6 +172,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
       case "LAPORAN RESTAN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.RESTAN_REPORT, arguments: "LIHAT");
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -157,6 +182,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_DETAIL_PAGE,
               arguments: {"spb": SPB(), "method": 'BACA'});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -164,6 +191,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
       case "ADMINISTRASI SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ADMIN_SPB);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -172,6 +201,8 @@ class KeraniKirimNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_DETAIL_PAGE,
               arguments: {"method": "BACA", "oph": OPH(), "restan": false});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -199,7 +230,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
 
   exportJson(BuildContext context) async {
     File? fileExport = await FileManagerJson().writeFileJsonSPB();
-    if(fileExport != null) {
+    if (fileExport != null) {
       FlushBarManager.showFlushBarSuccess(
           context, "Export Json Berhasil", "${fileExport.path}");
     } else {

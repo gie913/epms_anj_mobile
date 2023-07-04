@@ -14,6 +14,8 @@ class SynchResponse {
   Supervisi? supervisi;
   List<Supervisi3rdParty>? supervisi3rdParty;
   List? ophHistory;
+  String? serverDate;
+  String? serverTime;
 
   SynchResponse({
     this.message,
@@ -24,6 +26,8 @@ class SynchResponse {
     this.supervisi,
     this.supervisi3rdParty,
     this.ophHistory,
+    this.serverDate,
+    this.serverTime,
   });
 
   SynchResponse.fromJson(Map<String, dynamic> json) {
@@ -49,6 +53,8 @@ class SynchResponse {
       });
     }
     ophHistory = json['oph_history'] != null ? json['oph_history'] : [];
+    serverDate = json['server_date'] != null ? json['server_date'] : '';
+    serverTime = json['server_time'] != null ? json['server_time'] : '';
   }
 
   Map<String, dynamic> toJson() {
@@ -75,6 +81,12 @@ class SynchResponse {
     }
     if (this.ophHistory != null) {
       data['oph_history'] = this.ophHistory!.map((e) => e).toList();
+    }
+    if (this.serverDate != null) {
+      data['server_date'] = this.serverDate;
+    }
+    if (this.serverTime != null) {
+      data['server_time'] = this.serverTime;
     }
     return data;
   }

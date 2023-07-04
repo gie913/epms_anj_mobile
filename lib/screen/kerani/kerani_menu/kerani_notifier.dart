@@ -32,6 +32,7 @@ import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_oph_repository.dart';
 import 'package:epms/screen/upload/upload_spb_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class KeraniNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -334,12 +335,17 @@ class KeraniNotifier extends ChangeNotifier {
   }
 
   onClickedMenu(BuildContext context, String menu) async {
-    String dateNow = TimeManager.dateWithDash(DateTime.now());
+    final now = DateTime.now();
+    String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
+    final dateLoginParse = DateTime.parse(dateLogin!);
+
     switch (menu.toUpperCase()) {
       case "ABSENSI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ATTENDANCE_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -347,6 +353,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "BUAT FORM OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -354,6 +362,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "RIWAYAT OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_HISTORY_PAGE, arguments: 'LIHAT');
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -362,6 +372,8 @@ class KeraniNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_DETAIL_PAGE,
               arguments: {"method": "BACA", "oph": OPH(), "restan": false});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -369,6 +381,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "RENCANA PANEN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.HARVEST_PLAN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -376,6 +390,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "BUAT FORM SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -383,6 +399,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "RIWAYAT SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_HISTORY_PAGE, arguments: "DETAIL");
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -391,6 +409,8 @@ class KeraniNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_DETAIL_PAGE,
               arguments: {"spb": SPB(), "method": 'BACA'});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -398,6 +418,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "LAPORAN PANEN HARIAN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.PANEN_KEMARIN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -405,6 +427,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "LAPORAN SPB KEMARIN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.REPORT_SPB_KEMARIN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -412,6 +436,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "LAPORAN RESTAN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.RESTAN_REPORT, arguments: 'LIHAT');
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -419,6 +445,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "ADMINISTRASI OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ADMIN_OPH);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -426,6 +454,8 @@ class KeraniNotifier extends ChangeNotifier {
       case "ADMINISTRASI SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ADMIN_SPB);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -474,6 +504,17 @@ class KeraniNotifier extends ChangeNotifier {
         title: "Anda harus login ulang",
         subtitle: "untuk melanjutkan transaksi",
         onPress: _dialogService.popDialog);
+  }
+
+  dialogSettingDateTime() {
+    _dialogService.showNoOptionDialog(
+      title: "Format Tanggal Salah",
+      subtitle: "Mohon sesuaikan kembali tanggal di handphone Anda",
+      onPress: () {
+        _dialogService.popDialog();
+        OpenSettings.openDateSetting();
+      },
+    );
   }
 
   showDialogSupervisi(Supervisor supervisor) {

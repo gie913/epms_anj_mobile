@@ -20,6 +20,7 @@ import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_supervisi_spb_repository.dart';
 import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class SupervisorSPBNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -35,6 +36,17 @@ class SupervisorSPBNotifier extends ChangeNotifier {
         title: "Anda harus login ulang",
         subtitle: "untuk melanjutkan transaksi",
         onPress: _dialogService.popDialog);
+  }
+
+  dialogSettingDateTime() {
+    _dialogService.showNoOptionDialog(
+      title: "Format Tanggal Salah",
+      subtitle: "Mohon sesuaikan kembali tanggal di handphone Anda",
+      onPress: () {
+        _dialogService.popDialog();
+        OpenSettings.openDateSetting();
+      },
+    );
   }
 
   void _showDialogApprovalTbsLuar(BuildContext context) {
@@ -151,8 +163,10 @@ class SupervisorSPBNotifier extends ChangeNotifier {
   }
 
   onClickMenu(int index) async {
-    String dateNow = TimeManager.dateWithDash(DateTime.now());
+    final now = DateTime.now();
+    String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
+    final dateLoginParse = DateTime.parse(dateLogin!);
 
     switch (supervisorSPBMenuEntries[index - 2].toUpperCase()) {
       case "KELUAR":
@@ -189,6 +203,8 @@ class SupervisorSPBNotifier extends ChangeNotifier {
       case "SUPERVISI SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_SUPERVISI_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -196,6 +212,8 @@ class SupervisorSPBNotifier extends ChangeNotifier {
       case "HISTORY SUPERVISI SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_SUPERVISI_HISTORY_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -204,6 +222,8 @@ class SupervisorSPBNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_DETAIL_PAGE,
               arguments: {"spb": SPB(), "method": 'BACA'});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }

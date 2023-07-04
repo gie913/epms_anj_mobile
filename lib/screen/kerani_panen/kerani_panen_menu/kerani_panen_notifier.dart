@@ -24,6 +24,7 @@ import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_oph_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class KeraniPanenNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -37,7 +38,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
   doUpload() async {
     _dialogService.popDialog();
     List<OPH> _listOPH = await DatabaseOPH().selectOPH();
-    List<TAttendanceSchema> _listAttendance = await DatabaseAttendance().selectEmployeeAttendance();
+    List<TAttendanceSchema> _listAttendance =
+        await DatabaseAttendance().selectEmployeeAttendance();
     if (_listOPH.isNotEmpty) {
       List<OPH> photo = await DatabaseOPH().selectOPHPhoto();
       if (photo.isNotEmpty) {
@@ -64,10 +66,11 @@ class KeraniPanenNotifier extends ChangeNotifier {
         UploadOPHRepository().doPostUploadOPH(
             listOPH, listAttendance, onSuccessUploadOPH, onErrorUploadOPH);
       }
-    } else if(_listAttendance.isNotEmpty) {
+    } else if (_listAttendance.isNotEmpty) {
       _dialogService.showLoadingDialog(title: "Upload OPH");
       List<String> mapListAttendance = [];
-      List<TAttendanceSchema> _listAttendance = await DatabaseAttendance().selectEmployeeAttendance();
+      List<TAttendanceSchema> _listAttendance =
+          await DatabaseAttendance().selectEmployeeAttendance();
       for (int i = 0; i < _listAttendance.length; i++) {
         String jsonString = jsonEncode(_listAttendance[i]);
         mapListAttendance.add("\"$i\":$jsonString");
@@ -144,12 +147,16 @@ class KeraniPanenNotifier extends ChangeNotifier {
 
   onClickedMenu(BuildContext context, List<String> harvesterMenuEntries,
       int index) async {
-    String dateNow = TimeManager.dateWithDash(DateTime.now());
+    final now = DateTime.now();
+    String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
+    final dateLoginParse = DateTime.parse(dateLogin!);
     switch (harvesterMenuEntries[index - 2].toUpperCase()) {
       case "ABSENSI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ATTENDANCE_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -157,6 +164,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "BUAT FORM OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_FORM_PAGE);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -164,6 +173,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "RIWAYAT OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_HISTORY_PAGE, arguments: 'LIHAT');
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -171,6 +182,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "RENCANA PANEN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.HARVEST_PLAN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -178,6 +191,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "LAPORAN PANEN HARIAN":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.PANEN_KEMARIN);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -185,6 +200,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "LAPORAN RESTAN HARI INI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.RESTAN_REPORT, arguments: 'LIHAT');
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -192,6 +209,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
       case "ADMINISTRASI OPH":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ADMIN_OPH);
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -200,6 +219,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.OPH_DETAIL_PAGE,
               arguments: {"method": "BACA", "oph": OPH(), "restan": false});
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
         } else {
           dialogReLogin();
         }
@@ -230,6 +251,17 @@ class KeraniPanenNotifier extends ChangeNotifier {
         title: "Anda harus login ulang",
         subtitle: "untuk melanjutkan transaksi",
         onPress: _dialogService.popDialog);
+  }
+
+  dialogSettingDateTime() {
+    _dialogService.showNoOptionDialog(
+      title: "Format Tanggal Salah",
+      subtitle: "Mohon sesuaikan kembali tanggal di handphone Anda",
+      onPress: () {
+        _dialogService.popDialog();
+        OpenSettings.openDateSetting();
+      },
+    );
   }
 
   showDialogSupervisi(Supervisor supervisor) {
