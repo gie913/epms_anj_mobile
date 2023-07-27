@@ -84,7 +84,7 @@ class SupervisorSPBNotifier extends ChangeNotifier {
       }
 
       for (int i = 0; i < _listTBSLuarGrading.length; i++) {
-        _listTBSLuarGrading[i].formType = 2;
+        // _listTBSLuarGrading[i].formType = 2;
         String jsonString = jsonEncode(_listTBSLuarGrading[i]);
         mapListTBSLuarGrading.add("\"$i\":$jsonString");
       }
