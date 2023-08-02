@@ -28,17 +28,22 @@ import 'package:epms/database/service/database_m_material.dart';
 import 'package:epms/database/service/database_m_tph.dart';
 import 'package:epms/database/service/database_m_vendor.dart';
 import 'package:epms/database/service/database_m_vra.dart';
+import 'package:epms/database/service/database_material.dart';
 import 'package:epms/database/service/database_mc_oph.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
+import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
+import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:epms/model/m_config_schema.dart';
 import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/screen/home/home_notifier.dart';
+import 'package:epms/screen/home/logout_repository.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:open_settings/open_settings.dart';
 
 class SynchNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -380,6 +385,8 @@ class SynchNotifier extends ChangeNotifier {
     final serverDateParse = DateTime.parse(synchResponse.serverDate!);
     final serverTimeParse = DateTime.parse(
         '${synchResponse.serverDate!} ${synchResponse.serverTime!}');
+    final now = DateTime.now();
+    final diff = now.difference(serverTimeParse);
     print('cek server date : $serverDateParse');
     print('cek server time : $serverTimeParse');
     StorageManager.saveData(
@@ -397,8 +404,53 @@ class SynchNotifier extends ChangeNotifier {
     //   synchResponse.global!.rolesSchema![0].userRoles!,
     //   ophHistoryDummy,
     // );
-    _navigationService.push(ValueService.getMenuFirst(
-        synchResponse.global!.rolesSchema![0].userRoles!));
+    if (diff.inMinutes > 30) {
+      LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
+      _dialogService.showNoOptionDialog(
+        title: "Beda waktu dengan server",
+        subtitle: "${diff.inHours} jam ${diff.inMinutes} menit",
+        onPress: () {
+          _dialogService.popDialog();
+          OpenSettings.openDateSetting();
+        },
+      );
+    } else {
+      _navigationService.push(ValueService.getMenuFirst(
+          synchResponse.global!.rolesSchema![0].userRoles!));
+    }
+  }
+
+  onSuccessLogOut() {
+    // getEstateCode();
+    deleteMasterData();
+    StorageManager.deleteData('userId');
+    StorageManager.deleteData('userToken');
+    StorageManager.deleteData("setTime");
+    _navigationService.push(Routes.LOGIN_PAGE);
+  }
+
+  deleteMasterData() async {
+    StorageManager.deleteData("blockDefault");
+    DatabaseMConfig().deleteMConfig();
+    DatabaseTBSLuar().deleteTBSLuar();
+    DatabaseLaporanRestan().deleteLaporanRestan();
+    DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+    DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
+    DatabaseTHarvestingPlan().deleteTHarvestingPlan();
+    DatabaseAttendance().deleteEmployeeAttendance();
+    DatabaseTWorkplanSchema().deleteTWorkPlan();
+    DatabaseMaterial().deleteMaterial();
+    DatabaseSupervisor().deleteSupervisor();
+    DatabaseMAncakEmployee().deleteMAncakEmployeeSchema();
+    DatabaseTABWSchema().deleteTABWSchema();
+  }
+
+  onErrorLogOut(String response) {
+    _dialogService.popDialog();
+    _dialogService.showNoOptionDialog(
+        title: "Gagal Log Out",
+        subtitle: "$response",
+        onPress: _dialogService.popDialog);
   }
 
   Future<void> saveOphHistory(String role, List? ophHistory) async {

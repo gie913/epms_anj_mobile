@@ -7,7 +7,11 @@ class ThemeNotifier with ChangeNotifier {
     fontFamily: "DIN Pro",
     primaryColor: Color(0xFF212121),
     dividerTheme: DividerThemeData(color: Colors.grey),
-    appBarTheme: AppBarTheme(color: Colors.transparent),
+    appBarTheme: AppBarTheme(
+      color: Colors.transparent,
+      foregroundColor: Colors.white,
+      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(Palette.primaryColorProd),
