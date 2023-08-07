@@ -30,10 +30,12 @@ const String tSPBDetailSchemaListTable = "T_SPB_Detail_Schema_List";
 const String tSPBLoaderSchemaListTable = "T_SPB_Loader_Schema_List";
 const String laporanSPBKemarinTable = "Laporan_SPB_Kemarin";
 const String tOPHSuperviseSchemaListTable = "T_OPH_Supervise_Schema_List";
-const String tSuperviseAncakPanenSchemaListTable = "T_Supervise_Ancak_Panen_Schema_List";
+const String tSuperviseAncakPanenSchemaListTable =
+    "T_Supervise_Ancak_Panen_Schema_List";
 const String tSPBSuperviseSchemaListTable = "T_SPB_Supervise_Schema_List";
 const String mAncakEmployeeTable = "M_Ancak_Employee";
 const String tWorkPlanSchemaTable = "T_Workplan_Schema";
 const String tMaterial = "T_Material";
 const String tTBSLuar = "T_TBS_Luar";
 const String tTBSLuarOneMonth = "T_TBS_Luar_One_Month";
+const String tAuth = "T_AUTH";

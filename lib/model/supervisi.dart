@@ -1,3 +1,4 @@
+import 'package:epms/model/auth_model.dart';
 import 'package:epms/model/laporan_panen_kemarin.dart';
 import 'package:epms/model/t_harvesting_plan_schema.dart';
 import 'package:epms/model/t_work_plan_schema.dart';
@@ -11,8 +12,16 @@ class Supervisi {
   List<LaporanRestan>? laporanRestan;
   List<TWorkplanSchema>? tWorkplanSchema;
   List<LaporanPanenKemarin>? laporanPanenKemarin;
+  List<AuthModel>? auth;
 
-  Supervisi({this.mAncakEmployee, this.tHarvestingPlanSchema, this.laporanRestan, this.tWorkplanSchema, this.laporanPanenKemarin});
+  Supervisi({
+    this.mAncakEmployee,
+    this.tHarvestingPlanSchema,
+    this.laporanRestan,
+    this.tWorkplanSchema,
+    this.laporanPanenKemarin,
+    this.auth,
+  });
 
   Supervisi.fromJson(Map<String, dynamic> json) {
     if (json['M_Ancak_Employee'] != null) {
@@ -45,6 +54,11 @@ class Supervisi {
         laporanPanenKemarin!.add(new LaporanPanenKemarin.fromJson(v));
       });
     }
+
+    if (json['auth'] != null) {
+      auth = List<AuthModel>.from(
+          (json['auth'] as List).map((e) => AuthModel.fromJson(e)));
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +82,9 @@ class Supervisi {
     if (this.laporanPanenKemarin != null) {
       data['Laporan_Panen_Kemarin'] =
           this.laporanPanenKemarin!.map((v) => v.toJson()).toList();
+    }
+    if (this.auth != null) {
+      data['auth'] = List.from(this.auth!.map((e) => e.toJson()));
     }
     return data;
   }

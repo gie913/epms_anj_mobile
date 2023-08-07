@@ -33,6 +33,7 @@ import 'package:epms/database/service/database_mc_oph.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
+import 'package:epms/database/service/database_t_auth.dart';
 import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
@@ -338,6 +339,12 @@ class SynchNotifier extends ChangeNotifier {
                                                   synchResponse.supervisi
                                                           ?.laporanPanenKemarin ??
                                                       []);
+                                          _dataText =
+                                              "Synch data Supervisi Auth";
+                                          notifyListeners();
+                                          DatabaseTAuth.insertTAuth(
+                                              synchResponse.supervisi!.auth ??
+                                                  []);
                                         } else if (synchResponse
                                                 .supervisi3rdParty !=
                                             null) {

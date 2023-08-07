@@ -19,6 +19,7 @@ import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
+import 'package:epms/database/service/database_t_auth.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/model/m_config_schema.dart';
@@ -216,5 +217,6 @@ class HomeNotifier extends ChangeNotifier {
     DatabaseSupervisor().deleteSupervisor();
     DatabaseMAncakEmployee().deleteMAncakEmployeeSchema();
     DatabaseTABWSchema().deleteTABWSchema();
+    DatabaseTAuth().deleteTAuth();
   }
 }

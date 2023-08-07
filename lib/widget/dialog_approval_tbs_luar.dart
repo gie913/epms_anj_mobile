@@ -3,20 +3,27 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/model/auth_model.dart';
 import 'package:flutter/material.dart';
 
 class DialogApprovalTbsLuar extends StatefulWidget {
   final String title;
   final String labelButton;
   final String hintText;
-  final ValueSetter<String> onPress;
+  final ValueSetter<bool> onSubmit;
+  final List<AuthModel> listAuthenticator;
+  final AuthModel selectedAuthenticator;
+  final ValueSetter<AuthModel> onChangeAuthenticator;
 
   const DialogApprovalTbsLuar({
     Key? key,
     required this.title,
     required this.labelButton,
     required this.hintText,
-    required this.onPress,
+    required this.onSubmit,
+    required this.listAuthenticator,
+    required this.selectedAuthenticator,
+    required this.onChangeAuthenticator,
   }) : super(key: key);
 
   @override
@@ -26,6 +33,13 @@ class DialogApprovalTbsLuar extends StatefulWidget {
 class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
   final controller = TextEditingController();
   NavigatorService _navigationService = locator<NavigatorService>();
+  AuthModel selectedAuthenticator = AuthModel();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedAuthenticator = widget.selectedAuthenticator;
+  }
 
   @override
   void dispose() {
@@ -53,8 +67,16 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
                       "Approval Manager",
                       "Masukkan PIN Approval Terlebih dahulu");
                 } else {
-                  widget.onPress(controller.text);
-                  Navigator.pop(context);
+                  if (selectedAuthenticator.pin != controller.text) {
+                    widget.onSubmit(false);
+                    Navigator.pop(context);
+                    FlushBarManager.showFlushBarWarning(
+                        _navigationService.navigatorKey.currentContext!,
+                        "Approval Manager",
+                        "PIN Approval Salah");
+                  } else {
+                    widget.onSubmit(true);
+                  }
                 }
               },
               child: Container(
@@ -66,17 +88,55 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
             ),
           )
         ],
-        content: Container(
-          height: MediaQuery.of(context).size.height * 0.1,
-          child: Center(
-            child: TextFormField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: widget.hintText,
-              ),
+        content: Flex(
+          direction: Axis.vertical,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Text('Pilih Manager', style: Style.textBoldBlack14),
+                SizedBox(width: 12),
+                Expanded(
+                  flex: 5,
+                  child: DropdownButton(
+                    isExpanded: true,
+                    value: selectedAuthenticator,
+                    items: widget.listAuthenticator.map((value) {
+                      return DropdownMenuItem(
+                        child: Text(value.supervisiName),
+                        value: value,
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          selectedAuthenticator = value;
+                        });
+                        widget.onChangeAuthenticator(value);
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
+            Row(
+              children: [
+                Expanded(
+                    flex: 4, child: Text('PIN', style: Style.textBoldBlack14)),
+                SizedBox(width: 12),
+                Expanded(
+                  flex: 7,
+                  child: TextFormField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: widget.hintText,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

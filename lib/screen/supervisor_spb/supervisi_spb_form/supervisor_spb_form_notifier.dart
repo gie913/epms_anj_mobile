@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:epms/base/common/locator.dart';
@@ -18,8 +19,10 @@ import 'package:epms/database/service/database_m_employee.dart';
 import 'package:epms/database/service/database_m_estate.dart';
 import 'package:epms/database/service/database_m_vendor.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
+import 'package:epms/database/service/database_t_auth.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
+import 'package:epms/model/auth_model.dart';
 import 'package:epms/model/m_config_schema.dart';
 import 'package:epms/model/m_division_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
@@ -29,6 +32,7 @@ import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/model/supervisi_3rd_party.dart';
 import 'package:epms/model/tbs_luar.dart';
+import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -266,13 +270,35 @@ class SupervisorSPBFormNotifier extends ChangeNotifier {
 
   TextEditingController get deliveryID => _deliveryID;
 
+  List<AuthModel> _authList = [];
+
+  List<AuthModel> get authList => _authList;
+
+  AuthModel _selectedAuth = AuthModel();
+
+  AuthModel get selectedAuth => _selectedAuth;
+
   onInit() async {
     _listDriver = await DatabaseMEmployeeSchema().selectMEmployeeSchema();
     _listVendor = await DatabaseMVendorSchema().selectMVendorSchema();
     _listDivision = await DatabaseMDivisionSchema().selectMDivisionSchema();
     _listMEstateSchema = await DatabaseMEstateSchema().selectMEstateSchema();
+    await getAuthList();
     generateVariable();
     getLocation();
+  }
+
+  Future<void> getAuthList() async {
+    final data = await DatabaseTAuth().selectTAuth();
+    _authList = data;
+    _selectedAuth = _authList.first;
+    print('cek auth : $_authList');
+    notifyListeners();
+  }
+
+  void onChangeAuth(AuthModel data) {
+    _selectedAuth = data;
+    notifyListeners();
   }
 
   getLocation() async {
@@ -521,6 +547,39 @@ class SupervisorSPBFormNotifier extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
+  }
+
+  void _showDialogApprovalTbsLuar(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return DialogApprovalTbsLuar(
+          title: 'Approval Manager',
+          labelButton: 'SUBMIT',
+          hintText: 'Masukkan PIN',
+          listAuthenticator: _authList,
+          selectedAuthenticator: _selectedAuth,
+          onChangeAuthenticator: (value) {
+            onChangeAuth(value);
+          },
+          onSubmit: (value) {
+            log('cek isAuthValid : $value');
+            if (value) {
+              Navigator.pop(context);
+              _dialogService.showOptionDialog(
+                title: "Simpan Supervisi SPB",
+                subtitle: "Anda yakin ingin menyimpan Supervisi SPB?",
+                buttonTextYes: "Iya",
+                buttonTextNo: "Tidak",
+                onPressYes: onPressYes,
+                onPressNo: onPressNo,
+              );
+            }
+          },
+        );
+      },
+    );
   }
 
   showDialogQuestion(BuildContext context) {
@@ -1083,13 +1142,7 @@ class SupervisorSPBFormNotifier extends ChangeNotifier {
                 _tbsLuar?.gradingPhoto = _pickedFile;
                 _tbsLuar?.notes = _notesOPH.text;
                 notifyListeners();
-                _dialogService.showOptionDialog(
-                    title: "Simpan Supervisi SPB",
-                    subtitle: "Anda yakin ingin menyimpan Supervisi SPB?",
-                    buttonTextYes: "Iya",
-                    buttonTextNo: "Tidak",
-                    onPressYes: onPressYes,
-                    onPressNo: onPressNo);
+                _showDialogApprovalTbsLuar(context);
               } else {
                 FlushBarManager.showFlushBarWarning(
                     context,

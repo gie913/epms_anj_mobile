@@ -18,7 +18,6 @@ import 'package:epms/model/tbs_luar.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_supervisi_spb_repository.dart';
-import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
 
@@ -45,25 +44,6 @@ class SupervisorSPBNotifier extends ChangeNotifier {
       onPress: () {
         _dialogService.popDialog();
         OpenSettings.openDateSetting();
-      },
-    );
-  }
-
-  void _showDialogApprovalTbsLuar(BuildContext context) {
-    _dialogService.popDialog();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return DialogApprovalTbsLuar(
-          title: 'Approval Manager',
-          labelButton: 'SUBMIT',
-          hintText: 'Masukkan PIN',
-          onPress: (value) {
-            print('cek ini :$value');
-            doUpload();
-          },
-        );
       },
     );
   }
@@ -235,10 +215,6 @@ class SupervisorSPBNotifier extends ChangeNotifier {
             buttonTextYes: "Ya",
             buttonTextNo: "Tidak",
             onPressYes: doUpload,
-            // onPressYes: () {
-            //   _showDialogApprovalTbsLuar(
-            //       _navigationService.navigatorKey.currentContext!);
-            // },
             onPressNo: _dialogService.popDialog);
         break;
     }
