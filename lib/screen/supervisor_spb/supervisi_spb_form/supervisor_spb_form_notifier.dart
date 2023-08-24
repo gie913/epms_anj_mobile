@@ -293,6 +293,10 @@ class SupervisorSPBFormNotifier extends ChangeNotifier {
     _authList = data;
     _selectedAuth = _authList.first;
     print('cek auth : $_authList');
+
+    // final pinDecode = utf8.decode(base64Decode(_selectedAuth.pin));
+    // print('cek auth encode : ${_selectedAuth.pin}');
+    // print('cek auth decode : $pinDecode');
     notifyListeners();
   }
 

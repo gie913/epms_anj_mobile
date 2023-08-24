@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
@@ -34,6 +36,7 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
   final controller = TextEditingController();
   NavigatorService _navigationService = locator<NavigatorService>();
   AuthModel selectedAuthenticator = AuthModel();
+  bool obsecureText = true;
 
   @override
   void initState() {
@@ -67,7 +70,8 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
                       "Approval Manager",
                       "Masukkan PIN Approval Terlebih dahulu");
                 } else {
-                  if (selectedAuthenticator.pin != controller.text) {
+                  final pinEncode = base64Encode(utf8.encode(controller.text));
+                  if (selectedAuthenticator.pin != pinEncode) {
                     widget.onSubmit(false);
                     Navigator.pop(context);
                     FlushBarManager.showFlushBarWarning(
@@ -129,8 +133,21 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
                   child: TextFormField(
                     controller: controller,
                     keyboardType: TextInputType.number,
+                    obscureText: obsecureText,
                     decoration: InputDecoration(
                       hintText: widget.hintText,
+                      suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            obsecureText = !obsecureText;
+                          });
+                        },
+                        child: Icon(
+                          obsecureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
                   ),
                 ),
