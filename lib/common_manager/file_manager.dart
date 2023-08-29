@@ -10,6 +10,7 @@ import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_detail.dart';
 import 'package:epms/database/service/database_spb_loader.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
+import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/oph_supervise.dart';
 import 'package:epms/model/oph_supervise_ancak.dart';
@@ -18,6 +19,7 @@ import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/model/t_attendance_schema.dart';
+import 'package:epms/model/tbs_luar.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileManagerJson {
@@ -302,25 +304,39 @@ class FileManagerJson {
   Future<File?> writeFileJsonSupervisiSPB() async {
     List<SPBSupervise> _listOPHSupervise =
         await DatabaseSPBSupervise().selectSPBSupervise();
+    List<TBSLuar> _listTBSLuarGrading = await DatabaseTBSLuar().selectTBSLuar();
 
     List<String> mapListOPHSupervise = [];
+    List<String> mapListTBSLuarGrading = [];
 
-    if (_listOPHSupervise.isNotEmpty) {
+    if (_listOPHSupervise.isNotEmpty || _listTBSLuarGrading.isNotEmpty) {
       for (int i = 0; i < _listOPHSupervise.length; i++) {
         String jsonString = jsonEncode(_listOPHSupervise[i]);
         mapListOPHSupervise.add("\"$i\":$jsonString");
       }
 
+      for (int i = 0; i < _listTBSLuarGrading.length; i++) {
+        // _listTBSLuarGrading[i].formType = 2;
+        String jsonString = jsonEncode(_listTBSLuarGrading[i]);
+        mapListTBSLuarGrading.add("\"$i\":$jsonString");
+      }
+
       var stringListSPB = mapListOPHSupervise.join(",");
+      var stringListGrading = mapListTBSLuarGrading.join(",");
       String listSPB = "{$stringListSPB}";
+      String listGrading = "{$stringListGrading}";
 
       String token = await StorageManager.readData("userToken");
 
       Map<String, dynamic> newMapSPB = jsonDecode(listSPB);
+      Map<String, dynamic> newMapGrading = jsonDecode(listGrading);
 
       var mapTP = Map<String, dynamic>();
       mapTP = {
-        'Supervisi': {'T_SPB_Supervisi_Schema_List': newMapSPB}
+        'Supervisi': {
+          'T_SPB_Supervisi_Schema_List': newMapSPB,
+          'T_Grading_3rd_Party_Schema_List': newMapGrading,
+        }
       };
       var epmsData = Map<String, dynamic>();
       var jsonMap = jsonEncode(mapTP);

@@ -96,7 +96,7 @@ class SupervisorSPBNotifier extends ChangeNotifier {
   onErrorUploadSPB(BuildContext context, String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarError(
-        context, "Upload Supervisi SPB", "Gagal mengupload data");
+        context, "Upload Supervisi SPB Gagal", response);
   }
 
   uploadImage(BuildContext context) async {
