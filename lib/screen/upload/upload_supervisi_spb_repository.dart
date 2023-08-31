@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,10 +6,10 @@ import 'package:epms/base/api/api_endpoint.dart';
 import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class UploadSupervisiSPBRepository extends APIConfiguration {
-  void doPostUploadSupervisiSPB(BuildContext context, String listSPB, String listGrading, onSuccess, onError) async {
+  void doPostUploadSupervisiSPB(BuildContext context, String listSPB,
+      String listGrading, onSuccess, onError) async {
     String token = await StorageManager.readData("userToken");
     String baseUrl = await StorageManager.readData("apiServer");
 
@@ -24,7 +23,7 @@ class UploadSupervisiSPBRepository extends APIConfiguration {
       mapTP = {
         'Supervisi': {
           'T_SPB_Supervisi_Schema_List': newMapSPB,
-          'T_Grading_3rd_Party_Schema_List' : newMapGrading
+          'T_Grading_3rd_Party_Schema_List': newMapGrading
         }
       };
       var epmsData = Map<String, dynamic>();
@@ -32,7 +31,7 @@ class UploadSupervisiSPBRepository extends APIConfiguration {
       epmsData['epms_data'] = jsonMap;
       epmsData['user_token'] = token;
       await FileManagerJson().writeFileJsonSupervisiSPB();
-      http.Response response = await http.post(
+      var response = await ioClient!.post(
         uri,
         body: epmsData,
       );
