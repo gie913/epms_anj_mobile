@@ -127,27 +127,30 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                           )
                         : Container(),
                     SizedBox(height: 8),
-                    notifier.sourceSPBValue == "External" ? Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Driver:"),
-                          Flexible(
-                            child: Container(
-                              width: 200,
-                              child: TextFormField(
-                                textCapitalization: TextCapitalization.characters,
-                                controller: notifier.driverTBSLuar,
-                                textAlign: TextAlign.center,
-                                decoration:
-                                InputDecoration(hintText: "Nama Supir"),
-                              ),
+                    notifier.sourceSPBValue == "External"
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Driver:"),
+                                Flexible(
+                                  child: Container(
+                                    width: 200,
+                                    child: TextFormField(
+                                      textCapitalization:
+                                          TextCapitalization.characters,
+                                      controller: notifier.driverTBSLuar,
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                          hintText: "Nama Supir"),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ) : Container(),
+                          )
+                        : Container(),
                     notifier.sourceSPBValue == "Internal" &&
                             notifier.employeeTypeValue == "Internal"
                         ? Row(
@@ -181,8 +184,7 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                                   ),
                                   InkWell(
                                     child: Padding(
-                                      padding:
-                                          const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(8.0),
                                       child: Icon(Icons.search),
                                     ),
                                     onTap: () async {
@@ -316,8 +318,7 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                               value: notifier.division,
                               items: notifier.listDivision.map((value) {
                                 return DropdownMenuItem(
-                                  child: Text(
-                                      "${value.divisionCode}"),
+                                  child: Text("${value.divisionCode}"),
                                   value: value,
                                 );
                               }).toList(),
@@ -345,36 +346,37 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                         InputDecoration(hintText: "Tulis No. Kendaraan"),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () async {
-                      String? result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => QRReaderScreen()));
-                      if (result != null) {
-                        setState(() {
-                          notifier.vehicleNumber =
-                              TextEditingController(text: result);
-                        });
-                      }
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      color: Colors.green,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          "BACA QR Truk",
-                          style: Style.whiteBold14,
+                if (notifier.sourceSPBValue == 'Internal')
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () async {
+                        String? result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QRReaderScreen()));
+                        if (result != null) {
+                          setState(() {
+                            notifier.vehicleNumber =
+                                TextEditingController(text: result);
+                          });
+                        }
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        color: Colors.green,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "BACA QR Truk",
+                            style: Style.whiteBold14,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
+                  )
               ],
             ),
             SizedBox(height: 10),
@@ -401,7 +403,7 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                                     textCapitalization:
                                         TextCapitalization.characters,
                                     onChanged: (value) {
-                                      if(value.length >= 17) {
+                                      if (value.length >= 17) {
                                         notifier.checkDONumber(value);
                                       }
                                     },
@@ -430,53 +432,56 @@ class _SupervisorSPBFormTabState extends State<SupervisorSPBFormTab> {
                         ],
                       ),
                       SizedBox(height: 18),
-                      notifier.sourceSPBValue == "External" ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () async {
-                            String? result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => QRReaderScreen()));
-                            if (result != null) {
-                              notifier.setQRResult(result);
-                            }
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "Scan QR DO",
-                                style: Style.whiteBold14,
+                      notifier.sourceSPBValue == "External"
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: InkWell(
+                                onTap: () async {
+                                  String? result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              QRReaderScreen()));
+                                  if (result != null) {
+                                    notifier.setQRResult(result);
+                                  }
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  color: Colors.green,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      "Scan QR DO",
+                                      style: Style.whiteBold14,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ) : Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () {
-                            notifier.dialogNFC(context);
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                "Scan SPB",
-                                style: Style.whiteBold14,
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: InkWell(
+                                onTap: () {
+                                  notifier.dialogNFC(context);
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  color: Colors.green,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      "Scan SPB",
+                                      style: Style.whiteBold14,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      )
+                            )
                     ],
                   ),
                 ),
