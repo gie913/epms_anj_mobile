@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/model/m_customer_code_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/m_vendor_schema.dart';
@@ -9,6 +10,7 @@ import 'package:epms/screen/kerani_panen/form_oph/form_oph_notifier.dart';
 import 'package:epms/screen/qr_reader/qr_reader_screen.dart';
 import 'package:epms/screen/search/search_employee_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class FormOPHTab extends StatefulWidget {
@@ -498,8 +500,16 @@ class _FormOPHTabState extends State<FormOPHTab> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InkWell(
-                  onTap: () {
-                    notifier.checkFormGenerator(context);
+                  onTap: () async {
+                    if (await Permission
+                        .locationWhenInUse.serviceStatus.isEnabled) {
+                      notifier.checkFormGenerator(context);
+                    } else {
+                      FlushBarManager.showFlushBarWarning(
+                          context,
+                          "Gps Tidak Aktif",
+                          "Mohon mengaktifkan fitur gps pada perangkat Anda");
+                    }
                   },
                   child: Card(
                     color: Palette.primaryColorProd,
