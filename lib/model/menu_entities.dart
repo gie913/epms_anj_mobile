@@ -42,7 +42,6 @@ final List<Color> colorCodesAdministrationSPB = <Color>[
   Palette.redColorLight
 ];
 
-
 final List<String> deliveryMenuEntries = <String>[
   'BACA KARTU OPH',
   'BUAT FORM SPB',
@@ -77,6 +76,8 @@ final List<String> supervisorSPBMenuEntries = <String>[
   'HISTORY SUPERVISI SPB',
   'BACA KARTU SPB',
   'BACA KARTU TBS LUAR',
+  'INSPECTION',
+  'UPLOAD INSPECTION',
   'UPLOAD DATA',
   'KELUAR'
 ];
@@ -128,6 +129,8 @@ final List<Color> colorCodesSupervisorSPB = <Color>[
   Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,
+  Palette.primaryColorProd,
+  Colors.green,
   Colors.green,
   Palette.redColorLight
 ];

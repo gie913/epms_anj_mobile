@@ -37,10 +37,16 @@ class Routes {
   static const OPH_HISTORY_PAGE = "/oph_history";
   static const SPB_HISTORY_PAGE = "/spb_history";
   static const OPH_SUPERVISI_HISTORY_PAGE = "/oph_supervisi_history";
-  static const OPH_SUPERVISI_ANCAK_HISTORY_PAGE = "/oph_supervisi_ancak_history";
+  static const OPH_SUPERVISI_ANCAK_HISTORY_PAGE =
+      "/oph_supervisi_ancak_history";
   static const SPB_SUPERVISI_HISTORY_PAGE = "/spb_supervisi_history";
 
   static const TBS_LUAR_FORM_PAGE = "/tbs_luar_form_page";
   static const TBS_LUAR_DETAIL_PAGE = "/tbs_luar_detail_page";
   static const TBS_LUAR_HISTORY_PAGE = "/tbs_luar_history_page";
+
+  static const INSPECTION = '/inspection';
+  static const INSPECTION_FORM = '/inspection-form';
+  static const INSPECTION_ASSIGNMENT = '/inspection-assignment';
+  static const INSPECTION_HISTORY = '/inspection-history';
 }

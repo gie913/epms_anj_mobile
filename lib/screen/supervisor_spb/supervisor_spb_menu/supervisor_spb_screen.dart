@@ -17,6 +17,8 @@ class SupervisorSPBScreen extends StatefulWidget {
 }
 
 class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
+  int countInspection = 0;
+
   @override
   void initState() {
     context.read<HomeNotifier>().getUser(context);
@@ -125,6 +127,18 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                                 padding:
                                                     const EdgeInsets.all(8.0),
                                                 child: InkWell(
+                                                  child:
+                                                      Text("Synch Inspection"),
+                                                  onTap: () {},
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: InkWell(
                                                   child: Text("Export Json"),
                                                   onTap: () {
                                                     SupervisorSPBNotifier()
@@ -175,12 +189,51 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                               fontSize: 20,
                                               color: Colors.white),
                                         ),
-                                        child: Text(
-                                            supervisorSPBMenuEntries[index - 2]
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
+                                        child: supervisorSPBMenuEntries[
+                                                        index - 2]
+                                                    .toUpperCase() ==
+                                                'INSPECTION'
+                                            ? Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                    Text(
+                                                        "${harvesterMenuEntries[index - 2].toUpperCase()}",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                    SizedBox(width: 10),
+                                                    Row(children: [
+                                                      countInspection == 0
+                                                          ? SizedBox()
+                                                          : Row(children: [
+                                                              Icon(
+                                                                  Icons.warning,
+                                                                  color: Colors
+                                                                      .yellow),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Text(
+                                                                  "$countInspection",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)),
+                                                            ])
+                                                    ])
+                                                  ])
+                                            : Text(
+                                                supervisorSPBMenuEntries[
+                                                        index - 2]
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                       ),
                       );
                     }),

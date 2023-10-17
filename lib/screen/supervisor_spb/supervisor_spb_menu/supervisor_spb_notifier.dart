@@ -149,6 +149,9 @@ class SupervisorSPBNotifier extends ChangeNotifier {
     final dateLoginParse = DateTime.parse(dateLogin!);
 
     switch (supervisorSPBMenuEntries[index - 2].toUpperCase()) {
+      case 'INSPECTION':
+        _navigationService.push(Routes.INSPECTION);
+        break;
       case "KELUAR":
         _dialogService.showOptionDialog(
             title: "Log Out",

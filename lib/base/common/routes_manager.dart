@@ -4,6 +4,10 @@ import 'package:epms/model/laporan_spb_kemarin.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/screen/configuration/configuration_page.dart';
 import 'package:epms/screen/home/home_page.dart';
+import 'package:epms/screen/inspection/inspection_assignment_view.dart';
+import 'package:epms/screen/inspection/inspection_form_view.dart';
+import 'package:epms/screen/inspection/inspection_history_view.dart';
+import 'package:epms/screen/inspection/inspection_view.dart';
 import 'package:epms/screen/kerani_kirim/administration_spb/administration_spb_screen.dart';
 import 'package:epms/screen/kerani_kirim/detail_spb/detail_spb_page.dart';
 import 'package:epms/screen/kerani_kirim/edit_spb/edit_spb_page.dart';
@@ -236,6 +240,22 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           tbsLuar: arguments['tbs_luar'],
           method: arguments['method'],
         ),
+      );
+    case Routes.INSPECTION:
+      return MaterialPageRoute(
+        builder: (context) => InspectionView(),
+      );
+    case Routes.INSPECTION_FORM:
+      return MaterialPageRoute(
+        builder: (context) => InspectionFormView(),
+      );
+    case Routes.INSPECTION_ASSIGNMENT:
+      return MaterialPageRoute(
+        builder: (context) => InspectionAssignmentView(),
+      );
+    case Routes.INSPECTION_HISTORY:
+      return MaterialPageRoute(
+        builder: (context) => InspectionHistoryView(),
       );
     default:
       return MaterialPageRoute(
