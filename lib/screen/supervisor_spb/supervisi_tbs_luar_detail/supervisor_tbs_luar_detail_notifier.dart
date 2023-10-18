@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/camera_service.dart';
@@ -5,8 +7,11 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/tbs_luar_card_manager.dart';
+import 'package:epms/database/service/database_t_auth.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
+import 'package:epms/model/auth_model.dart';
 import 'package:epms/model/tbs_luar.dart';
+import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -107,6 +112,14 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
 
   TextEditingController get notesOPH => _notesOPH;
 
+  List<AuthModel> _authList = [];
+
+  List<AuthModel> get authList => _authList;
+
+  AuthModel _selectedAuth = AuthModel();
+
+  AuthModel get selectedAuth => _selectedAuth;
+
   onInit(BuildContext context, TBSLuar? tbsLuar, String method) async {
     if (method != "BACA") {
       _tbsLuar = tbsLuar;
@@ -138,6 +151,7 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
           buttonText: "Batal",
           onPress: onPressCancelRead);
     }
+    await getAuthList();
   }
 
   onSuccessRead(BuildContext context, TBSLuar tbsLuar) {
@@ -231,6 +245,48 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
 
   onChangeEdit(bool value) {
     _onEdit = value;
+    notifyListeners();
+  }
+
+  Future<void> getAuthList() async {
+    final data = await DatabaseTAuth().selectTAuth();
+    _authList = data;
+    _selectedAuth = _authList.first;
+    print('cek auth : $_authList');
+    // final pinDecode = utf8.decode(base64Decode(_selectedAuth.pin));
+    // print('cek auth encode : ${_selectedAuth.pin}');
+    // print('cek auth decode : $pinDecode');
+    notifyListeners();
+  }
+
+  void showDialogApprovalTbsLuar(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return DialogApprovalTbsLuar(
+          title: 'Approval Manager',
+          labelButton: 'SUBMIT',
+          hintText: 'Masukkan PIN',
+          listAuthenticator: _authList,
+          selectedAuthenticator: _selectedAuth,
+          onChangeAuthenticator: (value) {
+            onChangeAuth(value);
+          },
+          onSubmit: (value) {
+            log('cek isAuthValid : $value');
+            if (value) {
+              Navigator.pop(context);
+              showDialogQuestion(context);
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void onChangeAuth(AuthModel data) {
+    _selectedAuth = data;
     notifyListeners();
   }
 

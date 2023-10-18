@@ -103,7 +103,8 @@ class _SupervisorTBSLuarDetailTabState
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text("${notifier.tbsLuar?.supplierCode ?? ""}"),
-                      Text("${ValueService.rightTrimVendor(notifier.tbsLuar!.supplierName!)}"),
+                      Text(
+                          "${ValueService.rightTrimVendor(notifier.tbsLuar!.supplierName!)}"),
                     ],
                   ),
                 ],
@@ -140,9 +141,11 @@ class _SupervisorTBSLuarDetailTabState
                               Text("No ID DO"),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text("${notifier.tbsLuar?.spdID ?? ""}",
+                                child: Text(
+                                  "${notifier.tbsLuar?.spdID ?? ""}",
                                   style: Style.textBold18,
-                                  textAlign: TextAlign.center,),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ],
                           ),
@@ -156,119 +159,123 @@ class _SupervisorTBSLuarDetailTabState
             ),
             notifier.pickedFile != null
                 ? Image.file(
-              File("${notifier.pickedFile}"),
-              height: 400,
-            )
+                    File("${notifier.pickedFile}"),
+                    height: 400,
+                  )
                 : Container(),
-            notifier.onEdit ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () {
-                  notifier.getCamera(context);
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    color: Colors.green,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        "FOTO HASIL GRADING",
-                        style: Style.whiteBold14,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ) : Container(),
-            notifier.onEdit ? Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () {
-                      notifier.showDialogQuestion(context);
-                    },
-                    child: Card(
-                      color: Palette.primaryColorProd,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+            notifier.onEdit
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {
+                        notifier.getCamera(context);
+                      },
                       child: Container(
-                        padding: EdgeInsets.all(14),
                         width: MediaQuery.of(context).size.width,
-                        child: Text(
-                          "SIMPAN",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.center,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          color: Colors.green,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              "FOTO HASIL GRADING",
+                              style: Style.whiteBold14,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
+            notifier.onEdit
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            notifier.showDialogApprovalTbsLuar(context);
+                          },
+                          child: Card(
+                            color: Palette.primaryColorProd,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.all(14),
+                              width: MediaQuery.of(context).size.width,
+                              child: Text(
+                                "SIMPAN",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            notifier.onChangeEdit(false);
+                          },
+                          child: Card(
+                            color: Palette.redColorDark,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.all(14),
+                              width: MediaQuery.of(context).size.width,
+                              child: Text(
+                                "BATAL",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {
+                        notifier.onChangeEdit(true);
+                      },
+                      child: Card(
+                        color: Palette.primaryColorProd,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(14),
+                          width: MediaQuery.of(context).size.width,
+                          child: Text(
+                            "UBAH DATA",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () {
-                      notifier.onChangeEdit(false);
-                    },
-                    child: Card(
-                      color: Palette.redColorDark,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(14),
-                        width: MediaQuery.of(context).size.width,
-                        child: Text(
-                          "BATAL",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ) : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () {
-                  notifier.onChangeEdit(true);
-                },
-                child: Card(
-                  color: Palette.primaryColorProd,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Container(
-                    padding: EdgeInsets.all(14),
-                    width: MediaQuery.of(context).size.width,
-                    child: Text(
-                      "UBAH DATA",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ]),
         ),
       );
