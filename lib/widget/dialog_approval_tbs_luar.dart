@@ -55,10 +55,8 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
     return MediaQuery(
       data: Style.mediaQueryText(context),
       child: AlertDialog(
-        backgroundColor: Colors.white,
-        title: Center(
-          child: Text(widget.title, style: Style.textBoldBlack14),
-        ),
+        // backgroundColor: Colors.white,
+        title: Center(child: Text(widget.title)),
         actions: [
           Card(
             color: Palette.greenColor,
@@ -98,10 +96,10 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
           children: [
             Row(
               children: [
-                Text('Pilih Manager', style: Style.textBoldBlack14),
+                Expanded(flex: 4, child: Text('Manager')),
                 SizedBox(width: 12),
                 Expanded(
-                  flex: 5,
+                  flex: 7,
                   child: DropdownButton(
                     isExpanded: true,
                     value: selectedAuthenticator,
@@ -125,8 +123,7 @@ class _DialogApprovalTbsLuarState extends State<DialogApprovalTbsLuar> {
             ),
             Row(
               children: [
-                Expanded(
-                    flex: 4, child: Text('PIN', style: Style.textBoldBlack14)),
+                Expanded(flex: 4, child: Text('PIN')),
                 SizedBox(width: 12),
                 Expanded(
                   flex: 7,
