@@ -7,27 +7,25 @@ import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class InspectionAssignmentView extends StatefulWidget {
-  const InspectionAssignmentView({super.key});
+class InspectionApprovalView extends StatefulWidget {
+  const InspectionApprovalView({super.key});
 
   @override
-  State<InspectionAssignmentView> createState() =>
-      _InspectionAssignmentViewState();
+  State<InspectionApprovalView> createState() => _InspectionApprovalViewState();
 }
 
-class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
+class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   NavigatorService _navigationService = locator<NavigatorService>();
   final inspectionController =
       TextEditingController(text: 'Test Pengaduan Inspection');
   final actionController = TextEditingController();
-  final listAction = ['On Progress', 'Re-Assign', 'Complete'];
-  final listUserAssign = ['User 1', 'User 2', 'User 3'];
+  final listAction = ['Close', 'Revisi', 'Need Consultation'];
+  final listUserConsultation = ['User 1', 'User 2', 'User 3'];
   String? action;
-  String? userAssign;
+  String? userConsultation;
 
   @override
   void initState() {
-    action = 'On Progress';
     setState(() {});
     super.initState();
   }
@@ -39,7 +37,7 @@ class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
         return MediaQuery(
           data: Style.mediaQueryText(context),
           child: Scaffold(
-            appBar: AppBar(title: Text("Assignment")),
+            appBar: AppBar(title: Text("Approval")),
             body: Padding(
               padding: EdgeInsets.all(16),
               child: SingleChildScrollView(
@@ -101,10 +99,10 @@ class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
                         )
                       ],
                     ),
-                    if (action == 'Re-Assign')
+                    if (action == 'Need Consultation')
                       Row(
                         children: [
-                          Expanded(child: Text('User Re-Assign :')),
+                          Expanded(child: Text('User Consultation :')),
                           SizedBox(width: 12),
                           Expanded(
                             child: DropdownButton(
@@ -115,7 +113,7 @@ class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
                                     fontWeight: FontWeight.normal,
                                     color: Colors.grey),
                               ),
-                              value: userAssign,
+                              value: userConsultation,
                               style: Style.whiteBold14.copyWith(
                                 fontWeight: FontWeight.normal,
                                 color: themeNotifier.status == true ||
@@ -125,7 +123,7 @@ class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
                                     ? Colors.white
                                     : Colors.black,
                               ),
-                              items: listUserAssign.map((value) {
+                              items: listUserConsultation.map((value) {
                                 return DropdownMenuItem(
                                   child: Text(value),
                                   value: value,
@@ -133,7 +131,7 @@ class _InspectionAssignmentViewState extends State<InspectionAssignmentView> {
                               }).toList(),
                               onChanged: (String? value) {
                                 if (value != null) {
-                                  userAssign = value;
+                                  userConsultation = value;
                                   setState(() {});
                                 }
                               },

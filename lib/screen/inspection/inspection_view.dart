@@ -2,8 +2,8 @@ import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
-import 'package:epms/screen/inspection/components/inspection_assignment.dart';
-import 'package:epms/screen/inspection/components/inspection_history.dart';
+import 'package:epms/screen/inspection/components/tab_inspection_assignment.dart';
+import 'package:epms/screen/inspection/components/tab_inspection_history.dart';
 import 'package:flutter/material.dart';
 
 class InspectionView extends StatefulWidget {
@@ -50,8 +50,8 @@ class _InspectionViewState extends State<InspectionView> {
           ),
           body: TabBarView(
             children: const [
-              InspectionHistory(),
-              InspectionAssignment(),
+              TabInspectionHistory(),
+              TabInspectionAssignment(),
             ],
           ),
         ),

@@ -78,6 +78,25 @@ class InspectionItem extends StatelessWidget {
                         )
                       ],
                     ),
+                    Row(
+                      children: [
+                        Text(
+                          'User Assign :',
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            'User 1',
+                            style: Style.whiteBold12.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        )
+                      ],
+                    ),
                   ],
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:epms/model/laporan_spb_kemarin.dart';
 import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/screen/configuration/configuration_page.dart';
 import 'package:epms/screen/home/home_page.dart';
+import 'package:epms/screen/inspection/inspection_approval_view.dart';
 import 'package:epms/screen/inspection/inspection_assignment_view.dart';
 import 'package:epms/screen/inspection/inspection_form_view.dart';
 import 'package:epms/screen/inspection/inspection_history_view.dart';
@@ -256,6 +257,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case Routes.INSPECTION_HISTORY:
       return MaterialPageRoute(
         builder: (context) => InspectionHistoryView(),
+      );
+    case Routes.INSPECTION_APPROVAL:
+      return MaterialPageRoute(
+        builder: (context) => InspectionApprovalView(),
       );
     default:
       return MaterialPageRoute(

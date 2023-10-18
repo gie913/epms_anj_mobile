@@ -22,9 +22,11 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   final listInspectionCategory = ['Kategori 1', 'Kategori 2', 'Kategori 3'];
   final listInspectionCompany = ['Company 1', 'Company 2', 'Company 3'];
   final listInspectionDivisi = ['Divisi 1', 'Divisi 2', 'Divisi 3'];
+  final listUserAssign = ['User 1', 'User 2', 'User 3'];
   String? inspectionCategory;
   String? inspectionCompany;
   String? inspectionDivisi;
+  String? userAssign;
   final inspectionController = TextEditingController();
   final listInspectionPhoto = [];
   var isAutoAssign = false;
@@ -176,6 +178,45 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                     ),
                     Row(
                       children: [
+                        Expanded(child: Text('User Assign :')),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: DropdownButton(
+                            isExpanded: true,
+                            hint: Text(
+                              "Pilih User",
+                              style: Style.whiteBold14.copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey),
+                            ),
+                            value: userAssign,
+                            style: Style.whiteBold14.copyWith(
+                              fontWeight: FontWeight.normal,
+                              color: themeNotifier.status == true ||
+                                      MediaQuery.of(context)
+                                              .platformBrightness ==
+                                          Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            items: listUserAssign.map((value) {
+                              return DropdownMenuItem(
+                                child: Text(value),
+                                value: value,
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              if (value != null) {
+                                userAssign = value;
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
                         Text('Auto Assign :'),
                         SizedBox(width: 12),
                         Expanded(
@@ -194,12 +235,12 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         )
                       ],
                     ),
-                    Text('Deskripsi :'),
+                    Text('Pengaduan :'),
                     SizedBox(height: 6),
                     InputPrimary(
                       controller: inspectionController,
                       maxLines: 3,
-                      hintText: 'Masukkan Deskripsi Inspection',
+                      hintText: 'Masukkan Pengaduan',
                       validator: (value) => null,
                     ),
                     if (listInspectionPhoto.isNotEmpty)

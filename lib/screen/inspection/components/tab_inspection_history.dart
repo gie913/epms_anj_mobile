@@ -4,14 +4,14 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
 import 'package:flutter/material.dart';
 
-class InspectionAssignment extends StatefulWidget {
-  const InspectionAssignment({super.key});
+class TabInspectionHistory extends StatefulWidget {
+  const TabInspectionHistory({super.key});
 
   @override
-  State<InspectionAssignment> createState() => _InspectionAssignmentState();
+  State<TabInspectionHistory> createState() => _TabInspectionHistoryState();
 }
 
-class _InspectionAssignmentState extends State<InspectionAssignment> {
+class _TabInspectionHistoryState extends State<TabInspectionHistory> {
   NavigatorService _navigationService = locator<NavigatorService>();
 
   @override
@@ -24,7 +24,7 @@ class _InspectionAssignmentState extends State<InspectionAssignment> {
         itemBuilder: (context, index) {
           return InspectionItem(
             onTap: () {
-              _navigationService.push(Routes.INSPECTION_ASSIGNMENT);
+              _navigationService.push(Routes.INSPECTION_HISTORY);
             },
           );
         },

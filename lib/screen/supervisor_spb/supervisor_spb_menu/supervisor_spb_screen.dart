@@ -17,7 +17,7 @@ class SupervisorSPBScreen extends StatefulWidget {
 }
 
 class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
-  int countInspection = 0;
+  int countInspection = 2;
 
   @override
   void initState() {
@@ -198,7 +198,7 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                                     MainAxisAlignment.center,
                                                 children: [
                                                     Text(
-                                                        "${harvesterMenuEntries[index - 2].toUpperCase()}",
+                                                        "${supervisorSPBMenuEntries[index - 2].toUpperCase()}",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:

@@ -1,3 +1,4 @@
+import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,8 @@ class InspectionHistoryView extends StatefulWidget {
 }
 
 class _InspectionHistoryViewState extends State<InspectionHistoryView> {
-  final inspectionController = TextEditingController(text: 'Test Inspection');
+  final inspectionController =
+      TextEditingController(text: 'Test Pengaduan Inspection');
   final actionController =
       TextEditingController(text: 'Tindakan Inspection Test');
 
@@ -51,6 +53,14 @@ class _InspectionHistoryViewState extends State<InspectionHistoryView> {
                   ],
                 ),
                 SizedBox(height: 12),
+                Row(
+                  children: [
+                    Text('User Assign :'),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('User 1', textAlign: TextAlign.end))
+                  ],
+                ),
+                SizedBox(height: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -74,7 +84,7 @@ class _InspectionHistoryViewState extends State<InspectionHistoryView> {
                     SizedBox(height: 12),
                   ],
                 ),
-                Text('Deskripsi Inspection :'),
+                Text('Pengaduan :'),
                 SizedBox(height: 6),
                 InputPrimary(
                   controller: inspectionController,
@@ -82,7 +92,7 @@ class _InspectionHistoryViewState extends State<InspectionHistoryView> {
                   validator: (value) => null,
                   readOnly: true,
                 ),
-                Text('Tindakan Inspection :'),
+                Text('Tindakan :'),
                 SizedBox(height: 6),
                 InputPrimary(
                   controller: actionController,
@@ -98,6 +108,49 @@ class _InspectionHistoryViewState extends State<InspectionHistoryView> {
                         child: Text('On Progress', textAlign: TextAlign.end))
                   ],
                 ),
+                SizedBox(height: 12),
+                Text('Riwayat Re-Assign :'),
+                Card(
+                  color: Palette.primaryColorProd,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Kategori : '),
+                                  Text('Kategori 1'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text('Company : '),
+                                  Text('Company 1'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text('Divisi : '),
+                                  Text('Divisi 1'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text('User : '),
+                                  Text('User 2'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text('On Progress'),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
