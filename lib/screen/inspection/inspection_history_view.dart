@@ -121,32 +121,77 @@ class _InspectionHistoryViewState extends State<InspectionHistoryView> {
                             children: [
                               Row(
                                 children: [
-                                  Text('Kategori : '),
-                                  Text('Kategori 1'),
+                                  Text(
+                                    'Kategori : ',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    'Kategori 1',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  Text('Company : '),
-                                  Text('Company 1'),
+                                  Text(
+                                    'Company : ',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    'Company 1',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  Text('Divisi : '),
-                                  Text('Divisi 1'),
+                                  Text(
+                                    'Divisi : ',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    'Divisi 1',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  Text('User : '),
-                                  Text('User 2'),
+                                  Text(
+                                    'User : ',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    'User 2',
+                                    style: Style.whiteBold12.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.normal),
+                                  ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        Text('On Progress'),
+                        Text(
+                          'On Progress',
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
                       ],
                     ),
                   ),
