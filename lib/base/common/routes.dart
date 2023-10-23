@@ -47,7 +47,7 @@ class Routes {
 
   static const INSPECTION = '/inspection';
   static const INSPECTION_FORM = '/inspection-form';
-  static const INSPECTION_ASSIGNMENT = '/inspection-assignment';
-  static const INSPECTION_HISTORY = '/inspection-history';
+  static const INSPECTION_ASSIGNMENT_DETAIL = '/inspection-assignment-detail';
+  static const INSPECTION_DETAIL = '/inspection-detail';
   static const INSPECTION_APPROVAL = '/inspection-approval';
 }

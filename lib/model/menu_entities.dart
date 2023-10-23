@@ -77,7 +77,6 @@ final List<String> supervisorSPBMenuEntries = <String>[
   'BACA KARTU SPB',
   'BACA KARTU TBS LUAR',
   'INSPECTION',
-  'UPLOAD INSPECTION',
   'UPLOAD DATA',
   'KELUAR'
 ];
@@ -130,7 +129,6 @@ final List<Color> colorCodesSupervisorSPB = <Color>[
   Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,
-  Colors.green,
   Colors.green,
   Palette.redColorLight
 ];

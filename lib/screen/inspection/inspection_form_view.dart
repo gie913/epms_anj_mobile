@@ -8,6 +8,7 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class InspectionFormView extends StatefulWidget {
@@ -29,11 +30,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   String? userAssign;
   final inspectionController = TextEditingController();
   final listInspectionPhoto = [];
-  var isAutoAssign = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -59,6 +58,20 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                        'INSPECTION1${DateFormat('ddMMyyyy').format(DateTime.now())}'),
+                    SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text('Tanggal :'),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text(
+                                '${DateFormat('dd-MM-yyyy').format(DateTime.now())}',
+                                textAlign: TextAlign.end))
+                      ],
+                    ),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(child: Text('Kategori :')),
@@ -215,32 +228,12 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         )
                       ],
                     ),
-                    Row(
-                      children: [
-                        Text('Auto Assign :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Checkbox(
-                              value: isAutoAssign,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  isAutoAssign = value;
-                                  setState(() {});
-                                }
-                              },
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Text('Pengaduan :'),
+                    Text('Deskripsi :'),
                     SizedBox(height: 6),
                     InputPrimary(
                       controller: inspectionController,
-                      maxLines: 3,
-                      hintText: 'Masukkan Pengaduan',
+                      maxLines: 10,
+                      hintText: 'Masukkan Deskripsi',
                       validator: (value) => null,
                     ),
                     if (listInspectionPhoto.isNotEmpty)

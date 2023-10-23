@@ -5,9 +5,9 @@ import 'package:epms/model/spb_supervise.dart';
 import 'package:epms/screen/configuration/configuration_page.dart';
 import 'package:epms/screen/home/home_page.dart';
 import 'package:epms/screen/inspection/inspection_approval_view.dart';
-import 'package:epms/screen/inspection/inspection_assignment_view.dart';
+import 'package:epms/screen/inspection/inspection_assignment_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_form_view.dart';
-import 'package:epms/screen/inspection/inspection_history_view.dart';
+import 'package:epms/screen/inspection/inspection_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_view.dart';
 import 'package:epms/screen/kerani_kirim/administration_spb/administration_spb_screen.dart';
 import 'package:epms/screen/kerani_kirim/detail_spb/detail_spb_page.dart';
@@ -250,17 +250,23 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => InspectionFormView(),
       );
-    case Routes.INSPECTION_ASSIGNMENT:
+    case Routes.INSPECTION_ASSIGNMENT_DETAIL:
+      final arguments =
+          (settings.arguments ?? <String, dynamic>{}) as Map<String, dynamic>;
       return MaterialPageRoute(
-        builder: (context) => InspectionAssignmentView(),
+        builder: (context) => InspectionAssignmentDetailView(data: arguments),
       );
-    case Routes.INSPECTION_HISTORY:
+    case Routes.INSPECTION_DETAIL:
+      final arguments =
+          (settings.arguments ?? <String, dynamic>{}) as Map<String, dynamic>;
       return MaterialPageRoute(
-        builder: (context) => InspectionHistoryView(),
+        builder: (context) => InspectionDetailView(data: arguments),
       );
     case Routes.INSPECTION_APPROVAL:
+      final arguments =
+          (settings.arguments ?? <String, dynamic>{}) as Map<String, dynamic>;
       return MaterialPageRoute(
-        builder: (context) => InspectionApprovalView(),
+        builder: (context) => InspectionApprovalView(data: arguments),
       );
     default:
       return MaterialPageRoute(

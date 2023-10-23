@@ -7,38 +7,32 @@ import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class InspectionApprovalView extends StatefulWidget {
-  const InspectionApprovalView({super.key, required this.data});
+class InspectionAssignmentDetailView extends StatefulWidget {
+  const InspectionAssignmentDetailView({super.key, required this.data});
 
   final Map<String, dynamic> data;
 
   @override
-  State<InspectionApprovalView> createState() => _InspectionApprovalViewState();
+  State<InspectionAssignmentDetailView> createState() =>
+      _InspectionAssignmentDetailViewState();
 }
 
-class _InspectionApprovalViewState extends State<InspectionApprovalView> {
+class _InspectionAssignmentDetailViewState
+    extends State<InspectionAssignmentDetailView> {
   NavigatorService _navigationService = locator<NavigatorService>();
   final inspectionController = TextEditingController();
   final actionController = TextEditingController();
-  final noteController = TextEditingController();
-  final listAction = ['Close', 'Revisi', 'Need Consultation'];
-  final listUserConsultation = ['User 1', 'User 2', 'User 3'];
+  final listAction = ['On Progress', 'Re-Assign', 'Complete'];
+  final listUserAssign = ['User 1', 'User 2', 'User 3'];
   String? action;
-  String? userConsultation;
+  String? userAssign;
 
   @override
   void initState() {
+    action = widget.data['status'];
     inspectionController.text = widget.data['report'];
     setState(() {});
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    inspectionController.dispose();
-    actionController.dispose();
-    noteController.dispose();
-    super.dispose();
   }
 
   @override
@@ -48,7 +42,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         return MediaQuery(
           data: Style.mediaQueryText(context),
           child: Scaffold(
-            appBar: AppBar(title: Text("Approval")),
+            appBar: AppBar(title: Text("Assignment Detail")),
             body: Padding(
               padding: EdgeInsets.all(16),
               child: SingleChildScrollView(
@@ -149,16 +143,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                       validator: (value) => null,
                       readOnly: true,
                     ),
-                    Row(
-                      children: [
-                        Text('Status :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text(widget.data['status'],
-                                textAlign: TextAlign.end))
-                      ],
-                    ),
-                    SizedBox(height: 12),
                     if ((widget.data['history'] as List).isNotEmpty)
                       Text('Riwayat Tindakan :'),
                     ...(widget.data['history'] as List).map((item) {
@@ -313,16 +297,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         ),
                       );
                     }).toList(),
-                    // Text('Tindakan :'),
-                    // SizedBox(height: 6),
-                    // InputPrimary(
-                    //   controller: actionController,
-                    //   hintText: 'Belum ada Tindakan',
-                    //   maxLines: 10,
-                    //   validator: (value) => null,
-                    //   readOnly: action == 'Revisi' ? false : true,
-                    // ),
-
                     Row(
                       children: [
                         Expanded(child: Text('Action :')),
@@ -362,59 +336,54 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         )
                       ],
                     ),
-                    if (action == 'Need Consultation')
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    if (action == 'Re-Assign')
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Expanded(child: Text('User Consultation :')),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  hint: Text(
-                                    "Pilih User",
-                                    style: Style.whiteBold14.copyWith(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey),
-                                  ),
-                                  value: userConsultation,
-                                  style: Style.whiteBold14.copyWith(
+                          Expanded(child: Text('User Re-Assign :')),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButton(
+                              isExpanded: true,
+                              hint: Text(
+                                "Pilih User",
+                                style: Style.whiteBold14.copyWith(
                                     fontWeight: FontWeight.normal,
-                                    color: themeNotifier.status == true ||
-                                            MediaQuery.of(context)
-                                                    .platformBrightness ==
-                                                Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  items: listUserConsultation.map((value) {
-                                    return DropdownMenuItem(
-                                      child: Text(value),
-                                      value: value,
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? value) {
-                                    if (value != null) {
-                                      userConsultation = value;
-                                      setState(() {});
-                                    }
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                          Text('Keterangan :'),
-                          SizedBox(height: 6),
-                          InputPrimary(
-                            controller: noteController,
-                            maxLines: 10,
-                            hintText: 'Masukkan Keterangan',
-                            validator: (value) => null,
-                          ),
+                                    color: Colors.grey),
+                              ),
+                              value: userAssign,
+                              style: Style.whiteBold14.copyWith(
+                                fontWeight: FontWeight.normal,
+                                color: themeNotifier.status == true ||
+                                        MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              items: listUserAssign.map((value) {
+                                return DropdownMenuItem(
+                                  child: Text(value),
+                                  value: value,
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                if (value != null) {
+                                  userAssign = value;
+                                  setState(() {});
+                                }
+                              },
+                            ),
+                          )
                         ],
                       ),
+                    Text('Tindakan :'),
+                    SizedBox(height: 6),
+                    InputPrimary(
+                      controller: actionController,
+                      maxLines: 10,
+                      hintText: 'Masukkan Tindakan',
+                      validator: (value) => null,
+                    ),
                     SizedBox(height: 12),
                     InkWell(
                       onTap: () {},

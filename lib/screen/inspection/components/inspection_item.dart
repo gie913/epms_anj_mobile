@@ -3,9 +3,14 @@ import 'package:epms/base/ui/style.dart';
 import 'package:flutter/material.dart';
 
 class InspectionItem extends StatelessWidget {
-  const InspectionItem({super.key, required this.onTap});
+  const InspectionItem({
+    super.key,
+    required this.onTap,
+    required this.data,
+  });
 
   final Function() onTap;
+  final Map<String, dynamic> data;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +26,30 @@ class InspectionItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      data['id'],
+                      style: Style.whiteBold12.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.normal),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Tanggal :',
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            data['date'],
+                            style: Style.whiteBold12.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        )
+                      ],
+                    ),
                     Row(
                       children: [
                         Text(
@@ -32,7 +61,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Kategori 1',
+                            data['category'],
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -51,7 +80,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Company 1',
+                            data['company'],
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -70,7 +99,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Divisi 1',
+                            data['divisi'],
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -89,7 +118,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'User 1',
+                            data['user_assign'],
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -102,7 +131,7 @@ class InspectionItem extends StatelessWidget {
               ),
               SizedBox(width: 12),
               Text(
-                'On Progress',
+                data['status'],
                 style: Style.whiteBold12.copyWith(
                     color: Colors.white, fontWeight: FontWeight.normal),
               )

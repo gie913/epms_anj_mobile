@@ -127,18 +127,6 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                                 padding:
                                                     const EdgeInsets.all(8.0),
                                                 child: InkWell(
-                                                  child:
-                                                      Text("Synch Inspection"),
-                                                  onTap: () {},
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(height: 10),
-                                            Card(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: InkWell(
                                                   child: Text("Export Json"),
                                                   onTap: () {
                                                     SupervisorSPBNotifier()
