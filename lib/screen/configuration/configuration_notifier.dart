@@ -34,9 +34,15 @@ class ConfigurationNotifier extends ChangeNotifier {
 
   doSaveButton(BuildContext context, String apiServer, String database) {
     try {
-      StorageManager.saveData("apiServer", apiServer);
+      if (apiServer.isNotEmpty) {
+        StorageManager.saveData("apiServer", apiServer);
+      } else {
+        StorageManager.deleteData("apiServer");
+      }
+
       _navigationService.pop();
-      FlushBarManager.showFlushBarSuccess(context, "Konfigurasi server", "Berhasil");
+      FlushBarManager.showFlushBarSuccess(
+          context, "Konfigurasi server", "Berhasil");
     } catch (e) {
       print("Save api server error");
     }

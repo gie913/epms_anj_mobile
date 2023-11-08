@@ -1,10 +1,23 @@
+import 'dart:developer';
+import 'dart:math' as math;
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/camera_service.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/common_manager/value_service.dart';
+import 'package:epms/database/service/database_company_inspection.dart';
+import 'package:epms/database/service/database_division_inspection.dart';
+import 'package:epms/database/service/database_team_inspection.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/model/company_inspection_model.dart';
+import 'package:epms/model/division_inspection_model.dart';
+import 'package:epms/model/team_inspection_model.dart';
+import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
@@ -20,10 +33,27 @@ class InspectionFormView extends StatefulWidget {
 
 class _InspectionFormViewState extends State<InspectionFormView> {
   NavigatorService _navigationService = locator<NavigatorService>();
-  final listInspectionCategory = ['Kategori 1', 'Kategori 2', 'Kategori 3'];
-  final listInspectionCompany = ['Company 1', 'Company 2', 'Company 3'];
+
+  String inspectionId = '';
+  String inspectionDateTime = '';
+  String longitude = '';
+  String latitude = '';
+  String gpsLocation = '';
+  List<TeamInspectionModel> listCategory = const [];
+  TeamInspectionModel? selectedCategory;
+
+  List<CompanyInspectionModel> listCompany = const [];
+  CompanyInspectionModel? selectedCompany;
+
+  List<DivisionInspectionModel> listDivision = const [];
+  DivisionInspectionModel? selectedDivision;
+
+  bool isLoading = false;
+
+  final listInspectionCategory = ['ICT', 'EHS', 'ESTATE'];
+  final listInspectionCompany = ['ANJA', 'KAL', 'SMM'];
   final listInspectionDivisi = ['Divisi 1', 'Divisi 2', 'Divisi 3'];
-  final listUserAssign = ['User 1', 'User 2', 'User 3'];
+  final listUserAssign = ['Yogi', 'Ari', 'Adriansyah'];
   String? inspectionCategory;
   String? inspectionCompany;
   String? inspectionDivisi;
@@ -33,7 +63,88 @@ class _InspectionFormViewState extends State<InspectionFormView> {
 
   @override
   void initState() {
+    initData();
     super.initState();
+  }
+
+  void onLoading() => setState(() => isLoading = true);
+
+  void offLoading() => setState(() => isLoading = false);
+
+  Future<void> initData() async {
+    getInspectionId();
+    getInspectionDateTime();
+    await getCategory();
+    await getCompany();
+    await getDivision();
+    await getLocation();
+  }
+
+  void getInspectionId() {
+    final dateNow = DateTime.now();
+    final dateNowConvert = ValueService.generateIDFromDateTime(dateNow);
+    math.Random random = new math.Random();
+    var randomNumber = random.nextInt(100);
+    inspectionId = 'I$dateNowConvert$randomNumber';
+    log('cek inspection id : $inspectionId');
+    setState(() {});
+  }
+
+  void getInspectionDateTime() {
+    final dateNow = DateTime.now();
+    inspectionDateTime = DateFormat('dd-MM-yyyy HH:mm').format(dateNow);
+    log('cek inspection date time : $inspectionDateTime');
+    setState(() {});
+  }
+
+  Future<void> getLocation() async {
+    var position = await LocationService.getGPSLocation();
+    if (position != null) {
+      longitude = '${position.longitude}';
+      latitude = '${position.latitude}';
+      gpsLocation = "${position.longitude}, ${position.latitude}";
+    }
+    log('cek inspection location : $gpsLocation');
+    setState(() {});
+  }
+
+  Future<void> getCategory() async {
+    final data = await DatabaseTeamInspection.selectData();
+    listCategory = data;
+    log('cek list category : $listCategory');
+    setState(() {});
+  }
+
+  Future<void> getCompany() async {
+    final data = await DatabaseCompanyInspection.selectData();
+    listCompany = data;
+    log('cek list company : $listCompany');
+    setState(() {});
+  }
+
+  Future<void> getDivision() async {
+    final data = await DatabaseDivisionInspection.selectData();
+    listDivision = data;
+    log('cek list dision : $listDivision');
+    setState(() {});
+  }
+
+  Future<void> createInspection() async {
+    final ticketInspection = TicketInspectionModel(
+      id: inspectionId,
+      date: inspectionDateTime,
+      latitude: latitude,
+      longitude: longitude,
+      category: inspectionCategory ?? '-',
+      company: inspectionCompany ?? '-',
+      division: inspectionDivisi ?? '-',
+      report: inspectionController.text,
+      userAssign: userAssign ?? '-',
+      status: 'Waiting',
+      history: [],
+    );
+    await DatabaseTicketInspection.insertData(ticketInspection);
+    _navigationService.pop();
   }
 
   @override
@@ -58,20 +169,27 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                        'INSPECTION1${DateFormat('ddMMyyyy').format(DateTime.now())}'),
+                    Text(inspectionId),
                     SizedBox(height: 12),
                     Row(
                       children: [
                         Text('Tanggal :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(
-                                '${DateFormat('dd-MM-yyyy').format(DateTime.now())}',
+                            child: Text(inspectionDateTime,
                                 textAlign: TextAlign.end))
                       ],
                     ),
                     SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text('Lokasi Buat :'),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text(gpsLocation, textAlign: TextAlign.end))
+                      ],
+                    ),
+                    // SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(child: Text('Kategori :')),
@@ -101,7 +219,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 value: value,
                               );
                             }).toList(),
-                            onChanged: (String? value) {
+                            onChanged: (value) {
                               if (value != null) {
                                 inspectionCategory = value;
                                 setState(() {});
@@ -140,7 +258,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 value: value,
                               );
                             }).toList(),
-                            onChanged: (String? value) {
+                            onChanged: (value) {
                               if (value != null) {
                                 inspectionCompany = value;
                                 setState(() {});
@@ -179,7 +297,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 value: value,
                               );
                             }).toList(),
-                            onChanged: (String? value) {
+                            onChanged: (value) {
                               if (value != null) {
                                 inspectionDivisi = value;
                                 setState(() {});
@@ -300,8 +418,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {
-                        _navigationService.pop();
+                      onTap: () async {
+                        await createInspection();
                       },
                       child: Card(
                         color: Palette.primaryColorProd,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:epms/base/api/api_configuration.dart';
@@ -27,6 +28,8 @@ import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/model/sync_response_revamp.dart';
+import 'package:epms/model/synch_inspection_data.dart';
+import 'package:epms/model/synch_inspection_response.dart';
 import 'package:flutter/material.dart';
 
 class SynchRepository extends APIConfiguration {
@@ -84,36 +87,81 @@ class SynchRepository extends APIConfiguration {
     }
   }
 
+  void synchInspection(
+    BuildContext context,
+    Function(BuildContext context, SynchInspectionData data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek inspectionToken : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlSynchInspection =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/synch';
+      var responseSynchInspection =
+          await ioClient!.get(Uri.parse(urlSynchInspection), headers: headers);
+      log('cek url : $urlSynchInspection');
+      log('cek response synch inspection : ${responseSynchInspection.body}');
+      SynchInspectionResponse res = SynchInspectionResponse.fromJson(
+          jsonDecode(responseSynchInspection.body));
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error synch inspection : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error synch inspection : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error synch inspection : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error synch inspection : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
   Future<bool> deleteMasterData(BuildContext context) async {
-   try {
-     StorageManager.deleteData("lastSynchTime");
-     StorageManager.deleteData("lastSynchDate");
-     StorageManager.deleteData("estateCode");
-     DatabaseMEmployeeSchema().deleteMEmployeeSchema();
-     DatabaseMActivitySchema().deleteMActivitySchema();
-     DatabaseMCOPHSchema().deleteMCOPHSchema();
-     DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
-     DatabaseMCostControlSchema().deleteMCostControlSchema();
-     DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
-     DatabaseMDivisionSchema().deleteMDivisionSchema();
-     DatabaseMDestinationSchema().deleteMDestinationSchema();
-     DatabaseMMaterialSchema().deleteMMaterialSchema();
-     DatabaseMTPHSchema().deleteMTPHSchema();
-     DatabaseMVRASchema().deleteMVRASchema();
-     DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
-     DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
-     DatabaseTABWSchema().deleteTABWSchema();
-     DatabaseTHarvestingPlan().deleteTHarvestingPlan();
-     DatabaseLaporanRestan().deleteLaporanRestan();
-     DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
-     DatabaseMVendorSchema().deleteMVendorSchema();
-     DatabaseMEstateSchema().deleteMEstateSchema();
-     DatabaseAttendance().deleteEmployeeAttendance();
-     DatabaseMAttendance().deleteEmployeeAttendance();
-     DatabaseMBlockSchema().deleteMBlockSchema();
-     return true;
-   } catch (e) {
-     return false;
-   }
+    try {
+      StorageManager.deleteData("lastSynchTime");
+      StorageManager.deleteData("lastSynchDate");
+      StorageManager.deleteData("estateCode");
+      DatabaseMEmployeeSchema().deleteMEmployeeSchema();
+      DatabaseMActivitySchema().deleteMActivitySchema();
+      DatabaseMCOPHSchema().deleteMCOPHSchema();
+      DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
+      DatabaseMCostControlSchema().deleteMCostControlSchema();
+      DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
+      DatabaseMDivisionSchema().deleteMDivisionSchema();
+      DatabaseMDestinationSchema().deleteMDestinationSchema();
+      DatabaseMMaterialSchema().deleteMMaterialSchema();
+      DatabaseMTPHSchema().deleteMTPHSchema();
+      DatabaseMVRASchema().deleteMVRASchema();
+      DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
+      DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+      DatabaseTABWSchema().deleteTABWSchema();
+      DatabaseTHarvestingPlan().deleteTHarvestingPlan();
+      DatabaseLaporanRestan().deleteLaporanRestan();
+      DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
+      DatabaseMVendorSchema().deleteMVendorSchema();
+      DatabaseMEstateSchema().deleteMEstateSchema();
+      DatabaseAttendance().deleteEmployeeAttendance();
+      DatabaseMAttendance().deleteEmployeeAttendance();
+      DatabaseMBlockSchema().deleteMBlockSchema();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

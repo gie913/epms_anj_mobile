@@ -3,6 +3,7 @@ class Routes {
   static const LOGIN_PAGE = "/login";
   static const MAIN_PAGE = "/main";
   static const HOME_PAGE = "/home";
+  static const HOME_INSPECTION_PAGE = "/home-inspection";
 
   static const CONFIGURATION_PAGE = "/configuration";
   static const SUPERVISOR_FORM_PAGE = "/supervisor_form";

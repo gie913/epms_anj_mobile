@@ -1,14 +1,18 @@
+import 'dart:developer';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
+import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/service/database_activity.dart';
 import 'package:epms/database/service/database_attendance.dart';
 import 'package:epms/database/service/database_cost_control.dart';
 import 'package:epms/database/service/database_destination.dart';
 import 'package:epms/database/service/database_harvesting_plan.dart';
+import 'package:epms/database/service/database_access_inspection.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
 import 'package:epms/database/service/database_laporan_restan.dart';
 import 'package:epms/database/service/database_laporan_spb_kemarin.dart';
@@ -34,6 +38,8 @@ import 'package:epms/database/service/database_spb_loader.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_user_assignment.dart';
+import 'package:epms/database/service/database_user_inspection_config.dart';
+import 'package:epms/model/login_inspection_data.dart';
 import 'package:epms/model/login_response.dart';
 import 'package:epms/screen/login/login_repository.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +95,7 @@ class LoginNotifier extends ChangeNotifier {
   doLogin(BuildContext context) async {
     String? apiServer = await StorageManager.readData('apiServer');
     if (apiServer != null) {
+      log('Login Epms');
       if (_formKey.currentState!.validate()) {
         _loading = true;
         LoginRepository().doPostLogin(context, _username.text, _password.text,
@@ -96,14 +103,34 @@ class LoginNotifier extends ChangeNotifier {
         notifyListeners();
       }
     } else {
-      FlushBarManager.showFlushBarWarning(
-          context, "Server", "Anda belum melakukan konfigurasi server");
+      log('Login Inspection');
+      if (_formKey.currentState!.validate()) {
+        _loading = true;
+        LoginRepository().loginInspection(context, _username.text,
+            _password.text, onSuccessLoginInspection, onErrorLogin);
+        notifyListeners();
+      }
+      // FlushBarManager.showFlushBarWarning(
+      //     context, "Server", "Anda belum melakukan konfigurasi server");
     }
   }
 
   onSuccessLogin(BuildContext context, LoginResponse loginResponse) {
     _loading = false;
     saveDatabase(context, _username.text, loginResponse);
+    FlushBarManager.showFlushBarSuccess(
+        context, "Login Berhasil", "Anda berhasil login");
+    _navigationService.push(Routes.SYNCH_PAGE);
+    notifyListeners();
+  }
+
+  onSuccessLoginInspection(
+      BuildContext context, LoginInspectionData data) async {
+    _loading = false;
+    await saveDatabaseInspection(context, data);
+    FlushBarManager.showFlushBarSuccess(
+        context, "Login Berhasil", "Anda berhasil login");
+    _navigationService.push(Routes.SYNCH_PAGE);
     notifyListeners();
   }
 
@@ -124,10 +151,15 @@ class LoginNotifier extends ChangeNotifier {
       StorageManager.saveData('userRoles', loginResponse.userRole);
       StorageManager.saveData("userName", username);
       StorageManager.saveData("userToken", loginResponse.userToken);
-      FlushBarManager.showFlushBarSuccess(
-          context, "Login Berhasil", "Anda berhasil login");
-      _navigationService.push(Routes.SYNCH_PAGE);
     }
+  }
+
+  Future<void> saveDatabaseInspection(
+      BuildContext context, LoginInspectionData data) async {
+    StorageManager.saveData("inspectionToken", data.token);
+    StorageManager.saveData('inspectionTokenExpired', data.tokenExpiredAt);
+    await DatabaseUserInspectionConfig.insetData(data.user);
+    await DatabaseAccessInspection.insetData(data.access);
   }
 
   onPressResetData(BuildContext context) {
@@ -179,6 +211,10 @@ class LoginNotifier extends ChangeNotifier {
       DatabaseSPBDetail().deleteSPBDetail();
       DatabaseSPBLoader().deleteSPBLoader();
       DatabaseSPBSupervise().deleteSPBSupervise();
+      // Inspection
+      StorageManager.deleteData("inspectionToken");
+      StorageManager.deleteData("inspectionTokenExpired");
+      DatabaseHelper().deleteMasterDataInspection();
       _dialogService.popDialog();
       FlushBarManager.showFlushBarSuccess(
           _navigationService.navigatorKey.currentContext!,

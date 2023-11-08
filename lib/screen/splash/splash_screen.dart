@@ -6,30 +6,7 @@ import 'package:epms/base/constants/image_assets.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
-import 'package:epms/database/service/database_activity.dart';
-import 'package:epms/database/service/database_attendance.dart';
-import 'package:epms/database/service/database_cost_control.dart';
-import 'package:epms/database/service/database_destination.dart';
-import 'package:epms/database/service/database_harvesting_plan.dart';
-import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
-import 'package:epms/database/service/database_laporan_restan.dart';
-import 'package:epms/database/service/database_laporan_spb_kemarin.dart';
-import 'package:epms/database/service/database_m_ancak_employee.dart';
-import 'package:epms/database/service/database_m_attendance.dart';
-import 'package:epms/database/service/database_m_block.dart';
-import 'package:epms/database/service/database_m_customer_code.dart';
-import 'package:epms/database/service/database_m_division.dart';
-import 'package:epms/database/service/database_m_employee.dart';
-import 'package:epms/database/service/database_m_estate.dart';
-import 'package:epms/database/service/database_m_material.dart';
-import 'package:epms/database/service/database_m_tph.dart';
-import 'package:epms/database/service/database_m_vendor.dart';
-import 'package:epms/database/service/database_m_vra.dart';
-import 'package:epms/database/service/database_mc_oph.dart';
-import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_supervisor.dart';
-import 'package:epms/database/service/database_t_abw.dart';
-import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/model/supervisor.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -69,6 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void autoLogIn() async {
     dynamic session = await StorageManager.readData('userToken');
+    dynamic inspectionToken = await StorageManager.readData("inspectionToken");
     dynamic lastSynchDate = await StorageManager.readData('lastSynchDate');
     String? roles = await StorageManager.readData('userRoles');
     Permission.location.request();
@@ -88,23 +66,25 @@ class _SplashScreenState extends State<SplashScreen> {
             navigationService.push(Routes.HOME_PAGE);
           }
         }
+      } else if (inspectionToken != null) {
+        navigationService.push(Routes.HOME_INSPECTION_PAGE);
       } else {
         navigationService.push(Routes.LOGIN_PAGE);
       }
     });
   }
 
-  onSuccess() {
-    deleteMasterData();
-    StorageManager.deleteData('userId');
-    StorageManager.deleteData('userToken');
-    StorageManager.deleteData("setTime");
-    navigationService.push(Routes.LOGIN_PAGE);
-  }
+  // onSuccess() {
+  //   deleteMasterData();
+  //   StorageManager.deleteData('userId');
+  //   StorageManager.deleteData('userToken');
+  //   StorageManager.deleteData("setTime");
+  //   navigationService.push(Routes.LOGIN_PAGE);
+  // }
 
-  onError(String response) {
-    navigationService.push(Routes.HOME_PAGE);
-  }
+  // onError(String response) {
+  //   navigationService.push(Routes.HOME_PAGE);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -118,35 +98,35 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Future<bool> deleteMasterData() async {
-    try {
-      DatabaseMActivitySchema().deleteMActivitySchema();
-      DatabaseMCOPHSchema().deleteMCOPHSchema();
-      DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
-      DatabaseMCostControlSchema().deleteMCostControlSchema();
-      DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
-      DatabaseMDivisionSchema().deleteMDivisionSchema();
-      DatabaseMDestinationSchema().deleteMDestinationSchema();
-      DatabaseMMaterialSchema().deleteMMaterialSchema();
-      DatabaseMTPHSchema().deleteMTPHSchema();
-      DatabaseMVRASchema().deleteMVRASchema();
-      DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
-      DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
-      DatabaseTABWSchema().deleteTABWSchema();
-      DatabaseTHarvestingPlan().deleteTHarvestingPlan();
-      DatabaseLaporanRestan().deleteLaporanRestan();
-      DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
-      DatabaseMVendorSchema().deleteMVendorSchema();
-      DatabaseMEstateSchema().deleteMEstateSchema();
-      DatabaseMEmployeeSchema().deleteMEmployeeSchema();
-      DatabaseAttendance().deleteEmployeeAttendance();
-      DatabaseMAttendance().deleteEmployeeAttendance();
-      DatabaseMBlockSchema().deleteMBlockSchema();
-      DatabaseMAncakEmployee().deleteMAncakEmployeeSchema();
-      DatabaseTABWSchema().deleteTABWSchema();
-      return true;
-    } catch (E) {
-      return false;
-    }
-  }
+  // Future<bool> deleteMasterData() async {
+  //   try {
+  //     DatabaseMActivitySchema().deleteMActivitySchema();
+  //     DatabaseMCOPHSchema().deleteMCOPHSchema();
+  //     DatabaseMCSPBCardSchema().deleteMCSPBCardSchema();
+  //     DatabaseMCostControlSchema().deleteMCostControlSchema();
+  //     DatabaseMCustomerCodeSchema().deleteMCustomerCodeSchema();
+  //     DatabaseMDivisionSchema().deleteMDivisionSchema();
+  //     DatabaseMDestinationSchema().deleteMDestinationSchema();
+  //     DatabaseMMaterialSchema().deleteMMaterialSchema();
+  //     DatabaseMTPHSchema().deleteMTPHSchema();
+  //     DatabaseMVRASchema().deleteMVRASchema();
+  //     DatabaseTUserAssignment().deleteEmployeeTUserAssignment();
+  //     DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+  //     DatabaseTABWSchema().deleteTABWSchema();
+  //     DatabaseTHarvestingPlan().deleteTHarvestingPlan();
+  //     DatabaseLaporanRestan().deleteLaporanRestan();
+  //     DatabaseLaporanSPBKemarin().deleteLaporanSPBKemarin();
+  //     DatabaseMVendorSchema().deleteMVendorSchema();
+  //     DatabaseMEstateSchema().deleteMEstateSchema();
+  //     DatabaseMEmployeeSchema().deleteMEmployeeSchema();
+  //     DatabaseAttendance().deleteEmployeeAttendance();
+  //     DatabaseMAttendance().deleteEmployeeAttendance();
+  //     DatabaseMBlockSchema().deleteMBlockSchema();
+  //     DatabaseMAncakEmployee().deleteMAncakEmployeeSchema();
+  //     DatabaseTABWSchema().deleteTABWSchema();
+  //     return true;
+  //   } catch (E) {
+  //     return false;
+  //   }
+  // }
 }

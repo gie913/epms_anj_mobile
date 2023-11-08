@@ -116,7 +116,8 @@ class DetailOPHNotifier extends ChangeNotifier {
 
   onPressCancelRead() {
     _dialogService.popDialog();
-    _navigationService.push(Routes.HOME_PAGE);
+    // _navigationService.push(Routes.HOME_PAGE);
+    _navigationService.pop();
   }
 
   void blockNumberCheck(BuildContext context, String block) async {

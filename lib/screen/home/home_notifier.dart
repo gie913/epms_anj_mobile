@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
+import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/service/database_attendance.dart';
 import 'package:epms/database/service/database_harvesting_plan.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
@@ -150,6 +153,9 @@ class HomeNotifier extends ChangeNotifier {
     StorageManager.deleteData('userId');
     StorageManager.deleteData('userToken');
     StorageManager.deleteData("setTime");
+    StorageManager.deleteData("inspectionToken");
+    StorageManager.deleteData("inspectionTokenExpired");
+    DatabaseHelper().deleteMasterDataInspection();
     _dialogService.popDialog();
     _navigationService.push(Routes.LOGIN_PAGE);
   }
@@ -176,6 +182,7 @@ class HomeNotifier extends ChangeNotifier {
 
   onInitHome() async {
     _role = await StorageManager.readData('userRoles');
+    log('Cek Role : $_role');
     notifyListeners();
   }
 
@@ -218,5 +225,8 @@ class HomeNotifier extends ChangeNotifier {
     DatabaseMAncakEmployee().deleteMAncakEmployeeSchema();
     DatabaseTABWSchema().deleteTABWSchema();
     DatabaseTAuth().deleteTAuth();
+    // Inspection
+    // DatabaseUserInspectionConfig.deleteTable();
+    // DatabaseInspectionAccess.deleteTable();
   }
 }

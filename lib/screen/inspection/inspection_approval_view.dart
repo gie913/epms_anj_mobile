@@ -3,14 +3,18 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/model/history_inspection_model.dart';
+import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class InspectionApprovalView extends StatefulWidget {
   const InspectionApprovalView({super.key, required this.data});
 
-  final Map<String, dynamic> data;
+  final TicketInspectionModel data;
 
   @override
   State<InspectionApprovalView> createState() => _InspectionApprovalViewState();
@@ -19,16 +23,21 @@ class InspectionApprovalView extends StatefulWidget {
 class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   NavigatorService _navigationService = locator<NavigatorService>();
   final inspectionController = TextEditingController();
-  final actionController = TextEditingController();
   final noteController = TextEditingController();
   final listAction = ['Close', 'Revisi', 'Need Consultation'];
-  final listUserConsultation = ['User 1', 'User 2', 'User 3'];
+  final listUserConsultation = [
+    'Khairul Nasution',
+    'Satria Pinandito',
+    'Nelson Suwiko'
+  ];
   String? action;
   String? userConsultation;
+  List<HistoryInspectionModel> listHistoryInspection = [];
 
   @override
   void initState() {
-    inspectionController.text = widget.data['report'];
+    inspectionController.text = widget.data.report;
+    listHistoryInspection = widget.data.history;
     setState(() {});
     super.initState();
   }
@@ -36,9 +45,38 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   @override
   void dispose() {
     inspectionController.dispose();
-    actionController.dispose();
     noteController.dispose();
     super.dispose();
+  }
+
+  Future<void> submit() async {
+    final dataHistory = HistoryInspectionModel(
+      user: 'Andrian Arsil',
+      category: widget.data.category,
+      company: widget.data.company,
+      division: widget.data.division,
+      userReAssign: listHistoryInspection.last.userReAssign,
+      userConsultation: userConsultation ?? '',
+      response: noteController.text.isNotEmpty ? noteController.text : '-',
+      status: action ?? '-',
+      date: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+    );
+    listHistoryInspection.add(dataHistory);
+    final dataInspection = TicketInspectionModel(
+      id: widget.data.id,
+      date: widget.data.date,
+      category: widget.data.category,
+      company: widget.data.company,
+      division: widget.data.division,
+      latitude: widget.data.latitude,
+      longitude: widget.data.longitude,
+      report: widget.data.report,
+      userAssign: widget.data.userAssign,
+      status: action ?? '-',
+      history: listHistoryInspection,
+    );
+    await DatabaseTicketInspection.updateData(dataInspection);
+    _navigationService.pop();
   }
 
   @override
@@ -55,7 +93,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.data['id']),
+                    Text(widget.data.id),
                     SizedBox(height: 12),
                     Row(
                       children: [
@@ -63,7 +101,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         SizedBox(width: 12),
                         Expanded(
                             child: Text(
-                                '${widget.data['longitude']},${widget.data['latitude']}',
+                                '${widget.data.longitude},${widget.data.latitude}',
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -73,7 +111,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Tanggal :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['date'],
+                            child: Text(widget.data.date,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -83,7 +121,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Kategori :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['category'],
+                            child: Text(widget.data.category,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -93,7 +131,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Company :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['company'],
+                            child: Text(widget.data.company,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -103,7 +141,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Divisi :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['divisi'],
+                            child: Text(widget.data.division,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -113,7 +151,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('User Assign :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['user_assign'],
+                            child: Text(widget.data.userAssign,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -154,134 +192,35 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Status :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data['status'],
+                            child: Text(widget.data.status,
                                 textAlign: TextAlign.end))
                       ],
                     ),
                     SizedBox(height: 12),
-                    if ((widget.data['history'] as List).isNotEmpty)
-                      Text('Riwayat Tindakan :'),
-                    ...(widget.data['history'] as List).map((item) {
-                      return Card(
-                        color: Palette.primaryColorProd,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['user'],
-                                      style: Style.whiteBold14.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.normal),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Tanggal :',
-                                          style: Style.whiteBold12.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            item['date'],
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Kategori :',
-                                          style: Style.whiteBold12.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            item['category'],
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Company :',
-                                          style: Style.whiteBold12.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            item['company'],
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Divisi :',
-                                          style: Style.whiteBold12.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            item['divisi'],
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Tindakan :',
-                                          style: Style.whiteBold12.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            item['response'].toString().isEmpty
-                                                ? '-'
-                                                : item['response'],
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    if (item['user_re_assign']
-                                        .toString()
-                                        .isNotEmpty)
+                    Text('Riwayat Tindakan :'),
+                    if (widget.data.history.isNotEmpty)
+                      ...widget.data.history.map((item) {
+                        return Card(
+                          color: Palette.primaryColorProd,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.user,
+                                        style: Style.whiteBold14.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.normal),
+                                      ),
                                       Row(
                                         children: [
                                           Text(
-                                            'User Re-Assign :',
+                                            'Tanggal :',
                                             style: Style.whiteBold12.copyWith(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.normal),
@@ -289,7 +228,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                           SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
-                                              item['user_re_assign'],
+                                              item.date,
                                               style: Style.whiteBold12.copyWith(
                                                   color: Colors.white,
                                                   fontWeight:
@@ -298,21 +237,155 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                           )
                                         ],
                                       ),
-                                  ],
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Kategori :',
+                                            style: Style.whiteBold12.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              item.category,
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Company :',
+                                            style: Style.whiteBold12.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              item.company,
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Divisi :',
+                                            style: Style.whiteBold12.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              item.division,
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Tindakan :',
+                                            style: Style.whiteBold12.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              item.response.isEmpty
+                                                  ? '-'
+                                                  : item.response,
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      if (item.userReAssign.isNotEmpty)
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'User Re-Assign :',
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                            SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                item.userReAssign,
+                                                style: Style.whiteBold12
+                                                    .copyWith(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      if (item.userConsultation.isNotEmpty)
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'User Consultation :',
+                                              style: Style.whiteBold12.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                            SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                item.userConsultation,
+                                                style: Style.whiteBold12
+                                                    .copyWith(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 12),
-                              Text(
-                                item['status'],
-                                style: Style.whiteBold12.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal),
-                              )
-                            ],
+                                SizedBox(width: 12),
+                                Text(
+                                  item.status,
+                                  style: Style.whiteBold12.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.normal),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList()
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                            child: const Text('Belum Ada Riwayat Tindakan')),
+                      ),
                     // Text('Tindakan :'),
                     // SizedBox(height: 6),
                     // InputPrimary(
@@ -355,6 +428,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                             onChanged: (String? value) {
                               if (value != null) {
                                 action = value;
+                                noteController.clear();
+                                userConsultation = null;
                                 setState(() {});
                               }
                             },
@@ -437,8 +512,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {
-                        _navigationService.pop();
+                      onTap: () async {
+                        await submit();
                       },
                       child: Card(
                         color: Palette.primaryColorProd,

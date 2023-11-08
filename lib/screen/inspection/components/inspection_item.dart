@@ -1,5 +1,6 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:flutter/material.dart';
 
 class InspectionItem extends StatelessWidget {
@@ -10,7 +11,7 @@ class InspectionItem extends StatelessWidget {
   });
 
   final Function() onTap;
-  final Map<String, dynamic> data;
+  final TicketInspectionModel data;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class InspectionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['id'],
+                      data.id,
                       style: Style.whiteBold12.copyWith(
                           color: Colors.white, fontWeight: FontWeight.normal),
                     ),
@@ -42,7 +43,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data['date'],
+                            data.date,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -61,7 +62,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data['category'],
+                            data.category,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -80,7 +81,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data['company'],
+                            data.company,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -99,7 +100,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data['divisi'],
+                            data.division,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -118,7 +119,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data['user_assign'],
+                            data.userAssign,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -131,7 +132,7 @@ class InspectionItem extends StatelessWidget {
               ),
               SizedBox(width: 12),
               Text(
-                data['status'],
+                data.status,
                 style: Style.whiteBold12.copyWith(
                     color: Colors.white, fontWeight: FontWeight.normal),
               )
