@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
@@ -6,6 +8,7 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
+import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -52,9 +55,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   Future<void> submit() async {
     final dataHistory = HistoryInspectionModel(
       user: 'Andrian Arsil',
-      category: widget.data.category,
-      company: widget.data.company,
-      division: widget.data.division,
       userReAssign: listHistoryInspection.last.userReAssign,
       userConsultation: userConsultation ?? '',
       response: noteController.text.isNotEmpty ? noteController.text : '-',
@@ -73,6 +73,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
       report: widget.data.report,
       userAssign: widget.data.userAssign,
       status: action ?? '-',
+      images: widget.data.images,
       history: listHistoryInspection,
     );
     await DatabaseTicketInspection.updateData(dataInspection);
@@ -165,13 +166,17 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                           height: MediaQuery.of(context).size.width / 4,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: 4,
+                            itemCount: widget.data.images.length,
                             itemBuilder: (context, index) {
-                              return Container(
-                                width: MediaQuery.of(context).size.width / 4,
-                                height: MediaQuery.of(context).size.width / 4,
-                                color: Colors.amber,
-                                margin: EdgeInsets.only(right: 12),
+                              final image = widget.data.images[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: Image.file(
+                                  File(image),
+                                  width: MediaQuery.of(context).size.width / 4,
+                                  height: MediaQuery.of(context).size.width / 4,
+                                  fit: BoxFit.fill,
+                                ),
                               );
                             },
                           ),
@@ -199,187 +204,9 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                     SizedBox(height: 12),
                     Text('Riwayat Tindakan :'),
                     if (widget.data.history.isNotEmpty)
-                      ...widget.data.history.map((item) {
-                        return Card(
-                          color: Palette.primaryColorProd,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.user,
-                                        style: Style.whiteBold14.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Tanggal :',
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.date,
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Kategori :',
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.category,
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Company :',
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.company,
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Divisi :',
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.division,
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Tindakan :',
-                                            style: Style.whiteBold12.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.response.isEmpty
-                                                  ? '-'
-                                                  : item.response,
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      if (item.userReAssign.isNotEmpty)
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'User Re-Assign :',
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                item.userReAssign,
-                                                style: Style.whiteBold12
-                                                    .copyWith(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.normal),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      if (item.userConsultation.isNotEmpty)
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'User Consultation :',
-                                              style: Style.whiteBold12.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                item.userConsultation,
-                                                style: Style.whiteBold12
-                                                    .copyWith(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.normal),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Text(
-                                  item.status,
-                                  style: Style.whiteBold12.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.normal),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList()
+                      ...widget.data.history
+                          .map((item) => CardHistoryInspection(data: item))
+                          .toList()
                     else
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),

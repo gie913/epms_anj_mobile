@@ -14,6 +14,7 @@ class TicketInspectionModel {
     this.userAssign = '',
     this.status = '',
     this.report = '',
+    this.images = const [],
     this.history = const <HistoryInspectionModel>[],
   });
 
@@ -50,6 +51,11 @@ class TicketInspectionModel {
         userAssign: json['user_assign'] ?? '',
         status: json['status'] ?? '',
         report: json['report'] ?? '',
+        images: json['images'] != null
+            ? List.from(
+                (jsonDecode(json['images']) as List).map((e) => e),
+              )
+            : [],
         history: json['history'] != null
             ? List<HistoryInspectionModel>.from(
                 (jsonDecode(json['history']) as List).map((e) {
@@ -69,6 +75,7 @@ class TicketInspectionModel {
   final String userAssign;
   final String status;
   final String report;
+  final List images;
   final List<HistoryInspectionModel> history;
 
   Map<String, dynamic> toJson() {
@@ -84,6 +91,7 @@ class TicketInspectionModel {
     tempData['user_assign'] = userAssign;
     tempData['status'] = status;
     tempData['report'] = report;
+    tempData['images'] = List.from(images.map((e) => e));
     tempData['history'] = List.from(history.map((e) => e.toJson()));
 
     return tempData;
@@ -102,6 +110,7 @@ class TicketInspectionModel {
     tempData['user_assign'] = userAssign;
     tempData['status'] = status;
     tempData['report'] = report;
+    tempData['images'] = jsonEncode(List.from(images.map((e) => e)));
     tempData['history'] = jsonEncode(List.from(history.map((e) => e.toJson())));
 
     return tempData;
@@ -109,6 +118,6 @@ class TicketInspectionModel {
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, date: $date, longitude: $longitude, latitude: $latitude, category: $category, company: $company, division: $division, user_assign: $userAssign, status: $status, report: $report, history: $history)';
+    return 'TicketInspectionModel(id: $id, date: $date, longitude: $longitude, latitude: $latitude, category: $category, company: $company, division: $division, user_assign: $userAssign, status: $status, report: $report, images: ${images.length} item, history: $history)';
   }
 }

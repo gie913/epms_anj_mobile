@@ -9,5 +9,6 @@ class TicketInspectionEntity {
   static String userAssign = "user_assign";
   static String status = "status";
   static String report = "report";
+  static String images = 'images';
   static String history = "history";
 }

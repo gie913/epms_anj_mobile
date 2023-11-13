@@ -19,6 +19,7 @@ class DatabaseTicketInspection {
        ${TicketInspectionEntity.userAssign} TEXT,
        ${TicketInspectionEntity.status} TEXT,
        ${TicketInspectionEntity.report} TEXT,
+       ${TicketInspectionEntity.images} TEXT,
        ${TicketInspectionEntity.history} TEXT)
     ''');
   }

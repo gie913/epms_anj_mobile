@@ -21,6 +21,7 @@ import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -141,6 +142,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
       report: inspectionController.text,
       userAssign: userAssign ?? '-',
       status: 'Waiting',
+      images: listInspectionPhoto,
       history: [],
     );
     await DatabaseTicketInspection.insertData(ticketInspection);
@@ -386,8 +388,10 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                     InkWell(
                       onTap: () async {
                         if (listInspectionPhoto.length != 4) {
-                          final result =
-                              await CameraService.getImageByCamera(context);
+                          final result = await CameraService.getImage(
+                            context,
+                            imageSource: ImageSource.camera,
+                          );
                           if (result != null) {
                             listInspectionPhoto.add(result);
                             setState(() {});
@@ -409,7 +413,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              "FOTO HASIL INSPECTION",
+                              "LAMPIRKAN FOTO",
                               style: Style.whiteBold14,
                               textAlign: TextAlign.center,
                             ),
