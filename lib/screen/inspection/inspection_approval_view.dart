@@ -80,6 +80,32 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
     _navigationService.pop();
   }
 
+  void showFoto(BuildContext context, String imagePath) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      useSafeArea: false,
+      builder: (context) {
+        return MediaQuery(
+          data: Style.mediaQueryText(context),
+          child: AlertDialog(
+            insetPadding: EdgeInsets.all(16),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 1.5,
+              child: Image.file(
+                File(imagePath),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 1.5,
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
@@ -171,11 +197,18 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                               final image = widget.data.images[index];
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
-                                child: Image.file(
-                                  File(image),
-                                  width: MediaQuery.of(context).size.width / 4,
-                                  height: MediaQuery.of(context).size.width / 4,
-                                  fit: BoxFit.fill,
+                                child: InkWell(
+                                  onTap: () {
+                                    showFoto(context, image);
+                                  },
+                                  child: Image.file(
+                                    File(image),
+                                    width:
+                                        MediaQuery.of(context).size.width / 4,
+                                    height:
+                                        MediaQuery.of(context).size.width / 4,
+                                    fit: BoxFit.fill,
+                                  ),
                                 ),
                               );
                             },

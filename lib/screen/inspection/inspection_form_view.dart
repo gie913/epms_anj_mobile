@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:epms/base/common/locator.dart';
@@ -153,6 +154,98 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   void dispose() {
     inspectionController.dispose();
     super.dispose();
+  }
+
+  void showDialogOptionTakeFoto(
+    BuildContext context, {
+    required Function() onTapCamera,
+    required Function() onTapGalery,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return MediaQuery(
+          data: Style.mediaQueryText(context),
+          child: AlertDialog(
+            title: Center(
+                child: Text('Ambil Foto Melalui', style: Style.textBold14)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Palette.primaryColorProd,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: BorderSide(color: Palette.primaryColorProd)),
+                    padding: const EdgeInsets.all(16.0),
+                    textStyle:
+                        const TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onTapCamera();
+                  },
+                  child: Text("KAMERA",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(height: 12),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Palette.primaryColorProd,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: BorderSide(color: Palette.primaryColorProd)),
+                    padding: const EdgeInsets.all(16.0),
+                    textStyle:
+                        const TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onTapGalery();
+                  },
+                  child: Text("GALERI",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showFoto(BuildContext context, String imagePath) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      useSafeArea: false,
+      builder: (context) {
+        return MediaQuery(
+          data: Style.mediaQueryText(context),
+          child: AlertDialog(
+            insetPadding: EdgeInsets.all(16),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 1.5,
+              child: Image.file(
+                File(imagePath),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 1.5,
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -373,6 +466,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   padding: const EdgeInsets.only(right: 12),
                                   child: InspectionPhoto(
                                     imagePath: imagePath,
+                                    onTapView: () {
+                                      showFoto(context, imagePath);
+                                    },
                                     onTapRemove: () {
                                       listInspectionPhoto.remove(imagePath);
                                       setState(() {});
@@ -386,21 +482,36 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         ],
                       ),
                     InkWell(
-                      onTap: () async {
-                        if (listInspectionPhoto.length != 4) {
-                          final result = await CameraService.getImage(
+                      onTap: () {
+                        if (listInspectionPhoto.length < 5) {
+                          showDialogOptionTakeFoto(
                             context,
-                            imageSource: ImageSource.camera,
+                            onTapCamera: () async {
+                              final result = await CameraService.getImage(
+                                context,
+                                imageSource: ImageSource.camera,
+                              );
+                              if (result != null) {
+                                listInspectionPhoto.add(result);
+                                setState(() {});
+                              }
+                            },
+                            onTapGalery: () async {
+                              final result = await CameraService.getImage(
+                                context,
+                                imageSource: ImageSource.gallery,
+                              );
+                              if (result != null) {
+                                listInspectionPhoto.add(result);
+                                setState(() {});
+                              }
+                            },
                           );
-                          if (result != null) {
-                            listInspectionPhoto.add(result);
-                            setState(() {});
-                          }
                         } else {
                           FlushBarManager.showFlushBarWarning(
                               _navigationService.navigatorKey.currentContext!,
                               "Foto Inspection",
-                              "Maksimal 4 foto yang dapat Anda lampirkan");
+                              "Maksimal 5 foto yang dapat Anda lampirkan");
                         }
                       },
                       child: Card(
