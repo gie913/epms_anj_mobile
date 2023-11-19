@@ -10,7 +10,7 @@ class DatabaseActionInspection {
     await db.execute('''
       CREATE TABLE $actionInspectionTable(
        ${ActionInspectionEntity.name} TEXT,
-       ${ActionInspectionEntity.parameter} TEXT)
+       ${ActionInspectionEntity.options} TEXT)
     ''');
   }
 
@@ -24,9 +24,13 @@ class DatabaseActionInspection {
     await batch.commit();
   }
 
-  static Future<ActionInspectionModel> selectData() async {
+  static Future<ActionInspectionModel> selectDataByStatus(String status) async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(actionInspectionTable);
+    var mapList = await db.query(
+      actionInspectionTable,
+      where: "${ActionInspectionEntity.name}=?",
+      whereArgs: [status],
+    );
     ActionInspectionModel data =
         ActionInspectionModel.fromDatabase(mapList.first);
     return data;

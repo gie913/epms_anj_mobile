@@ -15,10 +15,12 @@ import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_division_inspection.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/model/company_inspection_model.dart';
 import 'package:epms/model/division_inspection_model.dart';
 import 'package:epms/model/team_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
+import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +40,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
 
   String inspectionId = '';
   String inspectionDateTime = '';
-  String longitude = '';
-  String latitude = '';
+  double longitude = 0;
+  double latitude = 0;
   String gpsLocation = '';
+
+  List<UserInspectionModel> listUserInspection = const [];
+  UserInspectionModel? selectedUserInspection;
+
   List<TeamInspectionModel> listCategory = const [];
   TeamInspectionModel? selectedCategory;
 
@@ -60,7 +66,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   String? inspectionCompany;
   String? inspectionDivisi;
   String? userAssign;
-  final inspectionController = TextEditingController();
+  final desctiptionController = TextEditingController();
   final listInspectionPhoto = [];
 
   @override
@@ -76,6 +82,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   Future<void> initData() async {
     getInspectionId();
     getInspectionDateTime();
+    await getUserInspection();
     await getCategory();
     await getCompany();
     await getDivision();
@@ -94,7 +101,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
 
   void getInspectionDateTime() {
     final dateNow = DateTime.now();
-    inspectionDateTime = DateFormat('dd-MM-yyyy HH:mm').format(dateNow);
+    inspectionDateTime = DateFormat('dd-MM-yyyy HH:mm:ss').format(dateNow);
     log('cek inspection date time : $inspectionDateTime');
     setState(() {});
   }
@@ -102,11 +109,18 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   Future<void> getLocation() async {
     var position = await LocationService.getGPSLocation();
     if (position != null) {
-      longitude = '${position.longitude}';
-      latitude = '${position.latitude}';
+      longitude = position.longitude;
+      latitude = position.latitude;
       gpsLocation = "${position.longitude}, ${position.latitude}";
     }
     log('cek inspection location : $gpsLocation');
+    setState(() {});
+  }
+
+  Future<void> getUserInspection() async {
+    final data = await DatabaseUserInspection.selectData();
+    listUserInspection = data;
+    log('cek list user inspection : $listUserInspection');
     setState(() {});
   }
 
@@ -131,28 +145,63 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     setState(() {});
   }
 
+  void initialSelectedUser() {
+    if (selectedCategory?.name != 'Estate') {
+      selectedUserInspection = listUserInspection.first;
+      setState(() {});
+    }
+  }
+
   Future<void> createInspection() async {
     final ticketInspection = TicketInspectionModel(
       id: inspectionId,
       date: inspectionDateTime,
       latitude: latitude,
       longitude: longitude,
-      category: inspectionCategory ?? '-',
-      company: inspectionCompany ?? '-',
-      division: inspectionDivisi ?? '-',
-      report: inspectionController.text,
-      userAssign: userAssign ?? '-',
-      status: 'Waiting',
+      category: selectedCategory != null ? selectedCategory!.name : '-',
+      company: selectedCompany != null ? selectedCompany!.alias : '-',
+      division: selectedDivision != null
+          ? 'Estate ${selectedDivision!.estateCode} | ${selectedDivision!.name}'
+          : '-',
+      description: desctiptionController.text,
+      userAssign:
+          selectedUserInspection != null ? selectedUserInspection!.name : '-',
+      status: 'waiting',
+      assignedTo:
+          selectedUserInspection != null ? selectedUserInspection!.id : '-',
+      mTeamId: selectedCategory != null ? selectedCategory!.id : '-',
+      mCompanyId: selectedCompany != null ? selectedCompany!.id : '-',
+      mDivisionId: selectedDivision != null ? selectedDivision!.id : '',
       images: listInspectionPhoto,
       history: [],
     );
+    // final ticketInspection = TicketInspectionModel(
+    //   id: inspectionId,
+    //   date: inspectionDateTime,
+    //   latitude: latitude,
+    //   longitude: longitude,
+    //   category: inspectionCategory ?? '-',
+    //   company: inspectionCompany ?? '-',
+    //   division: inspectionDivisi ?? '-',
+    //   report: inspectionController.text,
+    //   userAssign: userAssign ?? '-',
+    //   status: 'Waiting',
+    //   images: listInspectionPhoto,
+    //   history: [],
+    // );
     await DatabaseTicketInspection.insertData(ticketInspection);
+    // await InspectionRepository().createInspection(
+    //   context,
+    //   ticketInspection,
+    //   (context, successMessage) {},
+    //   (context, errorMessage) {},
+    // );
     _navigationService.pop();
   }
 
   @override
   void dispose() {
-    inspectionController.dispose();
+    desctiptionController.dispose();
     super.dispose();
   }
 
@@ -284,7 +333,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                             child: Text(gpsLocation, textAlign: TextAlign.end))
                       ],
                     ),
-                    // SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(child: Text('Kategori :')),
@@ -298,7 +346,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   fontWeight: FontWeight.normal,
                                   color: Colors.grey),
                             ),
-                            value: inspectionCategory,
+                            value: selectedCategory,
                             style: Style.whiteBold14.copyWith(
                               fontWeight: FontWeight.normal,
                               color: themeNotifier.status == true ||
@@ -308,15 +356,16 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                            items: listInspectionCategory.map((value) {
+                            items: listCategory.map((value) {
                               return DropdownMenuItem(
-                                child: Text(value),
+                                child: Text(value.name),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (value) {
                               if (value != null) {
-                                inspectionCategory = value;
+                                selectedCategory = value;
+                                log('selectedCategory : $selectedCategory');
                                 setState(() {});
                               }
                             },
@@ -337,7 +386,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   fontWeight: FontWeight.normal,
                                   color: Colors.grey),
                             ),
-                            value: inspectionCompany,
+                            value: selectedCompany,
                             style: Style.whiteBold14.copyWith(
                               fontWeight: FontWeight.normal,
                               color: themeNotifier.status == true ||
@@ -347,15 +396,17 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                            items: listInspectionCompany.map((value) {
+                            items: listCompany.map((value) {
                               return DropdownMenuItem(
-                                child: Text(value),
+                                child: Text(value.alias),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (value) {
                               if (value != null) {
-                                inspectionCompany = value;
+                                selectedCompany = value;
+                                initialSelectedUser();
+                                log('selectedCompany : $selectedCompany');
                                 setState(() {});
                               }
                             },
@@ -363,45 +414,50 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         )
                       ],
                     ),
-                    Row(
-                      children: [
-                        Expanded(child: Text('Divisi :')),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButton(
-                            isExpanded: true,
-                            hint: Text(
-                              "Pilih Divisi",
+                    if (selectedCategory?.name == 'Estate')
+                      Row(
+                        children: [
+                          Expanded(child: Text('Divisi :')),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButton(
+                              isExpanded: true,
+                              hint: Text(
+                                "Pilih Divisi",
+                                style: Style.whiteBold14.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.grey),
+                              ),
+                              value: selectedDivision,
                               style: Style.whiteBold14.copyWith(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.grey),
+                                fontWeight: FontWeight.normal,
+                                color: themeNotifier.status == true ||
+                                        MediaQuery.of(context)
+                                                .platformBrightness ==
+                                            Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              items: listDivision.map((value) {
+                                return DropdownMenuItem(
+                                  child: Text(
+                                      'Estate ${value.estateCode} | ${value.name}'),
+                                  value: value,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  selectedDivision = value;
+                                  selectedUserInspection =
+                                      listUserInspection.first;
+                                  log('selected divisi : $selectedDivision');
+                                  setState(() {});
+                                }
+                              },
                             ),
-                            value: inspectionDivisi,
-                            style: Style.whiteBold14.copyWith(
-                              fontWeight: FontWeight.normal,
-                              color: themeNotifier.status == true ||
-                                      MediaQuery.of(context)
-                                              .platformBrightness ==
-                                          Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            items: listInspectionDivisi.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(value),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                inspectionDivisi = value;
-                                setState(() {});
-                              }
-                            },
-                          ),
-                        )
-                      ],
-                    ),
+                          )
+                        ],
+                      ),
                     Row(
                       children: [
                         Expanded(child: Text('User Assign :')),
@@ -415,7 +471,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   fontWeight: FontWeight.normal,
                                   color: Colors.grey),
                             ),
-                            value: userAssign,
+                            value: selectedUserInspection,
                             style: Style.whiteBold14.copyWith(
                               fontWeight: FontWeight.normal,
                               color: themeNotifier.status == true ||
@@ -425,15 +481,16 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                            items: listUserAssign.map((value) {
+                            items: listUserInspection.map((value) {
                               return DropdownMenuItem(
-                                child: Text(value),
+                                child: Text(value.name),
                                 value: value,
                               );
                             }).toList(),
-                            onChanged: (String? value) {
+                            onChanged: (value) {
                               if (value != null) {
-                                userAssign = value;
+                                selectedUserInspection = value;
+                                log('selected user inspection : $selectedUserInspection');
                                 setState(() {});
                               }
                             },
@@ -441,10 +498,166 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         )
                       ],
                     ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(child: Text('Kategori :')),
+                    //     SizedBox(width: 12),
+                    //     Expanded(
+                    //       child: DropdownButton(
+                    //         isExpanded: true,
+                    //         hint: Text(
+                    //           "Pilih Kategori",
+                    //           style: Style.whiteBold14.copyWith(
+                    //               fontWeight: FontWeight.normal,
+                    //               color: Colors.grey),
+                    //         ),
+                    //         value: inspectionCategory,
+                    //         style: Style.whiteBold14.copyWith(
+                    //           fontWeight: FontWeight.normal,
+                    //           color: themeNotifier.status == true ||
+                    //                   MediaQuery.of(context)
+                    //                           .platformBrightness ==
+                    //                       Brightness.dark
+                    //               ? Colors.white
+                    //               : Colors.black,
+                    //         ),
+                    //         items: listInspectionCategory.map((value) {
+                    //           return DropdownMenuItem(
+                    //             child: Text(value),
+                    //             value: value,
+                    //           );
+                    //         }).toList(),
+                    //         onChanged: (value) {
+                    //           if (value != null) {
+                    //             inspectionCategory = value;
+                    //             setState(() {});
+                    //           }
+                    //         },
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(child: Text('Company :')),
+                    //     SizedBox(width: 12),
+                    //     Expanded(
+                    //       child: DropdownButton(
+                    //         isExpanded: true,
+                    //         hint: Text(
+                    //           "Pilih Company",
+                    //           style: Style.whiteBold14.copyWith(
+                    //               fontWeight: FontWeight.normal,
+                    //               color: Colors.grey),
+                    //         ),
+                    //         value: inspectionCompany,
+                    //         style: Style.whiteBold14.copyWith(
+                    //           fontWeight: FontWeight.normal,
+                    //           color: themeNotifier.status == true ||
+                    //                   MediaQuery.of(context)
+                    //                           .platformBrightness ==
+                    //                       Brightness.dark
+                    //               ? Colors.white
+                    //               : Colors.black,
+                    //         ),
+                    //         items: listInspectionCompany.map((value) {
+                    //           return DropdownMenuItem(
+                    //             child: Text(value),
+                    //             value: value,
+                    //           );
+                    //         }).toList(),
+                    //         onChanged: (value) {
+                    //           if (value != null) {
+                    //             inspectionCompany = value;
+                    //             setState(() {});
+                    //           }
+                    //         },
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(child: Text('Divisi :')),
+                    //     SizedBox(width: 12),
+                    //     Expanded(
+                    //       child: DropdownButton(
+                    //         isExpanded: true,
+                    //         hint: Text(
+                    //           "Pilih Divisi",
+                    //           style: Style.whiteBold14.copyWith(
+                    //               fontWeight: FontWeight.normal,
+                    //               color: Colors.grey),
+                    //         ),
+                    //         value: inspectionDivisi,
+                    //         style: Style.whiteBold14.copyWith(
+                    //           fontWeight: FontWeight.normal,
+                    //           color: themeNotifier.status == true ||
+                    //                   MediaQuery.of(context)
+                    //                           .platformBrightness ==
+                    //                       Brightness.dark
+                    //               ? Colors.white
+                    //               : Colors.black,
+                    //         ),
+                    //         items: listInspectionDivisi.map((value) {
+                    //           return DropdownMenuItem(
+                    //             child: Text(value),
+                    //             value: value,
+                    //           );
+                    //         }).toList(),
+                    //         onChanged: (value) {
+                    //           if (value != null) {
+                    //             inspectionDivisi = value;
+                    //             setState(() {});
+                    //           }
+                    //         },
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(child: Text('User Assign :')),
+                    //     SizedBox(width: 12),
+                    //     Expanded(
+                    //       child: DropdownButton(
+                    //         isExpanded: true,
+                    //         hint: Text(
+                    //           "Pilih User",
+                    //           style: Style.whiteBold14.copyWith(
+                    //               fontWeight: FontWeight.normal,
+                    //               color: Colors.grey),
+                    //         ),
+                    //         value: userAssign,
+                    //         style: Style.whiteBold14.copyWith(
+                    //           fontWeight: FontWeight.normal,
+                    //           color: themeNotifier.status == true ||
+                    //                   MediaQuery.of(context)
+                    //                           .platformBrightness ==
+                    //                       Brightness.dark
+                    //               ? Colors.white
+                    //               : Colors.black,
+                    //         ),
+                    //         items: listUserAssign.map((value) {
+                    //           return DropdownMenuItem(
+                    //             child: Text(value),
+                    //             value: value,
+                    //           );
+                    //         }).toList(),
+                    //         onChanged: (String? value) {
+                    //           if (value != null) {
+                    //             userAssign = value;
+                    //             setState(() {});
+                    //           }
+                    //         },
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
                     Text('Deskripsi :'),
                     SizedBox(height: 6),
                     InputPrimary(
-                      controller: inspectionController,
+                      controller: desctiptionController,
                       maxLines: 10,
                       hintText: 'Masukkan Deskripsi',
                       validator: (value) => null,

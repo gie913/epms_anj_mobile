@@ -50,6 +50,7 @@ import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/model/synch_inspection_data.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/home/logout_repository.dart';
+import 'package:epms/screen/home_inspection/home_inspection_notifier.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
@@ -135,12 +136,15 @@ class SynchNotifier extends ChangeNotifier {
     } catch (e) {
       print(e);
       _dialogService.showOptionDialog(
-          title: "Gagal Synch",
-          subtitle: "$e",
-          buttonTextYes: "Ulang",
-          buttonTextNo: "Log Out",
-          onPressYes: onClickReSynch,
-          onPressNo: HomeNotifier().doLogOut);
+        title: "Gagal Synch",
+        subtitle: "$e",
+        buttonTextYes: "Ulang",
+        buttonTextNo: "Log Out",
+        onPressYes: onClickReSynch,
+        onPressNo: () {
+          HomeInspectionNotifier().logOut();
+        },
+      );
     }
   }
 

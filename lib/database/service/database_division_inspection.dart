@@ -11,7 +11,9 @@ class DatabaseDivisionInspection {
       CREATE TABLE $divisionInspectionTable(
        ${DivisionInspectionEntity.id} TEXT,
        ${DivisionInspectionEntity.name} TEXT,
-       ${DivisionInspectionEntity.estate} TEXT)
+       ${DivisionInspectionEntity.code} TEXT,
+       ${DivisionInspectionEntity.estateCode} TEXT,
+       ${DivisionInspectionEntity.mCompanyId} TEXT)
     ''');
   }
 

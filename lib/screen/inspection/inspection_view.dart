@@ -10,6 +10,7 @@ import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/tab_to_do.dart';
 import 'package:epms/screen/inspection/components/tab_my_inspection.dart';
 import 'package:epms/screen/inspection/inspection_notifier.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +43,26 @@ class _InspectionViewState extends State<InspectionView> {
     listMyInspection = data;
     listToDo = data;
     setState(() {});
+  }
+
+  Future<void> uploadAndSynch() async {
+    final data = await DatabaseTicketInspection.selectData();
+    if (data.isNotEmpty) {
+      for (final ticketInspection in data) {
+        await InspectionRepository().createInspection(
+          context,
+          ticketInspection,
+          (context, successMessage) async {
+            await Future.delayed(const Duration(seconds: 1));
+            log('ID : ${ticketInspection.id} $successMessage');
+          },
+          (context, errorMessage) async {
+            await Future.delayed(const Duration(seconds: 1));
+            log('ID : ${ticketInspection.id} $errorMessage');
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -111,7 +132,8 @@ class _InspectionViewState extends State<InspectionView> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: InkWell(
                   onTap: () {
-                    _navigationService.pop();
+                    uploadAndSynch();
+                    // _navigationService.pop();
                   },
                   child: Card(
                     color: Colors.green,

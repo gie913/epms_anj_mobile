@@ -1,5 +1,6 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:flutter/material.dart';
 
@@ -109,7 +110,8 @@ class CardHistoryInspection extends StatelessWidget {
             ),
             SizedBox(width: 12),
             Text(
-              data.status,
+              ConvertHelper.titleCase(
+                  data.status.replaceAll(RegExp(r'_'), ' ')),
               style: Style.whiteBold12
                   .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
             )

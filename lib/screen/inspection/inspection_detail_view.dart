@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
@@ -16,17 +17,17 @@ class InspectionDetailView extends StatefulWidget {
 }
 
 class _InspectionDetailViewState extends State<InspectionDetailView> {
-  final inspectionController = TextEditingController();
+  final descriptionController = TextEditingController();
 
   @override
   void initState() {
-    inspectionController.text = widget.data.report;
+    descriptionController.text = widget.data.description;
     super.initState();
   }
 
   @override
   void dispose() {
-    inspectionController.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 
@@ -165,7 +166,7 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                 Text('Deskripsi :'),
                 SizedBox(height: 6),
                 InputPrimary(
-                  controller: inspectionController,
+                  controller: descriptionController,
                   maxLines: 10,
                   validator: (value) => null,
                   readOnly: true,
@@ -175,8 +176,10 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                     Text('Status :'),
                     SizedBox(width: 12),
                     Expanded(
-                        child:
-                            Text(widget.data.status, textAlign: TextAlign.end))
+                        child: Text(
+                            ConvertHelper.titleCase(widget.data.status
+                                .replaceAll(RegExp(r'_'), ' ')),
+                            textAlign: TextAlign.end))
                   ],
                 ),
                 SizedBox(height: 12),

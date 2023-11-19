@@ -29,9 +29,13 @@ class UploadImageOPHRepository extends APIConfiguration {
       var typeMedia = mimeContent!.substring(0, mimeContent.indexOf('/', 0));
       var pos = mimeContent.indexOf('/', 0);
       var subTypeMedia = mimeContent.substring(pos + 1, mimeContent.length);
-      var multipartFile = http.MultipartFile('image', stream, length,
-          filename: basename(imageFile.path),
-          contentType: MediaType(typeMedia, subTypeMedia));
+      var multipartFile = http.MultipartFile(
+        'image',
+        stream,
+        length,
+        filename: basename(imageFile.path),
+        contentType: MediaType(typeMedia, subTypeMedia),
+      );
       request.files.add(multipartFile);
       request.fields['module_id'] = moduleId;
       request.fields['module'] = module;

@@ -1,37 +1,35 @@
 import 'dart:convert';
 
-import 'package:epms/model/parameter_inspection_model.dart';
-
 class ActionInspectionModel {
   const ActionInspectionModel({
     this.name = '',
-    this.parameter = const ParameterInspectionModel(),
+    this.options = const [],
   });
 
   factory ActionInspectionModel.fromJson(Map<String, dynamic> json) =>
       ActionInspectionModel(
         name: json["name"] ?? '',
-        parameter: json["parameter"] != null
-            ? ParameterInspectionModel.fromJson(json["parameter"])
-            : const ParameterInspectionModel(),
+        options: json["parameter"]["options"] != null
+            ? List.from((json["parameter"]["options"] as List).map((e) => e))
+            : const [],
       );
 
   factory ActionInspectionModel.fromDatabase(Map<String, dynamic> json) =>
       ActionInspectionModel(
         name: json["name"] ?? '',
-        parameter: json["parameter"] != null
-            ? ParameterInspectionModel.fromJson(jsonDecode(json["parameter"]))
-            : const ParameterInspectionModel(),
+        options: json["options"] != null
+            ? List.from((jsonDecode(json["options"]) as List).map((e) => e))
+            : const [],
       );
 
   final String name;
-  final ParameterInspectionModel parameter;
+  final List options;
 
   Map<String, dynamic> toJson() {
     final tempData = <String, dynamic>{};
 
     tempData['name'] = name;
-    tempData['parameter'] = parameter.toJson();
+    tempData['options'] = List.from(options.map((e) => e));
 
     return tempData;
   }
@@ -40,13 +38,13 @@ class ActionInspectionModel {
     final tempData = <String, dynamic>{};
 
     tempData['name'] = name;
-    tempData['parameter'] = jsonEncode(parameter.toJson());
+    tempData['options'] = jsonEncode(options);
 
     return tempData;
   }
 
   @override
   String toString() {
-    return 'ActionInspectionModel(name: $name, parameter: $parameter)';
+    return 'ActionInspectionModel(name: $name, options: $options)';
   }
 }

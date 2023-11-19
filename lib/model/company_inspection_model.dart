@@ -11,7 +11,7 @@ class CompanyInspectionModel {
         id: json["id"] ?? '',
         name: json["name"] ?? '',
         code: json["code"] ?? '',
-        alias: json["alias"] ?? 0,
+        alias: json["alias"] ?? '',
       );
 
   final String id;

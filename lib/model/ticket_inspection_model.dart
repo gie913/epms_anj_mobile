@@ -6,14 +6,18 @@ class TicketInspectionModel {
   const TicketInspectionModel({
     this.id = '',
     this.date = '',
-    this.longitude = '',
-    this.latitude = '',
+    this.longitude = 0,
+    this.latitude = 0,
     this.category = '',
     this.company = '',
     this.division = '',
     this.userAssign = '',
     this.status = '',
-    this.report = '',
+    this.description = '',
+    this.assignedTo = '',
+    this.mTeamId = '',
+    this.mCompanyId = '',
+    this.mDivisionId = '',
     this.images = const [],
     this.history = const <HistoryInspectionModel>[],
   });
@@ -22,14 +26,18 @@ class TicketInspectionModel {
       TicketInspectionModel(
         id: json['id'] ?? '',
         date: json['date'] ?? '',
-        longitude: json['longitude'] ?? '',
-        latitude: json['latitude'] ?? '',
+        longitude: json['longitude'] ?? 0,
+        latitude: json['latitude'] ?? 0,
         category: json['category'] ?? '',
         company: json['company'] ?? '',
         division: json['division'] ?? '',
         userAssign: json['user_assign'] ?? '',
         status: json['status'] ?? '',
-        report: json['report'] ?? '',
+        description: json['description'] ?? '',
+        assignedTo: json['assigned_to'] ?? '',
+        mTeamId: json['m_team_id'] ?? '',
+        mCompanyId: json['m_company_id'] ?? '',
+        mDivisionId: json['m_division_id'] ?? '',
         history: json['history'] != null
             ? List<HistoryInspectionModel>.from(
                 (json['history'] as List).map((e) {
@@ -43,14 +51,18 @@ class TicketInspectionModel {
       TicketInspectionModel(
         id: json['id'] ?? '',
         date: json['date'] ?? '',
-        longitude: json['longitude'] ?? '',
-        latitude: json['latitude'] ?? '',
+        longitude: json['longitude'] ?? 0,
+        latitude: json['latitude'] ?? 0,
         category: json['category'] ?? '',
         company: json['company'] ?? '',
         division: json['division'] ?? '',
         userAssign: json['user_assign'] ?? '',
         status: json['status'] ?? '',
-        report: json['report'] ?? '',
+        description: json['description'] ?? '',
+        assignedTo: json['assigned_to'] ?? '',
+        mTeamId: json['m_team_id'] ?? '',
+        mCompanyId: json['m_company_id'] ?? '',
+        mDivisionId: json['m_division_id'] ?? '',
         images: json['images'] != null
             ? List.from(
                 (jsonDecode(json['images']) as List).map((e) => e),
@@ -67,14 +79,18 @@ class TicketInspectionModel {
 
   final String id;
   final String date;
-  final String longitude;
-  final String latitude;
+  final double longitude;
+  final double latitude;
   final String category;
   final String company;
   final String division;
   final String userAssign;
   final String status;
-  final String report;
+  final String description;
+  final String assignedTo;
+  final String mTeamId;
+  final String mCompanyId;
+  final String mDivisionId;
   final List images;
   final List<HistoryInspectionModel> history;
 
@@ -90,7 +106,11 @@ class TicketInspectionModel {
     tempData['division'] = division;
     tempData['user_assign'] = userAssign;
     tempData['status'] = status;
-    tempData['report'] = report;
+    tempData['description'] = description;
+    tempData['assigned_to'] = assignedTo;
+    tempData['m_team_id'] = mTeamId;
+    tempData['m_company_id'] = mCompanyId;
+    tempData['m_division_id'] = mDivisionId;
     tempData['images'] = List.from(images.map((e) => e));
     tempData['history'] = List.from(history.map((e) => e.toJson()));
 
@@ -109,7 +129,11 @@ class TicketInspectionModel {
     tempData['division'] = division;
     tempData['user_assign'] = userAssign;
     tempData['status'] = status;
-    tempData['report'] = report;
+    tempData['description'] = description;
+    tempData['assigned_to'] = assignedTo;
+    tempData['m_team_id'] = mTeamId;
+    tempData['m_company_id'] = mCompanyId;
+    tempData['m_division_id'] = mDivisionId;
     tempData['images'] = jsonEncode(List.from(images.map((e) => e)));
     tempData['history'] = jsonEncode(List.from(history.map((e) => e.toJson())));
 
@@ -118,6 +142,6 @@ class TicketInspectionModel {
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, date: $date, longitude: $longitude, latitude: $latitude, category: $category, company: $company, division: $division, user_assign: $userAssign, status: $status, report: $report, images: ${images.length} item, history: $history)';
+    return 'TicketInspectionModel(id: $id, date: $date, longitude: $longitude, latitude: $latitude, category: $category, company: $company, division: $division, user_assign: $userAssign, status: $status, description: $description, assigned_to: $assignedTo, m_team_id: $mTeamId, m_company_id: $mCompanyId, m_division_id: $mDivisionId, images: ${images.length} item, history: $history)';
   }
 }

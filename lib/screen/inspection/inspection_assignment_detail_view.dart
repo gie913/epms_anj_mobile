@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:epms/base/common/locator.dart';
@@ -5,9 +6,13 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
+import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:flutter/material.dart';
@@ -27,20 +32,43 @@ class InspectionAssignmentDetailView extends StatefulWidget {
 class _InspectionAssignmentDetailViewState
     extends State<InspectionAssignmentDetailView> {
   NavigatorService _navigationService = locator<NavigatorService>();
-  final inspectionController = TextEditingController();
+  final descriptionController = TextEditingController();
   final actionController = TextEditingController();
-  final listAction = ['On Progress', 'Re-Assign', 'Complete'];
+  // final listAction = ['On Progress', 'Re-Assign', 'Complete'];
   final listUserReAssign = ['Yogi', 'Ari', 'Adriansyah'];
-  String? action;
+  // String? action;
   String? userReAssign;
   List<HistoryInspectionModel> listHistoryInspection = [];
 
+  List<UserInspectionModel> listUserInspection = const [];
+  UserInspectionModel? selectedUserInspection;
+
+  List<String> listActionOption = const [];
+  String? selectedAction;
+
   @override
   void initState() {
-    inspectionController.text = widget.data.report;
+    descriptionController.text = widget.data.description;
     listHistoryInspection = widget.data.history;
+    getUserInspection();
+    getOptionAction();
     setState(() {});
     super.initState();
+  }
+
+  Future<void> getUserInspection() async {
+    final data = await DatabaseUserInspection.selectData();
+    listUserInspection = data;
+    log('cek list user inspection : $listUserInspection');
+    setState(() {});
+  }
+
+  Future<void> getOptionAction() async {
+    final data =
+        await DatabaseActionInspection.selectDataByStatus(widget.data.status);
+    listActionOption = List<String>.from(data.options.map((e) => e.toString()));
+    log('cek list action options : $listActionOption');
+    setState(() {});
   }
 
   void showFoto(BuildContext context, String imagePath) {
@@ -74,7 +102,7 @@ class _InspectionAssignmentDetailViewState
       user: widget.data.userAssign,
       userReAssign: userReAssign ?? '',
       response: actionController.text,
-      status: action ?? '-',
+      status: selectedAction ?? '-',
       date: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
     );
     listHistoryInspection.add(dataHistory);
@@ -86,14 +114,21 @@ class _InspectionAssignmentDetailViewState
       division: widget.data.division,
       latitude: widget.data.latitude,
       longitude: widget.data.longitude,
-      report: widget.data.report,
+      description: widget.data.description,
       userAssign: widget.data.userAssign,
-      status: action ?? '-',
+      status: selectedAction ?? '-',
       images: widget.data.images,
       history: listHistoryInspection,
     );
     await DatabaseTicketInspection.updateData(dataInspection);
     _navigationService.pop();
+  }
+
+  @override
+  void dispose() {
+    descriptionController.dispose();
+    actionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -178,8 +213,12 @@ class _InspectionAssignmentDetailViewState
                         Text('Status :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.status,
-                                textAlign: TextAlign.end))
+                          child: Text(
+                            ConvertHelper.titleCase(widget.data.status
+                                .replaceAll(RegExp(r'_'), ' ')),
+                            textAlign: TextAlign.end,
+                          ),
+                        )
                       ],
                     ),
                     SizedBox(height: 12),
@@ -220,7 +259,7 @@ class _InspectionAssignmentDetailViewState
                     Text('Deskripsi :'),
                     SizedBox(height: 6),
                     InputPrimary(
-                      controller: inspectionController,
+                      controller: descriptionController,
                       maxLines: 10,
                       validator: (value) => null,
                       readOnly: true,
@@ -249,7 +288,7 @@ class _InspectionAssignmentDetailViewState
                                   fontWeight: FontWeight.normal,
                                   color: Colors.grey),
                             ),
-                            value: action,
+                            value: selectedAction,
                             style: Style.whiteBold14.copyWith(
                               fontWeight: FontWeight.normal,
                               color: themeNotifier.status == true ||
@@ -259,15 +298,16 @@ class _InspectionAssignmentDetailViewState
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                            items: listAction.map((value) {
+                            items: listActionOption.map((value) {
                               return DropdownMenuItem(
-                                child: Text(value),
+                                child: Text(ConvertHelper.titleCase(
+                                    value.replaceAll(RegExp(r'_'), ' '))),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (String? value) {
                               if (value != null) {
-                                action = value;
+                                selectedAction = value;
                                 setState(() {});
                               }
                             },
@@ -275,7 +315,7 @@ class _InspectionAssignmentDetailViewState
                         )
                       ],
                     ),
-                    if (action == 'Re-Assign')
+                    if (selectedAction == 'reassign')
                       Row(
                         children: [
                           Expanded(child: Text('User Re-Assign :')),
@@ -289,7 +329,7 @@ class _InspectionAssignmentDetailViewState
                                     fontWeight: FontWeight.normal,
                                     color: Colors.grey),
                               ),
-                              value: userReAssign,
+                              value: selectedUserInspection,
                               style: Style.whiteBold14.copyWith(
                                 fontWeight: FontWeight.normal,
                                 color: themeNotifier.status == true ||
@@ -299,15 +339,15 @@ class _InspectionAssignmentDetailViewState
                                     ? Colors.white
                                     : Colors.black,
                               ),
-                              items: listUserReAssign.map((value) {
+                              items: listUserInspection.map((value) {
                                 return DropdownMenuItem(
-                                  child: Text(value),
+                                  child: Text(value.name),
                                   value: value,
                                 );
                               }).toList(),
-                              onChanged: (String? value) {
+                              onChanged: (value) {
                                 if (value != null) {
-                                  userReAssign = value;
+                                  selectedUserInspection = value;
                                   setState(() {});
                                 }
                               },
@@ -315,6 +355,46 @@ class _InspectionAssignmentDetailViewState
                           )
                         ],
                       ),
+                    // if (action == 'Re-Assign')
+                    //   Row(
+                    //     children: [
+                    //       Expanded(child: Text('User Re-Assign :')),
+                    //       SizedBox(width: 12),
+                    //       Expanded(
+                    //         child: DropdownButton(
+                    //           isExpanded: true,
+                    //           hint: Text(
+                    //             "Pilih User",
+                    //             style: Style.whiteBold14.copyWith(
+                    //                 fontWeight: FontWeight.normal,
+                    //                 color: Colors.grey),
+                    //           ),
+                    //           value: userReAssign,
+                    //           style: Style.whiteBold14.copyWith(
+                    //             fontWeight: FontWeight.normal,
+                    //             color: themeNotifier.status == true ||
+                    //                     MediaQuery.of(context)
+                    //                             .platformBrightness ==
+                    //                         Brightness.dark
+                    //                 ? Colors.white
+                    //                 : Colors.black,
+                    //           ),
+                    //           items: listUserReAssign.map((value) {
+                    //             return DropdownMenuItem(
+                    //               child: Text(value),
+                    //               value: value,
+                    //             );
+                    //           }).toList(),
+                    //           onChanged: (String? value) {
+                    //             if (value != null) {
+                    //               userReAssign = value;
+                    //               setState(() {});
+                    //             }
+                    //           },
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
                     Text('Tindakan :'),
                     SizedBox(height: 6),
                     InputPrimary(

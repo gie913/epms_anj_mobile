@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:epms/base/common/locator.dart';
@@ -5,6 +6,8 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
@@ -25,31 +28,43 @@ class InspectionApprovalView extends StatefulWidget {
 
 class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   NavigatorService _navigationService = locator<NavigatorService>();
-  final inspectionController = TextEditingController();
+  final descriptionController = TextEditingController();
   final noteController = TextEditingController();
-  final listAction = ['Close', 'Revisi', 'Need Consultation'];
+  // final listAction = ['Close', 'Revisi', 'Need Consultation'];
   final listUserConsultation = [
     'Khairul Nasution',
     'Satria Pinandito',
     'Nelson Suwiko'
   ];
-  String? action;
+  // String? action;
   String? userConsultation;
   List<HistoryInspectionModel> listHistoryInspection = [];
 
+  List<String> listActionOption = const [];
+  String? selectedAction;
+
   @override
   void initState() {
-    inspectionController.text = widget.data.report;
+    descriptionController.text = widget.data.description;
     listHistoryInspection = widget.data.history;
+    getOptionAction();
     setState(() {});
     super.initState();
   }
 
   @override
   void dispose() {
-    inspectionController.dispose();
+    descriptionController.dispose();
     noteController.dispose();
     super.dispose();
+  }
+
+  Future<void> getOptionAction() async {
+    final data =
+        await DatabaseActionInspection.selectDataByStatus(widget.data.status);
+    listActionOption = List<String>.from(data.options.map((e) => e.toString()));
+    log('cek list action options : $listActionOption');
+    setState(() {});
   }
 
   Future<void> submit() async {
@@ -58,7 +73,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
       userReAssign: listHistoryInspection.last.userReAssign,
       userConsultation: userConsultation ?? '',
       response: noteController.text.isNotEmpty ? noteController.text : '-',
-      status: action ?? '-',
+      status: selectedAction ?? '-',
       date: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
     );
     listHistoryInspection.add(dataHistory);
@@ -70,9 +85,9 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
       division: widget.data.division,
       latitude: widget.data.latitude,
       longitude: widget.data.longitude,
-      report: widget.data.report,
+      description: widget.data.description,
       userAssign: widget.data.userAssign,
-      status: action ?? '-',
+      status: selectedAction ?? '-',
       images: widget.data.images,
       history: listHistoryInspection,
     );
@@ -220,7 +235,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                     Text('Deskripsi :'),
                     SizedBox(height: 6),
                     InputPrimary(
-                      controller: inspectionController,
+                      controller: descriptionController,
                       maxLines: 10,
                       validator: (value) => null,
                       readOnly: true,
@@ -230,7 +245,9 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Status :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.status,
+                            child: Text(
+                                ConvertHelper.titleCase(widget.data.status
+                                    .replaceAll(RegExp(r'_'), ' ')),
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -269,7 +286,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   fontWeight: FontWeight.normal,
                                   color: Colors.grey),
                             ),
-                            value: action,
+                            value: selectedAction,
                             style: Style.whiteBold14.copyWith(
                               fontWeight: FontWeight.normal,
                               color: themeNotifier.status == true ||
@@ -279,15 +296,16 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                            items: listAction.map((value) {
+                            items: listActionOption.map((value) {
                               return DropdownMenuItem(
-                                child: Text(value),
+                                child: Text(ConvertHelper.titleCase(
+                                    value.replaceAll(RegExp(r'_'), ' '))),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (String? value) {
                               if (value != null) {
-                                action = value;
+                                selectedAction = value;
                                 noteController.clear();
                                 userConsultation = null;
                                 setState(() {});
@@ -297,7 +315,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         )
                       ],
                     ),
-                    if (action == 'Need Consultation')
+                    if (selectedAction == 'need_consultation')
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

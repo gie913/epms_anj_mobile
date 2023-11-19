@@ -11,14 +11,18 @@ class DatabaseTicketInspection {
       CREATE TABLE $ticketInspectionTable(
        ${TicketInspectionEntity.id} TEXT,
        ${TicketInspectionEntity.date} TEXT,
-       ${TicketInspectionEntity.longitude} TEXT,
-       ${TicketInspectionEntity.latitude} TEXT,
+       ${TicketInspectionEntity.longitude} REAL,
+       ${TicketInspectionEntity.latitude} REAL,
        ${TicketInspectionEntity.category} TEXT,
        ${TicketInspectionEntity.company} TEXT,
        ${TicketInspectionEntity.division} TEXT,
        ${TicketInspectionEntity.userAssign} TEXT,
        ${TicketInspectionEntity.status} TEXT,
-       ${TicketInspectionEntity.report} TEXT,
+       ${TicketInspectionEntity.description} TEXT,
+       ${TicketInspectionEntity.assignedTo} TEXT,
+       ${TicketInspectionEntity.mTeamId} TEXT,
+       ${TicketInspectionEntity.mCompanyId} TEXT,
+       ${TicketInspectionEntity.mDivisionId} TEXT,       
        ${TicketInspectionEntity.images} TEXT,
        ${TicketInspectionEntity.history} TEXT)
     ''');

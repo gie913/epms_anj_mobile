@@ -49,10 +49,10 @@ class _TabToDoState extends State<TabToDo> {
                 return InspectionItem(
                   data: data,
                   onTap: () async {
-                    if (data.status == 'Re-Assign' ||
-                        data.status == 'Complete' ||
-                        data.status == 'Close' ||
-                        data.status == 'Need Consultation') {
+                    if (data.status == 'reassign' ||
+                        data.status == 'complete' ||
+                        data.status == 'close' ||
+                        data.status == 'need_consultation') {
                       await _navigationService.push(
                         Routes.INSPECTION_APPROVAL,
                         arguments: data,

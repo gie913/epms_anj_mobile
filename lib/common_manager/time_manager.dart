@@ -19,6 +19,11 @@ class TimeManager {
     return format;
   }
 
+  static String dateInspection(String dateString) {
+    DateTime dateTime = new DateFormat("dd-MM-yyyy HH:mm:ss").parse(dateString);
+    return DateFormat('yyyy-MM-dd').format(dateTime);
+  }
+
   static String todayWithSlash(DateTime dateTime) {
     String format = formatDate(dateTime, [dd, '/', mm, '/', yyyy]);
     return format;
