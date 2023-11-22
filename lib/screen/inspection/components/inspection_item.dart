@@ -5,11 +5,7 @@ import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:flutter/material.dart';
 
 class InspectionItem extends StatelessWidget {
-  const InspectionItem({
-    super.key,
-    required this.onTap,
-    required this.data,
-  });
+  const InspectionItem({super.key, required this.onTap, required this.data});
 
   final Function() onTap;
   final TicketInspectionModel data;
@@ -29,7 +25,7 @@ class InspectionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.id,
+                      data.code,
                       style: Style.whiteBold12.copyWith(
                           color: Colors.white, fontWeight: FontWeight.normal),
                     ),
@@ -44,7 +40,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data.date,
+                            data.trTime,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -63,7 +59,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data.category,
+                            data.mTeamName,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -82,7 +78,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data.company,
+                            data.mCompanyAlias,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
@@ -90,25 +86,27 @@ class InspectionItem extends StatelessWidget {
                         )
                       ],
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          'Divisi :',
-                          style: Style.whiteBold12.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal),
-                        ),
-                        SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            data.division,
+                    if (data.mDivisionEstateCode.isNotEmpty &&
+                        data.mDivisionName.isNotEmpty)
+                      Row(
+                        children: [
+                          Text(
+                            'Divisi :',
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),
                           ),
-                        )
-                      ],
-                    ),
+                          SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'Estate ${data.mDivisionEstateCode} | ${data.mDivisionName}',
+                              style: Style.whiteBold12.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          )
+                        ],
+                      ),
                     Row(
                       children: [
                         Text(
@@ -120,7 +118,7 @@ class InspectionItem extends StatelessWidget {
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            data.userAssign,
+                            data.assignee,
                             style: Style.whiteBold12.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.normal),

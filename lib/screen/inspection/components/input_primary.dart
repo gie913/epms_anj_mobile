@@ -10,7 +10,7 @@ class InputPrimary extends StatefulWidget {
   const InputPrimary({
     super.key,
     this.autoFocus = false,
-    required this.controller,
+    this.controller,
     this.enabled = true,
     this.hintText = 'Type Here',
     this.inputFormatters,
@@ -37,7 +37,7 @@ class InputPrimary extends StatefulWidget {
   });
 
   final bool autoFocus;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool? enabled;
   final String hintText;
   final List<TextInputFormatter>? inputFormatters;

@@ -10,22 +10,42 @@ class DatabaseTicketInspection {
     await db.execute('''
       CREATE TABLE $ticketInspectionTable(
        ${TicketInspectionEntity.id} TEXT,
-       ${TicketInspectionEntity.date} TEXT,
-       ${TicketInspectionEntity.longitude} REAL,
-       ${TicketInspectionEntity.latitude} REAL,
-       ${TicketInspectionEntity.category} TEXT,
-       ${TicketInspectionEntity.company} TEXT,
-       ${TicketInspectionEntity.division} TEXT,
-       ${TicketInspectionEntity.userAssign} TEXT,
+       ${TicketInspectionEntity.code} TEXT,
+       ${TicketInspectionEntity.trTime} TEXT,
+       ${TicketInspectionEntity.mCompanyId} TEXT,
+       ${TicketInspectionEntity.mCompanyName} TEXT,
+       ${TicketInspectionEntity.mCompanyAlias} TEXT,
+       ${TicketInspectionEntity.mTeamId} TEXT,
+       ${TicketInspectionEntity.mTeamName} TEXT,
+       ${TicketInspectionEntity.mDivisionId} TEXT,
+       ${TicketInspectionEntity.mDivisionName} TEXT,
+       ${TicketInspectionEntity.mDivisionEstateCode} TEXT,
+       ${TicketInspectionEntity.gpsLng} REAL,
+       ${TicketInspectionEntity.gpsLat} REAL,
+       ${TicketInspectionEntity.submittedAt} TEXT,       
+       ${TicketInspectionEntity.submittedBy} TEXT,
+       ${TicketInspectionEntity.submittedByName} TEXT,
+       ${TicketInspectionEntity.assignee} TEXT,
+       ${TicketInspectionEntity.assigneeId} TEXT,
        ${TicketInspectionEntity.status} TEXT,
        ${TicketInspectionEntity.description} TEXT,
-       ${TicketInspectionEntity.assignedTo} TEXT,
-       ${TicketInspectionEntity.mTeamId} TEXT,
-       ${TicketInspectionEntity.mCompanyId} TEXT,
-       ${TicketInspectionEntity.mDivisionId} TEXT,       
-       ${TicketInspectionEntity.images} TEXT,
-       ${TicketInspectionEntity.history} TEXT)
+       ${TicketInspectionEntity.closedAt} TEXT,
+       ${TicketInspectionEntity.closedBy} TEXT,
+       ${TicketInspectionEntity.closedByName} TEXT,
+       ${TicketInspectionEntity.attachments} TEXT,
+       ${TicketInspectionEntity.responses} TEXT)
     ''');
+  }
+
+  static Future<void> addAllData(List<TicketInspectionModel> data) async {
+    Database db = await DatabaseHelper().database;
+
+    final batch = db.batch();
+
+    for (final item in data) {
+      batch.insert(ticketInspectionTable, item.toDatabase());
+    }
+    await batch.commit();
   }
 
   static Future<void> insertData(TicketInspectionModel data) async {
@@ -36,7 +56,7 @@ class DatabaseTicketInspection {
   static Future<void> updateData(TicketInspectionModel data) async {
     Database db = await DatabaseHelper().database;
     await db.update(ticketInspectionTable, data.toDatabase(),
-        where: '${TicketInspectionEntity.id}=?', whereArgs: [data.id]);
+        where: '${TicketInspectionEntity.code}=?', whereArgs: [data.code]);
   }
 
   static Future<List<TicketInspectionModel>> selectData() async {

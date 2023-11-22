@@ -51,4 +51,5 @@ class Routes {
   static const INSPECTION_ASSIGNMENT_DETAIL = '/inspection-assignment-detail';
   static const INSPECTION_DETAIL = '/inspection-detail';
   static const INSPECTION_APPROVAL = '/inspection-approval';
+  static const INSPECTION_USER = '/inspection-user';
 }

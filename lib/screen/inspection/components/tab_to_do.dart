@@ -1,9 +1,7 @@
-import 'dart:developer';
-
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/navigator_service.dart';
-import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
 import 'package:flutter/material.dart';
@@ -24,14 +22,13 @@ class _TabToDoState extends State<TabToDo> {
 
   @override
   void initState() {
-    log('Init Tab To Do');
     listToDo = widget.listToDo;
     setState(() {});
     super.initState();
   }
 
-  Future<void> updateInspection() async {
-    final data = await DatabaseTicketInspection.selectData();
+  Future<void> getTodoInspectionFromLocal() async {
+    final data = await DatabaseTodoInspection.selectData();
     listToDo = data;
     setState(() {});
   }
@@ -57,26 +54,14 @@ class _TabToDoState extends State<TabToDo> {
                         Routes.INSPECTION_APPROVAL,
                         arguments: data,
                       );
-                      await updateInspection();
+                      await getTodoInspectionFromLocal();
                     } else {
                       await _navigationService.push(
                         Routes.INSPECTION_ASSIGNMENT_DETAIL,
                         arguments: data,
                       );
-                      await updateInspection();
+                      await getTodoInspectionFromLocal();
                     }
-
-                    // if (index == 2 || index == 3) {
-                    //   _navigationService.push(
-                    //     Routes.INSPECTION_APPROVAL,
-                    //     arguments: data,
-                    //   );
-                    // } else {
-                    //   _navigationService.push(
-                    //     Routes.INSPECTION_ASSIGNMENT_DETAIL,
-                    //     arguments: data,
-                    //   );
-                    // }
                   },
                 );
               },

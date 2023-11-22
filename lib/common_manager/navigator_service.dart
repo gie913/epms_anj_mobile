@@ -47,6 +47,10 @@ class NavigatorService {
     return true;
   }
 
+  void popNew({dynamic result}) {
+    navigatorKey.currentState!.pop(result);
+  }
+
   void popUntil(
     String routeName, {
     dynamic arguments,

@@ -44,12 +44,19 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
             content: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 1.5,
-              child: Image.file(
-                File(imagePath),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 1.5,
-                fit: BoxFit.fill,
-              ),
+              child: (imagePath.contains('http'))
+                  ? Image.network(
+                      imagePath,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 1.5,
+                      fit: BoxFit.fill,
+                    )
+                  : Image.file(
+                      File(imagePath),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 1.5,
+                      fit: BoxFit.fill,
+                    ),
             ),
           ),
         );
@@ -69,7 +76,7 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.data.id),
+                Text(widget.data.code),
                 SizedBox(height: 12),
                 Row(
                   children: [
@@ -77,7 +84,7 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                     SizedBox(width: 12),
                     Expanded(
                         child: Text(
-                            '${widget.data.longitude},${widget.data.latitude}',
+                            '${widget.data.gpsLng},${widget.data.gpsLat}',
                             textAlign: TextAlign.end))
                   ],
                 ),
@@ -87,7 +94,8 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                     Text('Tanggal :'),
                     SizedBox(width: 12),
                     Expanded(
-                        child: Text(widget.data.date, textAlign: TextAlign.end))
+                        child:
+                            Text(widget.data.trTime, textAlign: TextAlign.end))
                   ],
                 ),
                 SizedBox(height: 12),
@@ -96,7 +104,7 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                     Text('Kategori :'),
                     SizedBox(width: 12),
                     Expanded(
-                        child: Text(widget.data.category,
+                        child: Text(widget.data.mTeamName,
                             textAlign: TextAlign.end))
                   ],
                 ),
@@ -106,27 +114,32 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                     Text('Company :'),
                     SizedBox(width: 12),
                     Expanded(
-                        child:
-                            Text(widget.data.company, textAlign: TextAlign.end))
-                  ],
-                ),
-                SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text('Divisi :'),
-                    SizedBox(width: 12),
-                    Expanded(
-                        child: Text(widget.data.division,
+                        child: Text(widget.data.mCompanyAlias,
                             textAlign: TextAlign.end))
                   ],
                 ),
+                if (widget.data.mDivisionEstateCode.isNotEmpty ||
+                    widget.data.mDivisionName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Row(
+                      children: [
+                        Text('Divisi :'),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text(
+                                'Estate ${widget.data.mDivisionEstateCode} | ${widget.data.mDivisionName}',
+                                textAlign: TextAlign.end))
+                      ],
+                    ),
+                  ),
                 SizedBox(height: 12),
                 Row(
                   children: [
                     Text('User Assign :'),
                     SizedBox(width: 12),
                     Expanded(
-                        child: Text(widget.data.userAssign,
+                        child: Text(widget.data.assignee,
                             textAlign: TextAlign.end))
                   ],
                 ),
@@ -140,21 +153,32 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                       height: MediaQuery.of(context).size.width / 4,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: widget.data.images.length,
+                        itemCount: widget.data.attachments.length,
                         itemBuilder: (context, index) {
-                          final image = widget.data.images[index];
+                          final image = widget.data.attachments[index];
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: InkWell(
                               onTap: () {
                                 showFoto(context, image);
                               },
-                              child: Image.file(
-                                File(image),
-                                width: MediaQuery.of(context).size.width / 4,
-                                height: MediaQuery.of(context).size.width / 4,
-                                fit: BoxFit.fill,
-                              ),
+                              child: (image.toString().contains('http'))
+                                  ? Image.network(
+                                      image,
+                                      width:
+                                          MediaQuery.of(context).size.width / 4,
+                                      height:
+                                          MediaQuery.of(context).size.width / 4,
+                                      fit: BoxFit.fill,
+                                    )
+                                  : Image.file(
+                                      File(image),
+                                      width:
+                                          MediaQuery.of(context).size.width / 4,
+                                      height:
+                                          MediaQuery.of(context).size.width / 4,
+                                      fit: BoxFit.fill,
+                                    ),
                             ),
                           );
                         },
@@ -184,8 +208,8 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                 ),
                 SizedBox(height: 12),
                 Text('Riwayat Tindakan :'),
-                if (widget.data.history.isNotEmpty)
-                  ...widget.data.history
+                if (widget.data.responses.isNotEmpty)
+                  ...widget.data.responses
                       .map((item) => CardHistoryInspection(data: item))
                       .toList()
                 else

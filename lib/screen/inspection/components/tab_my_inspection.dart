@@ -17,59 +17,6 @@ class TabMyInspection extends StatefulWidget {
 class _TabMyInspectionState extends State<TabMyInspection> {
   NavigatorService _navigationService = locator<NavigatorService>();
 
-  // final listMyInspection = [
-  //   {
-  //     'id': 'INSPECTION120102023',
-  //     'date': '20-10-2023',
-  //     'longitude': -6.2299939,
-  //     'latitude': 106.8276762,
-  //     'category': 'Kategori 1',
-  //     'company': 'Company 1',
-  //     'divisi': 'Divisi 1',
-  //     'user_assign': 'User 1',
-  //     'status': 'Re-Assign',
-  //     'report': 'Test Pengaduan Inspection',
-  //     'history': [
-  //       {
-  //         'user': 'User 1',
-  //         'date': '20-10-2023',
-  //         'category': 'Kategori 1',
-  //         'company': 'Company 1',
-  //         'divisi': 'Divisi 1',
-  //         'response': 'Bukan Salah Saya',
-  //         'status': 'Re-Assign',
-  //         'user_re_assign': 'User 2',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     'id': 'INSPECTION220102023',
-  //     'date': '20-10-2023',
-  //     'longitude': -6.2299939,
-  //     'latitude': 106.8276762,
-  //     'category': 'Kategori 2',
-  //     'company': 'Company 2',
-  //     'divisi': 'Divisi 2',
-  //     'user_assign': 'User 1',
-  //     'status': 'On Progress',
-  //     'report': 'Test Pengaduan Inspection',
-  //     'history': [],
-  //   },
-  //   {
-  //     'id': 'INSPECTION320102023',
-  //     'date': '20-10-2023',
-  //     'longitude': -6.2299939,
-  //     'latitude': 106.8276762,
-  //     'category': 'Kategori 3',
-  //     'company': 'Company 3',
-  //     'divisi': 'Divisi 3',
-  //     'user_assign': 'User 3',
-  //     'status': 'Complete',
-  //     'report': 'Test Pengaduan Inspection',
-  //     'history': [],
-  //   },
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return Padding(

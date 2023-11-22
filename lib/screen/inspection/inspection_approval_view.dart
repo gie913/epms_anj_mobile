@@ -1,19 +1,31 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:epms/base/common/locator.dart';
+import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
+import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_user_inspection.dart';
+import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
+import 'package:epms/model/user_inspection_config_model.dart';
+import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
+import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -28,26 +40,36 @@ class InspectionApprovalView extends StatefulWidget {
 
 class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   NavigatorService _navigationService = locator<NavigatorService>();
+
+  String responseId = '';
+  UserInspectionConfigModel user = const UserInspectionConfigModel();
+
+  double longitude = 0;
+  double latitude = 0;
+  String gpsLocation = '';
+
+  List<UserInspectionModel> listUserInspection = const [];
+  UserInspectionModel? selectedUserInspection;
+
   final descriptionController = TextEditingController();
   final noteController = TextEditingController();
-  // final listAction = ['Close', 'Revisi', 'Need Consultation'];
-  final listUserConsultation = [
-    'Khairul Nasution',
-    'Satria Pinandito',
-    'Nelson Suwiko'
-  ];
-  // String? action;
-  String? userConsultation;
+
   List<HistoryInspectionModel> listHistoryInspection = [];
 
   List<String> listActionOption = const [];
   String? selectedAction;
 
+  final listInspectionPhoto = [];
+
   @override
   void initState() {
     descriptionController.text = widget.data.description;
-    listHistoryInspection = widget.data.history;
+    listHistoryInspection = widget.data.responses;
+    getResponseId();
     getOptionAction();
+    getUserInspection();
+    getUser();
+    getLocation();
     setState(() {});
     super.initState();
   }
@@ -67,32 +89,145 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
     setState(() {});
   }
 
+  Future<void> getUserInspection() async {
+    final data = await DatabaseUserInspection.selectData();
+    listUserInspection = data;
+    log('cek list user inspection : $listUserInspection');
+    setState(() {});
+  }
+
+  Future<void> getUser() async {
+    final data = await DatabaseUserInspectionConfig.selectData();
+    user = data;
+    log('cek user : $user');
+    setState(() {});
+  }
+
+  Future<void> getLocation() async {
+    var position = await LocationService.getGPSLocation();
+    if (position != null) {
+      longitude = position.longitude;
+      latitude = position.latitude;
+      gpsLocation = "${position.longitude}, ${position.latitude}";
+    }
+    log('cek inspection location : $gpsLocation');
+    setState(() {});
+  }
+
   Future<void> submit() async {
     final dataHistory = HistoryInspectionModel(
-      user: 'Andrian Arsil',
-      userReAssign: listHistoryInspection.last.userReAssign,
-      userConsultation: userConsultation ?? '',
-      response: noteController.text.isNotEmpty ? noteController.text : '-',
-      status: selectedAction ?? '-',
-      date: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+      id: widget.data.id,
+      code: responseId,
+      trTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      submittedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      submittedBy: user.id,
+      submittedByName: user.name,
+      description: noteController.text.isNotEmpty ? noteController.text : '',
+      consultedWith:
+          selectedUserInspection != null ? selectedUserInspection!.id : '',
+      consultedWithName:
+          selectedUserInspection != null ? selectedUserInspection!.name : '',
+      gpsLat: latitude,
+      gpsLng: longitude,
+      status: selectedAction ?? '',
+      attachments: [],
     );
     listHistoryInspection.add(dataHistory);
     final dataInspection = TicketInspectionModel(
       id: widget.data.id,
-      date: widget.data.date,
-      category: widget.data.category,
-      company: widget.data.company,
-      division: widget.data.division,
-      latitude: widget.data.latitude,
-      longitude: widget.data.longitude,
-      description: widget.data.description,
-      userAssign: widget.data.userAssign,
+      code: widget.data.code,
+      trTime: widget.data.trTime,
+      mCompanyId: widget.data.mCompanyId,
+      mCompanyName: widget.data.mCompanyName,
+      mCompanyAlias: widget.data.mCompanyAlias,
+      mTeamId: widget.data.mTeamId,
+      mTeamName: widget.data.mTeamName,
+      mDivisionId: widget.data.mDivisionId,
+      mDivisionName: widget.data.mDivisionName,
+      mDivisionEstateCode: widget.data.mDivisionEstateCode,
+      gpsLng: widget.data.gpsLng,
+      gpsLat: widget.data.gpsLat,
+      submittedAt: widget.data.submittedAt,
+      submittedBy: widget.data.submittedBy,
+      submittedByName: widget.data.submittedByName,
+      assignee: widget.data.assignee,
+      assigneeId: widget.data.assigneeId,
       status: selectedAction ?? '-',
-      images: widget.data.images,
-      history: listHistoryInspection,
+      description: widget.data.description,
+      closedAt: widget.data.closedAt,
+      closedBy: widget.data.closedBy,
+      closedByName: widget.data.closedByName,
+      attachments: widget.data.attachments,
+      responses: listHistoryInspection,
     );
     await DatabaseTicketInspection.updateData(dataInspection);
     _navigationService.pop();
+  }
+
+  void showDialogOptionTakeFoto(
+    BuildContext context, {
+    required Function() onTapCamera,
+    required Function() onTapGalery,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return MediaQuery(
+          data: Style.mediaQueryText(context),
+          child: AlertDialog(
+            title: Center(
+                child: Text('Ambil Foto Melalui', style: Style.textBold14)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Palette.primaryColorProd,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: BorderSide(color: Palette.primaryColorProd)),
+                    padding: const EdgeInsets.all(16.0),
+                    textStyle:
+                        const TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onTapCamera();
+                  },
+                  child: Text("KAMERA",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(height: 12),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Palette.primaryColorProd,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: BorderSide(color: Palette.primaryColorProd)),
+                    padding: const EdgeInsets.all(16.0),
+                    textStyle:
+                        const TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onTapGalery();
+                  },
+                  child: Text("GALERI",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void showFoto(BuildContext context, String imagePath) {
@@ -121,6 +256,16 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
     );
   }
 
+  void getResponseId() {
+    final dateNow = DateTime.now();
+    final dateNowConvert = ValueService.generateIDFromDateTime(dateNow);
+    math.Random random = new math.Random();
+    var randomNumber = random.nextInt(100);
+    responseId =
+        'R${widget.data.responses.length + 1}$dateNowConvert$randomNumber';
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
@@ -143,7 +288,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         SizedBox(width: 12),
                         Expanded(
                             child: Text(
-                                '${widget.data.longitude},${widget.data.latitude}',
+                                '${widget.data.gpsLng},${widget.data.gpsLat}',
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -153,7 +298,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Tanggal :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.date,
+                            child: Text(widget.data.trTime,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -163,7 +308,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Kategori :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.category,
+                            child: Text(widget.data.mTeamName,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -173,27 +318,32 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         Text('Company :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.company,
+                            child: Text(widget.data.mCompanyAlias,
                                 textAlign: TextAlign.end))
                       ],
                     ),
-                    SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Text('Divisi :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text(widget.data.division,
-                                textAlign: TextAlign.end))
-                      ],
-                    ),
+                    if (widget.data.mDivisionEstateCode.isNotEmpty ||
+                        widget.data.mDivisionName.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Row(
+                          children: [
+                            Text('Divisi :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(
+                                    '${widget.data.mDivisionEstateCode} | ${widget.data.mDivisionName}',
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                      ),
                     SizedBox(height: 12),
                     Row(
                       children: [
                         Text('User Assign :'),
                         SizedBox(width: 12),
                         Expanded(
-                            child: Text(widget.data.userAssign,
+                            child: Text(widget.data.assignee,
                                 textAlign: TextAlign.end))
                       ],
                     ),
@@ -207,9 +357,9 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                           height: MediaQuery.of(context).size.width / 4,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: widget.data.images.length,
+                            itemCount: widget.data.attachments.length,
                             itemBuilder: (context, index) {
-                              final image = widget.data.images[index];
+                              final image = widget.data.attachments[index];
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
                                 child: InkWell(
@@ -253,8 +403,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                     ),
                     SizedBox(height: 12),
                     Text('Riwayat Tindakan :'),
-                    if (widget.data.history.isNotEmpty)
-                      ...widget.data.history
+                    if (widget.data.responses.isNotEmpty)
+                      ...widget.data.responses
                           .map((item) => CardHistoryInspection(data: item))
                           .toList()
                     else
@@ -272,7 +422,16 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                     //   validator: (value) => null,
                     //   readOnly: action == 'Revisi' ? false : true,
                     // ),
-
+                    Row(
+                      children: [
+                        Text('Lokasi Tindakan Buat :'),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text('$longitude,$latitude',
+                                textAlign: TextAlign.end))
+                      ],
+                    ),
+                    SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(child: Text('Action :')),
@@ -307,7 +466,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                               if (value != null) {
                                 selectedAction = value;
                                 noteController.clear();
-                                userConsultation = null;
                                 setState(() {});
                               }
                             },
@@ -324,40 +482,110 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                               Expanded(child: Text('User Consultation :')),
                               SizedBox(width: 12),
                               Expanded(
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  hint: Text(
-                                    "Pilih User",
-                                    style: Style.whiteBold14.copyWith(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey),
-                                  ),
-                                  value: userConsultation,
-                                  style: Style.whiteBold14.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                    color: themeNotifier.status == true ||
-                                            MediaQuery.of(context)
-                                                    .platformBrightness ==
-                                                Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  items: listUserConsultation.map((value) {
-                                    return DropdownMenuItem(
-                                      child: Text(value),
-                                      value: value,
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? value) {
-                                    if (value != null) {
-                                      userConsultation = value;
-                                      setState(() {});
-                                    }
+                                child: InkWell(
+                                  onTap: () async {
+                                    final data = await _navigationService
+                                        .push(Routes.INSPECTION_USER);
+                                    selectedUserInspection = data;
+                                    setState(() {});
+                                    log('selected user consultation : $selectedUserInspection');
                                   },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: themeNotifier.status ==
+                                                          true ||
+                                                      MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                  ? Colors.white
+                                                  : Colors.grey.shade400,
+                                              width: 0.5)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child:
+                                                selectedUserInspection != null
+                                                    ? Text(
+                                                        selectedUserInspection!
+                                                            .name)
+                                                    : Text(
+                                                        'Pilih User',
+                                                        style: TextStyle(
+                                                            color: themeNotifier
+                                                                            .status ==
+                                                                        true ||
+                                                                    MediaQuery.of(context)
+                                                                            .platformBrightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                ? Colors.grey
+                                                                    .shade500
+                                                                : Colors.black
+                                                                    .withOpacity(
+                                                                        0.35)),
+                                                      ),
+                                          ),
+                                          Icon(Icons.arrow_drop_down,
+                                              color: themeNotifier.status ==
+                                                          true ||
+                                                      MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                  ? Colors.grey.shade400
+                                                  : Colors.grey.shade700)
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
+                          // Row(
+                          //   children: [
+                          //     Expanded(child: Text('User Consultation :')),
+                          //     SizedBox(width: 12),
+                          //     Expanded(
+                          //       child: DropdownButton(
+                          //         isExpanded: true,
+                          //         hint: Text(
+                          //           "Pilih User",
+                          //           style: Style.whiteBold14.copyWith(
+                          //               fontWeight: FontWeight.normal,
+                          //               color: Colors.grey),
+                          //         ),
+                          //         value: userConsultation,
+                          //         style: Style.whiteBold14.copyWith(
+                          //           fontWeight: FontWeight.normal,
+                          //           color: themeNotifier.status == true ||
+                          //                   MediaQuery.of(context)
+                          //                           .platformBrightness ==
+                          //                       Brightness.dark
+                          //               ? Colors.white
+                          //               : Colors.black,
+                          //         ),
+                          //         items: listUserConsultation.map((value) {
+                          //           return DropdownMenuItem(
+                          //             child: Text(value),
+                          //             value: value,
+                          //           );
+                          //         }).toList(),
+                          //         onChanged: (String? value) {
+                          //           if (value != null) {
+                          //             userConsultation = value;
+                          //             setState(() {});
+                          //           }
+                          //         },
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
                           Text('Keterangan :'),
                           SizedBox(height: 6),
                           InputPrimary(
@@ -369,8 +597,72 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         ],
                       ),
                     SizedBox(height: 12),
+                    if (listInspectionPhoto.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Foto Tindakan Inspection :'),
+                          SizedBox(height: 6),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.width / 4,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: listInspectionPhoto.length,
+                              itemBuilder: (context, index) {
+                                final imagePath = listInspectionPhoto[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 12),
+                                  child: InspectionPhoto(
+                                    imagePath: imagePath,
+                                    onTapView: () {
+                                      showFoto(context, imagePath);
+                                    },
+                                    onTapRemove: () {
+                                      listInspectionPhoto.remove(imagePath);
+                                      setState(() {});
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    SizedBox(height: 12),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        if (listInspectionPhoto.length < 5) {
+                          showDialogOptionTakeFoto(
+                            context,
+                            onTapCamera: () async {
+                              final result = await CameraService.getImage(
+                                context,
+                                imageSource: ImageSource.camera,
+                              );
+                              if (result != null) {
+                                listInspectionPhoto.add(result);
+                                setState(() {});
+                              }
+                            },
+                            onTapGalery: () async {
+                              final result = await CameraService.getImage(
+                                context,
+                                imageSource: ImageSource.gallery,
+                              );
+                              if (result != null) {
+                                listInspectionPhoto.add(result);
+                                setState(() {});
+                              }
+                            },
+                          );
+                        } else {
+                          FlushBarManager.showFlushBarWarning(
+                              _navigationService.navigatorKey.currentContext!,
+                              "Foto Inspection",
+                              "Maksimal 5 foto yang dapat Anda lampirkan");
+                        }
+                      },
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),

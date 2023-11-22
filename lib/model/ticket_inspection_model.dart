@@ -1,46 +1,68 @@
 import 'dart:convert';
 
+import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/history_inspection_model.dart';
 
 class TicketInspectionModel {
   const TicketInspectionModel({
     this.id = '',
-    this.date = '',
-    this.longitude = 0,
-    this.latitude = 0,
-    this.category = '',
-    this.company = '',
-    this.division = '',
-    this.userAssign = '',
+    this.code = '',
+    this.trTime = '',
+    this.mCompanyId = '',
+    this.mCompanyName = '',
+    this.mCompanyAlias = '',
+    this.mTeamId = '',
+    this.mTeamName = '',
+    this.mDivisionId = '',
+    this.mDivisionName = '',
+    this.mDivisionEstateCode = '',
+    this.gpsLng = 0,
+    this.gpsLat = 0,
+    this.submittedAt = '',
+    this.submittedBy = '',
+    this.submittedByName = '',
+    this.assignee = '',
+    this.assigneeId = '',
     this.status = '',
     this.description = '',
-    this.assignedTo = '',
-    this.mTeamId = '',
-    this.mCompanyId = '',
-    this.mDivisionId = '',
-    this.images = const [],
-    this.history = const <HistoryInspectionModel>[],
+    this.closedAt = '',
+    this.closedBy = '',
+    this.closedByName = '',
+    this.attachments = const [],
+    this.responses = const <HistoryInspectionModel>[],
   });
 
   factory TicketInspectionModel.fromJson(Map<String, dynamic> json) =>
       TicketInspectionModel(
         id: json['id'] ?? '',
-        date: json['date'] ?? '',
-        longitude: json['longitude'] ?? 0,
-        latitude: json['latitude'] ?? 0,
-        category: json['category'] ?? '',
-        company: json['company'] ?? '',
-        division: json['division'] ?? '',
-        userAssign: json['user_assign'] ?? '',
+        code: json['code'] ?? '',
+        trTime: json['tr_time'] ?? '',
+        mCompanyId: json['m_company_id'] ?? '',
+        mCompanyName: json['m_company_name'] ?? '',
+        mCompanyAlias: json['m_company_alias'] ?? '',
+        mTeamId: json['m_team_id'] ?? '',
+        mTeamName: json['m_team_name'] ?? '',
+        mDivisionId: json['m_division_id'] ?? '',
+        mDivisionName: json['m_division_name'] ?? '',
+        mDivisionEstateCode: json['m_division_estate_code'] ?? '',
+        gpsLng: ConvertHelper.stringToDouble(json['gps_lng'] ?? ''),
+        gpsLat: ConvertHelper.stringToDouble(json['gps_lat'] ?? ''),
+        submittedAt: json['submitted_at'] ?? '',
+        submittedBy: json['submitted_by'] ?? '',
+        submittedByName: json['submitted_by_name'] ?? '',
+        assignee: json['assignee'] ?? '',
+        assigneeId: json['assignee_id'] ?? '',
         status: json['status'] ?? '',
         description: json['description'] ?? '',
-        assignedTo: json['assigned_to'] ?? '',
-        mTeamId: json['m_team_id'] ?? '',
-        mCompanyId: json['m_company_id'] ?? '',
-        mDivisionId: json['m_division_id'] ?? '',
-        history: json['history'] != null
+        closedAt: json['closed_at'] ?? '',
+        closedBy: json['closed_by'] ?? '',
+        closedByName: json['closed_by_name'] ?? '',
+        attachments: json['attachments'] != null
+            ? List.from((json['attachments'] as List).map((e) => e))
+            : [],
+        responses: json['responses'] != null
             ? List<HistoryInspectionModel>.from(
-                (json['history'] as List).map((e) {
+                (json['responses'] as List).map((e) {
                   return HistoryInspectionModel.fromJson(e);
                 }),
               )
@@ -50,27 +72,36 @@ class TicketInspectionModel {
   factory TicketInspectionModel.fromDatabase(Map<String, dynamic> json) =>
       TicketInspectionModel(
         id: json['id'] ?? '',
-        date: json['date'] ?? '',
-        longitude: json['longitude'] ?? 0,
-        latitude: json['latitude'] ?? 0,
-        category: json['category'] ?? '',
-        company: json['company'] ?? '',
-        division: json['division'] ?? '',
-        userAssign: json['user_assign'] ?? '',
+        code: json['code'] ?? '',
+        trTime: json['tr_time'] ?? '',
+        mCompanyId: json['m_company_id'] ?? '',
+        mCompanyName: json['m_company_name'] ?? '',
+        mCompanyAlias: json['m_company_alias'] ?? '',
+        mTeamId: json['m_team_id'] ?? '',
+        mTeamName: json['m_team_name'] ?? '',
+        mDivisionId: json['m_division_id'] ?? '',
+        mDivisionName: json['m_division_name'] ?? '',
+        mDivisionEstateCode: json['m_division_estate_code'] ?? '',
+        gpsLng: json['gps_lng'] ?? 0,
+        gpsLat: json['gps_lat'] ?? 0,
+        submittedAt: json['submitted_at'] ?? '',
+        submittedBy: json['submitted_by'] ?? '',
+        submittedByName: json['submitted_by_name'] ?? '',
+        assignee: json['assignee'] ?? '',
+        assigneeId: json['assignee_id'] ?? '',
         status: json['status'] ?? '',
         description: json['description'] ?? '',
-        assignedTo: json['assigned_to'] ?? '',
-        mTeamId: json['m_team_id'] ?? '',
-        mCompanyId: json['m_company_id'] ?? '',
-        mDivisionId: json['m_division_id'] ?? '',
-        images: json['images'] != null
+        closedAt: json['closed_at'] ?? '',
+        closedBy: json['closed_by'] ?? '',
+        closedByName: json['closed_by_name'] ?? '',
+        attachments: json['attachments'] != null
             ? List.from(
-                (jsonDecode(json['images']) as List).map((e) => e),
+                (jsonDecode(json['attachments']) as List).map((e) => e),
               )
             : [],
-        history: json['history'] != null
+        responses: json['responses'] != null
             ? List<HistoryInspectionModel>.from(
-                (jsonDecode(json['history']) as List).map((e) {
+                (jsonDecode(json['responses']) as List).map((e) {
                   return HistoryInspectionModel.fromJson(e);
                 }),
               )
@@ -78,41 +109,59 @@ class TicketInspectionModel {
       );
 
   final String id;
-  final String date;
-  final double longitude;
-  final double latitude;
-  final String category;
-  final String company;
-  final String division;
-  final String userAssign;
+  final String code;
+  final String trTime;
+  final String mCompanyId;
+  final String mCompanyName;
+  final String mCompanyAlias;
+  final String mTeamId;
+  final String mTeamName;
+  final String mDivisionId;
+  final String mDivisionName;
+  final String mDivisionEstateCode;
+  final double gpsLng;
+  final double gpsLat;
+  final String submittedAt;
+  final String submittedBy;
+  final String submittedByName;
+  final String assignee;
+  final String assigneeId;
   final String status;
   final String description;
-  final String assignedTo;
-  final String mTeamId;
-  final String mCompanyId;
-  final String mDivisionId;
-  final List images;
-  final List<HistoryInspectionModel> history;
+  final String closedAt;
+  final String closedBy;
+  final String closedByName;
+  final List attachments;
+  final List<HistoryInspectionModel> responses;
 
   Map<String, dynamic> toJson() {
     final tempData = <String, dynamic>{};
 
     tempData['id'] = id;
-    tempData['date'] = date;
-    tempData['longitude'] = longitude;
-    tempData['latitude'] = latitude;
-    tempData['category'] = category;
-    tempData['company'] = company;
-    tempData['division'] = division;
-    tempData['user_assign'] = userAssign;
+    tempData['code'] = code;
+    tempData['tr_time'] = trTime;
+    tempData['m_company_id'] = mCompanyId;
+    tempData['m_company_name'] = mCompanyName;
+    tempData['m_company_alias'] = mCompanyAlias;
+    tempData['m_team_id'] = mTeamId;
+    tempData['m_team_name'] = mTeamName;
+    tempData['m_division_id'] = mDivisionId;
+    tempData['m_division_name'] = mDivisionName;
+    tempData['m_division_estate_code'] = mDivisionEstateCode;
+    tempData['gps_lng'] = gpsLng;
+    tempData['gps_lat'] = gpsLat;
+    tempData['submitted_at'] = submittedAt;
+    tempData['submitted_by'] = submittedBy;
+    tempData['submitted_by_name'] = submittedByName;
+    tempData['assignee'] = assignee;
+    tempData['assignee_id'] = assigneeId;
     tempData['status'] = status;
     tempData['description'] = description;
-    tempData['assigned_to'] = assignedTo;
-    tempData['m_team_id'] = mTeamId;
-    tempData['m_company_id'] = mCompanyId;
-    tempData['m_division_id'] = mDivisionId;
-    tempData['images'] = List.from(images.map((e) => e));
-    tempData['history'] = List.from(history.map((e) => e.toJson()));
+    tempData['closed_at'] = closedAt;
+    tempData['closed_by'] = closedBy;
+    tempData['closed_by_name'] = closedByName;
+    tempData['attachments'] = List.from(attachments.map((e) => e));
+    tempData['responses'] = List.from(responses.map((e) => e.toJson()));
 
     return tempData;
   }
@@ -121,27 +170,37 @@ class TicketInspectionModel {
     final tempData = <String, dynamic>{};
 
     tempData['id'] = id;
-    tempData['date'] = date;
-    tempData['longitude'] = longitude;
-    tempData['latitude'] = latitude;
-    tempData['category'] = category;
-    tempData['company'] = company;
-    tempData['division'] = division;
-    tempData['user_assign'] = userAssign;
+    tempData['code'] = code;
+    tempData['tr_time'] = trTime;
+    tempData['m_company_id'] = mCompanyId;
+    tempData['m_company_name'] = mCompanyName;
+    tempData['m_company_alias'] = mCompanyAlias;
+    tempData['m_team_id'] = mTeamId;
+    tempData['m_team_name'] = mTeamName;
+    tempData['m_division_id'] = mDivisionId;
+    tempData['m_division_name'] = mDivisionName;
+    tempData['m_division_estate_code'] = mDivisionEstateCode;
+    tempData['gps_lng'] = gpsLng;
+    tempData['gps_lat'] = gpsLat;
+    tempData['submitted_at'] = submittedAt;
+    tempData['submitted_by'] = submittedBy;
+    tempData['submitted_by_name'] = submittedByName;
+    tempData['assignee'] = assignee;
+    tempData['assignee_id'] = assigneeId;
     tempData['status'] = status;
     tempData['description'] = description;
-    tempData['assigned_to'] = assignedTo;
-    tempData['m_team_id'] = mTeamId;
-    tempData['m_company_id'] = mCompanyId;
-    tempData['m_division_id'] = mDivisionId;
-    tempData['images'] = jsonEncode(List.from(images.map((e) => e)));
-    tempData['history'] = jsonEncode(List.from(history.map((e) => e.toJson())));
+    tempData['closed_at'] = closedAt;
+    tempData['closed_by'] = closedBy;
+    tempData['closed_by_name'] = closedByName;
+    tempData['attachments'] = jsonEncode(List.from(attachments.map((e) => e)));
+    tempData['responses'] =
+        jsonEncode(List.from(responses.map((e) => e.toJson())));
 
     return tempData;
   }
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, date: $date, longitude: $longitude, latitude: $latitude, category: $category, company: $company, division: $division, user_assign: $userAssign, status: $status, description: $description, assigned_to: $assignedTo, m_team_id: $mTeamId, m_company_id: $mCompanyId, m_division_id: $mDivisionId, images: ${images.length} item, history: $history)';
+    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, attachments: $attachments, responses: $responses)';
   }
 }

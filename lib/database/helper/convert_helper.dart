@@ -16,4 +16,12 @@ class ConvertHelper {
     // ex : Hello World
     return newText;
   }
+
+  static double stringToDouble(String value) {
+    if (value.isNotEmpty) {
+      return double.parse(value);
+    }
+
+    return double.parse('0');
+  }
 }

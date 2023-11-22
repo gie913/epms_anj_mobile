@@ -44,6 +44,7 @@ import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:path_provider/path_provider.dart';
@@ -109,6 +110,7 @@ class DatabaseHelper {
     DatabaseTAuth().createTableTAuth(db);
     // Inspection
     DatabaseTicketInspection().createTable(db);
+    DatabaseTodoInspection().createTable(db);
     DatabaseUserInspectionConfig().createTable(db);
     DatabaseUserInspection().createTable(db);
     DatabaseTeamInspection().createTable(db);
@@ -128,6 +130,7 @@ class DatabaseHelper {
 
   void deleteMasterDataInspection() {
     DatabaseTicketInspection.deleteTable();
+    DatabaseTodoInspection.deleteTable();
     DatabaseUserInspectionConfig.deleteTable();
     DatabaseUserInspection.deleteTable();
     DatabaseTeamInspection.deleteTable();

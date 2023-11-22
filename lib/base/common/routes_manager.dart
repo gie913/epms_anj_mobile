@@ -11,6 +11,7 @@ import 'package:epms/screen/inspection/inspection_assignment_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_form_view.dart';
 import 'package:epms/screen/inspection/inspection_page.dart';
+import 'package:epms/screen/inspection/inspection_user_view.dart';
 import 'package:epms/screen/kerani_kirim/administration_spb/administration_spb_screen.dart';
 import 'package:epms/screen/kerani_kirim/detail_spb/detail_spb_page.dart';
 import 'package:epms/screen/kerani_kirim/edit_spb/edit_spb_page.dart';
@@ -277,6 +278,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           : const TicketInspectionModel();
       return MaterialPageRoute(
         builder: (context) => InspectionApprovalView(data: arguments),
+      );
+    case Routes.INSPECTION_USER:
+      return MaterialPageRoute(
+        builder: (context) => InspectionUserView(),
       );
     default:
       return MaterialPageRoute(
