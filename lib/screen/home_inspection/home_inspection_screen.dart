@@ -16,7 +16,7 @@ class HomeInspectionScreen extends StatefulWidget {
 class _HomeInspectionScreenState extends State<HomeInspectionScreen> {
   @override
   void initState() {
-    context.read<HomeInspectionNotifier>().initData();
+    context.read<HomeInspectionNotifier>().initData(context);
     super.initState();
   }
 

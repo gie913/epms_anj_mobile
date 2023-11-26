@@ -19,7 +19,7 @@ class InspectionRepository extends APIConfiguration {
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
-    log('cek inspectionToken : $inspectionToken');
+    log('cek ticketInspectionToken : $inspectionToken');
 
     try {
       var headers = {
@@ -64,7 +64,7 @@ class InspectionRepository extends APIConfiguration {
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
-    log('cek inspectionToken : $inspectionToken');
+    log('cek TodoInspectionToken : $inspectionToken');
 
     try {
       var headers = {
@@ -110,7 +110,7 @@ class InspectionRepository extends APIConfiguration {
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
-    log('cek inspectionToken : $inspectionToken');
+    log('cek CreateInspectionToken : $inspectionToken');
 
     var headers = {
       'Content-type': 'application/x-www-form-urlencoded',
@@ -133,7 +133,7 @@ class InspectionRepository extends APIConfiguration {
             contentType: MediaType.parse('image/jpeg'),
           );
           request.files.add(multipartFile);
-        } else {
+        } else if (image.toString().isNotEmpty) {
           File imageFile = File(image);
           var stream = http.ByteStream(imageFile.openRead());
           var length = await imageFile.length();
@@ -203,7 +203,7 @@ class InspectionRepository extends APIConfiguration {
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
-    log('cek inspectionToken : $inspectionToken');
+    log('cek CreateResponseInspectionToken : $inspectionToken');
 
     var headers = {
       'Content-type': 'application/x-www-form-urlencoded',
@@ -226,7 +226,7 @@ class InspectionRepository extends APIConfiguration {
             contentType: MediaType.parse('image/jpeg'),
           );
           request.files.add(multipartFile);
-        } else {
+        } else if (image.toString().isNotEmpty) {
           File imageFile = File(image);
           var stream = http.ByteStream(imageFile.openRead());
           var length = await imageFile.length();

@@ -32,6 +32,7 @@ class DatabaseTicketInspection {
        ${TicketInspectionEntity.closedAt} TEXT,
        ${TicketInspectionEntity.closedBy} TEXT,
        ${TicketInspectionEntity.closedByName} TEXT,
+       ${TicketInspectionEntity.isSynchronize} INTEGER,
        ${TicketInspectionEntity.attachments} TEXT,
        ${TicketInspectionEntity.responses} TEXT)
     ''');
@@ -40,12 +41,26 @@ class DatabaseTicketInspection {
   static Future<void> addAllData(List<TicketInspectionModel> data) async {
     Database db = await DatabaseHelper().database;
 
-    final batch = db.batch();
+    var mapList = await db.query(ticketInspectionTable);
+    var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
+      return TicketInspectionModel.fromDatabase(e);
+    }));
+    List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
 
-    for (final item in data) {
-      batch.insert(ticketInspectionTable, item.toDatabase());
+    for (var i = 0; i < data.length; i++) {
+      if (!dataFromLocalCode.contains(data[i].code)) {
+        await db.insert(ticketInspectionTable, data[i].toDatabase());
+      } else {
+        final dataFromLocalIndex = dataFromLocalCode.indexOf(data[i].code);
+        final dataFromLocalItem = dataFromLocal[dataFromLocalIndex];
+        await db.update(
+          ticketInspectionTable,
+          dataFromLocalItem.toDatabase(),
+          where: '${TicketInspectionEntity.code}=?',
+          whereArgs: [dataFromLocalItem.code],
+        );
+      }
     }
-    await batch.commit();
   }
 
   static Future<void> insertData(TicketInspectionModel data) async {

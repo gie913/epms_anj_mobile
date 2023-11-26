@@ -1,16 +1,18 @@
-import 'dart:developer';
-
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/oph.dart';
+import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/user_inspection_config_model.dart';
 import 'package:epms/screen/home/logout_repository.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:flutter/material.dart';
 
 class HomeInspectionNotifier extends ChangeNotifier {
@@ -26,26 +28,90 @@ class HomeInspectionNotifier extends ChangeNotifier {
 
   UserInspectionConfigModel get dataUser => _dataUser;
 
+  List<TicketInspectionModel> _listMyInspection = [];
+  List<TicketInspectionModel> get listMyInspection => _listMyInspection;
+
+  List<TicketInspectionModel> _listTodoInspection = [];
+  List<TicketInspectionModel> get listTodoInspection => _listTodoInspection;
+
+  bool _isInternetExist = false;
+
+  bool get isInternetExist => _isInternetExist;
+
   int _countInspection = 0;
 
   int get countInspection => _countInspection;
 
-  void initData() {
-    getDataUser();
-    getInspection();
+  void initData(BuildContext context) async {
+    await checkInternetConnection();
+    await getDataUser();
+    await getDataInspection(context);
+    await updateCountInspection();
   }
 
-  Future<void> getInspection() async {
-    final data = await DatabaseTicketInspection.selectData();
-    _countInspection = data.length;
+  Future<void> checkInternetConnection() async {
+    final data = await InspectionService.isInternetConnectionExist();
+    _isInternetExist = data;
     notifyListeners();
   }
 
-  void getDataUser() async {
+  Future<void> updateCountInspection() async {
+    await updateMyInspectionFromLocal();
+    await updateTodoInspectionFromLocal();
+    _countInspection = _listMyInspection.length + _listTodoInspection.length;
+    notifyListeners();
+  }
+
+  Future<void> getDataUser() async {
     var data = await DatabaseUserInspectionConfig.selectData();
     _dataUser = data;
     notifyListeners();
-    log('cek data user : $_dataUser');
+  }
+
+  Future<void> getDataInspection(BuildContext context) async {
+    if (isInternetExist) {
+      await InspectionRepository().getMyInspection(
+        context,
+        (context, data) async {
+          await DatabaseTicketInspection.addAllData(data);
+          await updateMyInspectionFromLocal();
+          await getTodoInspection(context);
+        },
+        (context, errorMessage) async {
+          await getTodoInspection(context);
+        },
+      );
+    } else {
+      await updateMyInspectionFromLocal();
+      await updateTodoInspectionFromLocal();
+    }
+  }
+
+  Future<void> updateMyInspectionFromLocal() async {
+    final data = await DatabaseTicketInspection.selectData();
+    _listMyInspection = data;
+    notifyListeners();
+  }
+
+  Future<void> getTodoInspection(BuildContext context) async {
+    if (isInternetExist) {
+      await InspectionRepository().getToDoInspection(
+        context,
+        (context, data) async {
+          await DatabaseTodoInspection.addAllData(data);
+          await updateTodoInspectionFromLocal();
+        },
+        (context, errorMessage) {},
+      );
+    } else {
+      await updateTodoInspectionFromLocal();
+    }
+  }
+
+  Future<void> updateTodoInspectionFromLocal() async {
+    final data = await DatabaseTodoInspection.selectData();
+    _listTodoInspection = data;
+    notifyListeners();
   }
 
   goToMenuBacaKartuOPH() {
@@ -55,7 +121,7 @@ class HomeInspectionNotifier extends ChangeNotifier {
 
   Future<void> goToMenuInspection() async {
     await _navigationService.push(Routes.INSPECTION);
-    await getInspection();
+    await updateCountInspection();
   }
 
   void showPopUpLogOut() {

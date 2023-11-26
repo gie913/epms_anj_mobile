@@ -9,6 +9,7 @@ import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/camera_service.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
@@ -86,11 +87,40 @@ class _InspectionAssignmentDetailViewState
       return false;
     }
 
+    if (selectedAction != null && selectedAction == 'reassign') {
+      if (selectedUserInspection == null) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon memilih user reassign terlebih dahulu",
+        );
+        return false;
+      }
+
+      if (actionController.text.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon mengisi deskripsi tindakan terlebih dahulu",
+        );
+        return false;
+      }
+
+      if (listInspectionPhoto.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon melampirkan bukti foto",
+        );
+        return false;
+      }
+    }
+
     if (actionController.text.isEmpty) {
       FlushBarManager.showFlushBarWarning(
         context,
         "Form Belum Lengkap",
-        "Mohon mengisi deskripsi terlebih dahulu",
+        "Mohon mengisi deskripsi tindakan terlebih dahulu",
       );
       return false;
     }
@@ -220,11 +250,24 @@ class _InspectionAssignmentDetailViewState
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 1.5,
               child: imagePath.contains('http')
-                  ? Image.network(
-                      imagePath,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.5,
-                      fit: BoxFit.fill,
+                  ? FutureBuilder(
+                      future: InspectionService.isInternetConnectionExist(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == true) {
+                          return Image.network(
+                            imagePath,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            fit: BoxFit.fill,
+                          );
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            color: Colors.orange,
+                          );
+                        }
+                      },
                     )
                   : Image.file(
                       File(imagePath),
@@ -288,11 +331,12 @@ class _InspectionAssignmentDetailViewState
         submittedByName: widget.data.submittedByName,
         assignee: widget.data.assignee,
         assigneeId: widget.data.assigneeId,
-        status: selectedAction ?? '-',
+        status: selectedAction ?? '',
         description: widget.data.description,
         closedAt: widget.data.closedAt,
         closedBy: widget.data.closedBy,
         closedByName: widget.data.closedByName,
+        isSynchronize: 0,
         attachments: widget.data.attachments,
         responses: listHistoryInspection,
       );
@@ -423,17 +467,37 @@ class _InspectionAssignmentDetailViewState
                                     showFoto(context, image);
                                   },
                                   child: (image.toString().contains('http'))
-                                      ? Image.network(
-                                          image,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              4,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              4,
-                                          fit: BoxFit.fill,
+                                      ? FutureBuilder(
+                                          future: InspectionService
+                                              .isInternetConnectionExist(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.data == true) {
+                                              return Image.network(
+                                                image,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                fit: BoxFit.fill,
+                                              );
+                                            } else {
+                                              return Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                color: Colors.orange,
+                                              );
+                                            }
+                                          },
                                         )
                                       : Image.file(
                                           File(image),
@@ -474,103 +538,248 @@ class _InspectionAssignmentDetailViewState
                         child: Center(
                             child: const Text('Belum Ada Riwayat Tindakan')),
                       ),
-                    Row(
-                      children: [
-                        Expanded(child: Text('Action :')),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButton(
-                            isExpanded: true,
-                            hint: Text(
-                              "Pilih Action",
-                              style: Style.whiteBold14.copyWith(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.grey),
+                    if (ConvertHelper.intToBool(widget.data.isSynchronize))
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(child: Text('Action :')),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButton(
+                                  isExpanded: true,
+                                  hint: Text(
+                                    "Pilih Action",
+                                    style: Style.whiteBold14.copyWith(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                  value: selectedAction,
+                                  style: Style.whiteBold14.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    color: themeNotifier.status == true ||
+                                            MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                  items: listActionOption.map((value) {
+                                    return DropdownMenuItem(
+                                      child: Text(ConvertHelper.titleCase(
+                                          value.replaceAll(RegExp(r'_'), ' '))),
+                                      value: value,
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    if (value != null) {
+                                      selectedAction = value;
+                                      setState(() {});
+                                    }
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                          if (selectedAction == 'reassign')
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Text('User Re Assign :')),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () async {
+                                        final data = await _navigationService
+                                            .push(Routes.INSPECTION_USER);
+                                        selectedUserInspection = data;
+                                        setState(() {});
+                                        log('selected user reassign : $selectedUserInspection');
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: themeNotifier.status ==
+                                                              true ||
+                                                          MediaQuery.of(context)
+                                                                  .platformBrightness ==
+                                                              Brightness.dark
+                                                      ? Colors.white
+                                                      : Colors.grey.shade400,
+                                                  width: 0.5)),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: selectedUserInspection !=
+                                                        null
+                                                    ? Text(
+                                                        selectedUserInspection!
+                                                            .name)
+                                                    : Text(
+                                                        'Pilih User',
+                                                        style: TextStyle(
+                                                            color: themeNotifier
+                                                                            .status ==
+                                                                        true ||
+                                                                    MediaQuery.of(context)
+                                                                            .platformBrightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                ? Colors.grey
+                                                                    .shade500
+                                                                : Colors.black
+                                                                    .withOpacity(
+                                                                        0.35)),
+                                                      ),
+                                              ),
+                                              Icon(Icons.arrow_drop_down,
+                                                  color: themeNotifier.status ==
+                                                              true ||
+                                                          MediaQuery.of(context)
+                                                                  .platformBrightness ==
+                                                              Brightness.dark
+                                                      ? Colors.grey.shade400
+                                                      : Colors.grey.shade700)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            value: selectedAction,
-                            style: Style.whiteBold14.copyWith(
-                              fontWeight: FontWeight.normal,
-                              color: themeNotifier.status == true ||
-                                      MediaQuery.of(context)
-                                              .platformBrightness ==
-                                          Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
+                          Row(
+                            children: [
+                              Text('Lokasi Tindakan :'),
+                              SizedBox(width: 12),
+                              Expanded(
+                                  child: Text('$longitude,$latitude',
+                                      textAlign: TextAlign.end))
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Text('Tindakan :'),
+                          SizedBox(height: 6),
+                          InputPrimary(
+                            controller: actionController,
+                            maxLines: 10,
+                            hintText: 'Masukkan Tindakan',
+                            validator: (value) => null,
+                          ),
+                          SizedBox(height: 12),
+                          if (listInspectionPhoto.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Foto Tindakan Inspection :'),
+                                SizedBox(height: 6),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.width / 4,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: listInspectionPhoto.length,
+                                    itemBuilder: (context, index) {
+                                      final imagePath =
+                                          listInspectionPhoto[index];
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: InspectionPhoto(
+                                          imagePath: imagePath,
+                                          onTapView: () {
+                                            showFoto(context, imagePath);
+                                          },
+                                          onTapRemove: () {
+                                            listInspectionPhoto
+                                                .remove(imagePath);
+                                            setState(() {});
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                              ],
                             ),
-                            items: listActionOption.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(ConvertHelper.titleCase(
-                                    value.replaceAll(RegExp(r'_'), ' '))),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              if (value != null) {
-                                selectedAction = value;
-                                setState(() {});
+                          InkWell(
+                            onTap: () {
+                              if (listInspectionPhoto.length < 5) {
+                                showDialogOptionTakeFoto(
+                                  context,
+                                  onTapCamera: () async {
+                                    final result = await CameraService.getImage(
+                                      context,
+                                      imageSource: ImageSource.camera,
+                                    );
+                                    if (result != null) {
+                                      listInspectionPhoto.add(result);
+                                      setState(() {});
+                                    }
+                                  },
+                                  onTapGalery: () async {
+                                    final result = await CameraService.getImage(
+                                      context,
+                                      imageSource: ImageSource.gallery,
+                                    );
+                                    if (result != null) {
+                                      listInspectionPhoto.add(result);
+                                      setState(() {});
+                                    }
+                                  },
+                                );
+                              } else {
+                                FlushBarManager.showFlushBarWarning(
+                                    _navigationService
+                                        .navigatorKey.currentContext!,
+                                    "Foto Inspection",
+                                    "Maksimal 5 foto yang dapat Anda lampirkan");
                               }
                             },
-                          ),
-                        )
-                      ],
-                    ),
-                    if (selectedAction == 'reassign')
-                      Row(
-                        children: [
-                          Expanded(child: Text('User Re Assign :')),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                final data = await _navigationService
-                                    .push(Routes.INSPECTION_USER);
-                                selectedUserInspection = data;
-                                setState(() {});
-                                log('selected user reassign : $selectedUserInspection');
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: themeNotifier.status == true ||
-                                                  MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                              ? Colors.white
-                                              : Colors.grey.shade400,
-                                          width: 0.5)),
-                                ),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              color: Colors.green,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: selectedUserInspection != null
-                                            ? Text(selectedUserInspection!.name)
-                                            : Text(
-                                                'Pilih User',
-                                                style: TextStyle(
-                                                    color: themeNotifier
-                                                                    .status ==
-                                                                true ||
-                                                            MediaQuery.of(
-                                                                        context)
-                                                                    .platformBrightness ==
-                                                                Brightness.dark
-                                                        ? Colors.grey.shade500
-                                                        : Colors.black
-                                                            .withOpacity(0.35)),
-                                              ),
-                                      ),
-                                      Icon(Icons.arrow_drop_down,
-                                          color: themeNotifier.status == true ||
-                                                  MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                              ? Colors.grey.shade400
-                                              : Colors.grey.shade700)
-                                    ],
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    "ATTACHMENT",
+                                    style: Style.whiteBold14,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              await submit();
+                            },
+                            child: Card(
+                              color: Palette.primaryColorProd,
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    "SUBMIT",
+                                    style: Style.whiteBold14,
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
@@ -578,131 +787,6 @@ class _InspectionAssignmentDetailViewState
                           ),
                         ],
                       ),
-                    Row(
-                      children: [
-                        Text('Lokasi Tindakan :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text('$longitude,$latitude',
-                                textAlign: TextAlign.end))
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Text('Tindakan :'),
-                    SizedBox(height: 6),
-                    InputPrimary(
-                      controller: actionController,
-                      maxLines: 10,
-                      hintText: 'Masukkan Tindakan',
-                      validator: (value) => null,
-                    ),
-                    SizedBox(height: 12),
-                    if (listInspectionPhoto.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Foto Tindakan Inspection :'),
-                          SizedBox(height: 6),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.width / 4,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: listInspectionPhoto.length,
-                              itemBuilder: (context, index) {
-                                final imagePath = listInspectionPhoto[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: InspectionPhoto(
-                                    imagePath: imagePath,
-                                    onTapView: () {
-                                      showFoto(context, imagePath);
-                                    },
-                                    onTapRemove: () {
-                                      listInspectionPhoto.remove(imagePath);
-                                      setState(() {});
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                        ],
-                      ),
-                    InkWell(
-                      onTap: () {
-                        if (listInspectionPhoto.length < 5) {
-                          showDialogOptionTakeFoto(
-                            context,
-                            onTapCamera: () async {
-                              final result = await CameraService.getImage(
-                                context,
-                                imageSource: ImageSource.camera,
-                              );
-                              if (result != null) {
-                                listInspectionPhoto.add(result);
-                                setState(() {});
-                              }
-                            },
-                            onTapGalery: () async {
-                              final result = await CameraService.getImage(
-                                context,
-                                imageSource: ImageSource.gallery,
-                              );
-                              if (result != null) {
-                                listInspectionPhoto.add(result);
-                                setState(() {});
-                              }
-                            },
-                          );
-                        } else {
-                          FlushBarManager.showFlushBarWarning(
-                              _navigationService.navigatorKey.currentContext!,
-                              "Foto Inspection",
-                              "Maksimal 5 foto yang dapat Anda lampirkan");
-                        }
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        color: Colors.green,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              "ATTACHMENT",
-                              style: Style.whiteBold14,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await submit();
-                      },
-                      child: Card(
-                        color: Palette.primaryColorProd,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text(
-                              "SUBMIT",
-                              style: Style.whiteBold14,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

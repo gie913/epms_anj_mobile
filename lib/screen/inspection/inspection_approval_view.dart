@@ -7,14 +7,14 @@ import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
-import 'package:epms/common_manager/camera_service.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_action_inspection.dart';
-import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/history_inspection_model.dart';
@@ -25,7 +25,6 @@ import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -49,7 +48,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   String gpsLocation = '';
 
   List<UserInspectionModel> listUserInspection = const [];
-  UserInspectionModel? selectedUserInspection;
+  UserInspectionModel? selectedUserReassign;
+  UserInspectionModel? selectedUserConsultant;
 
   final descriptionController = TextEditingController();
   final noteController = TextEditingController();
@@ -81,12 +81,86 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
     super.dispose();
   }
 
+  bool validateForm() {
+    if (selectedAction == null) {
+      FlushBarManager.showFlushBarWarning(
+        context,
+        "Form Belum Lengkap",
+        "Mohon memilih action terlebih dahulu",
+      );
+      return false;
+    }
+
+    if (selectedAction != null && selectedAction == 'reassign') {
+      if (selectedUserReassign == null) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon memilih user reassign terlebih dahulu",
+        );
+        return false;
+      }
+
+      if (noteController.text.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon mengisi deskripsi tindakan terlebih dahulu",
+        );
+        return false;
+      }
+
+      // if (listInspectionPhoto.isEmpty) {
+      //   FlushBarManager.showFlushBarWarning(
+      //     context,
+      //     "Form Belum Lengkap",
+      //     "Mohon melampirkan bukti foto",
+      //   );
+      //   return false;
+      // }
+    }
+
+    if (selectedAction != null && selectedAction == 'need_consultation') {
+      if (selectedUserConsultant == null) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon memilih user consultation terlebih dahulu",
+        );
+        return false;
+      }
+
+      if (noteController.text.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon mengisi keterangan terlebih dahulu",
+        );
+        return false;
+      }
+
+      // if (listInspectionPhoto.isEmpty) {
+      //   FlushBarManager.showFlushBarWarning(
+      //     context,
+      //     "Form Belum Lengkap",
+      //     "Mohon melampirkan bukti foto",
+      //   );
+      //   return false;
+      // }
+    }
+
+    return true;
+  }
+
   Future<void> getOptionAction() async {
-    final data =
-        await DatabaseActionInspection.selectDataByStatus(widget.data.status);
-    listActionOption = List<String>.from(data.options.map((e) => e.toString()));
-    log('cek list action options : $listActionOption');
-    setState(() {});
+    if (widget.data.status != 'accept-reassign') {
+      final data =
+          await DatabaseActionInspection.selectDataByStatus(widget.data.status);
+      listActionOption =
+          List<String>.from(data.options.map((e) => e.toString()));
+      log('cek list action options : $listActionOption');
+      setState(() {});
+    }
   }
 
   Future<void> getUserInspection() async {
@@ -115,53 +189,62 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   }
 
   Future<void> submit() async {
-    final dataHistory = HistoryInspectionModel(
-      id: widget.data.id,
-      code: responseId,
-      trTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-      submittedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-      submittedBy: user.id,
-      submittedByName: user.name,
-      description: noteController.text.isNotEmpty ? noteController.text : '',
-      consultedWith:
-          selectedUserInspection != null ? selectedUserInspection!.id : '',
-      consultedWithName:
-          selectedUserInspection != null ? selectedUserInspection!.name : '',
-      gpsLat: latitude,
-      gpsLng: longitude,
-      status: selectedAction ?? '',
-      attachments: [],
-    );
-    listHistoryInspection.add(dataHistory);
-    final dataInspection = TicketInspectionModel(
-      id: widget.data.id,
-      code: widget.data.code,
-      trTime: widget.data.trTime,
-      mCompanyId: widget.data.mCompanyId,
-      mCompanyName: widget.data.mCompanyName,
-      mCompanyAlias: widget.data.mCompanyAlias,
-      mTeamId: widget.data.mTeamId,
-      mTeamName: widget.data.mTeamName,
-      mDivisionId: widget.data.mDivisionId,
-      mDivisionName: widget.data.mDivisionName,
-      mDivisionEstateCode: widget.data.mDivisionEstateCode,
-      gpsLng: widget.data.gpsLng,
-      gpsLat: widget.data.gpsLat,
-      submittedAt: widget.data.submittedAt,
-      submittedBy: widget.data.submittedBy,
-      submittedByName: widget.data.submittedByName,
-      assignee: widget.data.assignee,
-      assigneeId: widget.data.assigneeId,
-      status: selectedAction ?? '-',
-      description: widget.data.description,
-      closedAt: widget.data.closedAt,
-      closedBy: widget.data.closedBy,
-      closedByName: widget.data.closedByName,
-      attachments: widget.data.attachments,
-      responses: listHistoryInspection,
-    );
-    await DatabaseTicketInspection.updateData(dataInspection);
-    _navigationService.pop();
+    if (validateForm()) {
+      final dataHistory = HistoryInspectionModel(
+        id: widget.data.id,
+        code: responseId,
+        trTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+        submittedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+        submittedBy: user.id,
+        submittedByName: user.name,
+        description: noteController.text.isNotEmpty ? noteController.text : '',
+        reassignedTo:
+            selectedUserReassign != null ? selectedUserReassign!.id : '',
+        reassignedToName:
+            selectedUserReassign != null ? selectedUserReassign!.name : '',
+        consultedWith:
+            selectedUserConsultant != null ? selectedUserConsultant!.id : '',
+        consultedWithName:
+            selectedUserConsultant != null ? selectedUserConsultant!.name : '',
+        gpsLat: latitude,
+        gpsLng: longitude,
+        status: selectedAction ?? '',
+        attachments: listInspectionPhoto,
+      );
+      log('cek response new : $dataHistory');
+      listHistoryInspection.add(dataHistory);
+      log('cek list response : $listHistoryInspection');
+      final dataInspection = TicketInspectionModel(
+        id: widget.data.id,
+        code: widget.data.code,
+        trTime: widget.data.trTime,
+        mCompanyId: widget.data.mCompanyId,
+        mCompanyName: widget.data.mCompanyName,
+        mCompanyAlias: widget.data.mCompanyAlias,
+        mTeamId: widget.data.mTeamId,
+        mTeamName: widget.data.mTeamName,
+        mDivisionId: widget.data.mDivisionId,
+        mDivisionName: widget.data.mDivisionName,
+        mDivisionEstateCode: widget.data.mDivisionEstateCode,
+        gpsLng: widget.data.gpsLng,
+        gpsLat: widget.data.gpsLat,
+        submittedAt: widget.data.submittedAt,
+        submittedBy: widget.data.submittedBy,
+        submittedByName: widget.data.submittedByName,
+        assignee: widget.data.assignee,
+        assigneeId: widget.data.assigneeId,
+        status: selectedAction ?? '',
+        description: widget.data.description,
+        closedAt: widget.data.closedAt,
+        closedBy: widget.data.closedBy,
+        closedByName: widget.data.closedByName,
+        isSynchronize: 0,
+        attachments: widget.data.attachments,
+        responses: listHistoryInspection,
+      );
+      await DatabaseTodoInspection.updateData(dataInspection);
+      _navigationService.pop();
+    }
   }
 
   void showDialogOptionTakeFoto(
@@ -243,12 +326,32 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
             content: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 1.5,
-              child: Image.file(
-                File(imagePath),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 1.5,
-                fit: BoxFit.fill,
-              ),
+              child: imagePath.contains('http')
+                  ? FutureBuilder(
+                      future: InspectionService.isInternetConnectionExist(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == true) {
+                          return Image.network(
+                            imagePath,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            fit: BoxFit.fill,
+                          );
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            color: Colors.orange,
+                          );
+                        }
+                      },
+                    )
+                  : Image.file(
+                      File(imagePath),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 1.5,
+                      fit: BoxFit.fill,
+                    ),
             ),
           ),
         );
@@ -280,7 +383,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.data.id),
+                    Text(widget.data.code),
                     SizedBox(height: 12),
                     Row(
                       children: [
@@ -348,6 +451,18 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                       ],
                     ),
                     SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text('Status :'),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text(
+                                ConvertHelper.titleCase(widget.data.status
+                                    .replaceAll(RegExp(r'_'), ' ')),
+                                textAlign: TextAlign.end))
+                      ],
+                    ),
+                    SizedBox(height: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -366,14 +481,51 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   onTap: () {
                                     showFoto(context, image);
                                   },
-                                  child: Image.file(
-                                    File(image),
-                                    width:
-                                        MediaQuery.of(context).size.width / 4,
-                                    height:
-                                        MediaQuery.of(context).size.width / 4,
-                                    fit: BoxFit.fill,
-                                  ),
+                                  child: (image.toString().contains('http'))
+                                      ? FutureBuilder(
+                                          future: InspectionService
+                                              .isInternetConnectionExist(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.data == true) {
+                                              return Image.network(
+                                                image,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                fit: BoxFit.fill,
+                                              );
+                                            } else {
+                                              return Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    4,
+                                                color: Colors.orange,
+                                              );
+                                            }
+                                          },
+                                        )
+                                      : Image.file(
+                                          File(image),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          fit: BoxFit.fill,
+                                        ),
                                 ),
                               );
                             },
@@ -390,18 +542,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                       validator: (value) => null,
                       readOnly: true,
                     ),
-                    Row(
-                      children: [
-                        Text('Status :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text(
-                                ConvertHelper.titleCase(widget.data.status
-                                    .replaceAll(RegExp(r'_'), ' ')),
-                                textAlign: TextAlign.end))
-                      ],
-                    ),
-                    SizedBox(height: 12),
                     Text('Riwayat Tindakan :'),
                     if (widget.data.responses.isNotEmpty)
                       ...widget.data.responses
@@ -413,297 +553,358 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         child: Center(
                             child: const Text('Belum Ada Riwayat Tindakan')),
                       ),
-                    // Text('Tindakan :'),
-                    // SizedBox(height: 6),
-                    // InputPrimary(
-                    //   controller: actionController,
-                    //   hintText: 'Belum ada Tindakan',
-                    //   maxLines: 10,
-                    //   validator: (value) => null,
-                    //   readOnly: action == 'Revisi' ? false : true,
-                    // ),
-                    Row(
-                      children: [
-                        Text('Lokasi Tindakan Buat :'),
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text('$longitude,$latitude',
-                                textAlign: TextAlign.end))
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(child: Text('Action :')),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButton(
-                            isExpanded: true,
-                            hint: Text(
-                              "Pilih Action",
-                              style: Style.whiteBold14.copyWith(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.grey),
-                            ),
-                            value: selectedAction,
-                            style: Style.whiteBold14.copyWith(
-                              fontWeight: FontWeight.normal,
-                              color: themeNotifier.status == true ||
-                                      MediaQuery.of(context)
-                                              .platformBrightness ==
-                                          Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            items: listActionOption.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(ConvertHelper.titleCase(
-                                    value.replaceAll(RegExp(r'_'), ' '))),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              if (value != null) {
-                                selectedAction = value;
-                                noteController.clear();
-                                setState(() {});
-                              }
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    if (selectedAction == 'need_consultation')
+                    if (ConvertHelper.intToBool(widget.data.isSynchronize) &&
+                        widget.data.status != 'close')
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Expanded(child: Text('User Consultation :')),
+                              Text('Lokasi Tindakan :'),
                               SizedBox(width: 12),
                               Expanded(
-                                child: InkWell(
-                                  onTap: () async {
-                                    final data = await _navigationService
-                                        .push(Routes.INSPECTION_USER);
-                                    selectedUserInspection = data;
-                                    setState(() {});
-                                    log('selected user consultation : $selectedUserInspection');
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: themeNotifier.status ==
-                                                          true ||
-                                                      MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                  ? Colors.white
-                                                  : Colors.grey.shade400,
-                                              width: 0.5)),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child:
-                                                selectedUserInspection != null
-                                                    ? Text(
-                                                        selectedUserInspection!
-                                                            .name)
-                                                    : Text(
-                                                        'Pilih User',
-                                                        style: TextStyle(
-                                                            color: themeNotifier
-                                                                            .status ==
-                                                                        true ||
-                                                                    MediaQuery.of(context)
-                                                                            .platformBrightness ==
-                                                                        Brightness
-                                                                            .dark
-                                                                ? Colors.grey
-                                                                    .shade500
-                                                                : Colors.black
-                                                                    .withOpacity(
-                                                                        0.35)),
-                                                      ),
-                                          ),
-                                          Icon(Icons.arrow_drop_down,
-                                              color: themeNotifier.status ==
-                                                          true ||
-                                                      MediaQuery.of(context)
-                                                              .platformBrightness ==
-                                                          Brightness.dark
-                                                  ? Colors.grey.shade400
-                                                  : Colors.grey.shade700)
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                  child: Text('$longitude,$latitude',
+                                      textAlign: TextAlign.end))
                             ],
                           ),
-                          // Row(
-                          //   children: [
-                          //     Expanded(child: Text('User Consultation :')),
-                          //     SizedBox(width: 12),
-                          //     Expanded(
-                          //       child: DropdownButton(
-                          //         isExpanded: true,
-                          //         hint: Text(
-                          //           "Pilih User",
-                          //           style: Style.whiteBold14.copyWith(
-                          //               fontWeight: FontWeight.normal,
-                          //               color: Colors.grey),
-                          //         ),
-                          //         value: userConsultation,
-                          //         style: Style.whiteBold14.copyWith(
-                          //           fontWeight: FontWeight.normal,
-                          //           color: themeNotifier.status == true ||
-                          //                   MediaQuery.of(context)
-                          //                           .platformBrightness ==
-                          //                       Brightness.dark
-                          //               ? Colors.white
-                          //               : Colors.black,
-                          //         ),
-                          //         items: listUserConsultation.map((value) {
-                          //           return DropdownMenuItem(
-                          //             child: Text(value),
-                          //             value: value,
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(child: Text('Action :')),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButton(
+                                  isExpanded: true,
+                                  hint: Text(
+                                    "Pilih Action",
+                                    style: Style.whiteBold14.copyWith(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey),
+                                  ),
+                                  value: selectedAction,
+                                  style: Style.whiteBold14.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    color: themeNotifier.status == true ||
+                                            MediaQuery.of(context)
+                                                    .platformBrightness ==
+                                                Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                  items: listActionOption.map((value) {
+                                    return DropdownMenuItem(
+                                      child: Text(ConvertHelper.titleCase(
+                                        value
+                                            .replaceAll(RegExp(r'_'), ' ')
+                                            .replaceAll(RegExp(r'-'), ' '),
+                                      )),
+                                      value: value,
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    if (value != null) {
+                                      selectedAction = value;
+                                      noteController.clear();
+                                      setState(() {});
+                                    }
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                          if (selectedAction == 'reassign')
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(child: Text('User Re Assign :')),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          final data = await _navigationService
+                                              .push(Routes.INSPECTION_USER);
+                                          selectedUserReassign = data;
+                                          setState(() {});
+                                          log('selected user reassign : $selectedUserReassign');
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                                bottom: BorderSide(
+                                                    color: themeNotifier
+                                                                    .status ==
+                                                                true ||
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .platformBrightness ==
+                                                                Brightness.dark
+                                                        ? Colors.white
+                                                        : Colors.grey.shade400,
+                                                    width: 0.5)),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: selectedUserReassign !=
+                                                          null
+                                                      ? Text(
+                                                          selectedUserReassign!
+                                                              .name)
+                                                      : Text(
+                                                          'Pilih User',
+                                                          style: TextStyle(
+                                                              color: themeNotifier
+                                                                              .status ==
+                                                                          true ||
+                                                                      MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                  ? Colors.grey
+                                                                      .shade500
+                                                                  : Colors.black
+                                                                      .withOpacity(
+                                                                          0.35)),
+                                                        ),
+                                                ),
+                                                Icon(Icons.arrow_drop_down,
+                                                    color: themeNotifier
+                                                                    .status ==
+                                                                true ||
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .platformBrightness ==
+                                                                Brightness.dark
+                                                        ? Colors.grey.shade400
+                                                        : Colors.grey.shade700)
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text('Tindakan :'),
+                                SizedBox(height: 6),
+                                InputPrimary(
+                                  controller: noteController,
+                                  maxLines: 10,
+                                  hintText: 'Masukkan Tindakan',
+                                  validator: (value) => null,
+                                ),
+                              ],
+                            ),
+                          if (selectedAction == 'need_consultation')
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        child: Text('User Consultation :')),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          final data = await _navigationService
+                                              .push(Routes.INSPECTION_USER);
+                                          selectedUserConsultant = data;
+                                          setState(() {});
+                                          log('selected user consultation : $selectedUserConsultant');
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                                bottom: BorderSide(
+                                                    color: themeNotifier
+                                                                    .status ==
+                                                                true ||
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .platformBrightness ==
+                                                                Brightness.dark
+                                                        ? Colors.white
+                                                        : Colors.grey.shade400,
+                                                    width: 0.5)),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: selectedUserConsultant !=
+                                                          null
+                                                      ? Text(
+                                                          selectedUserConsultant!
+                                                              .name)
+                                                      : Text(
+                                                          'Pilih User',
+                                                          style: TextStyle(
+                                                              color: themeNotifier
+                                                                              .status ==
+                                                                          true ||
+                                                                      MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                  ? Colors.grey
+                                                                      .shade500
+                                                                  : Colors.black
+                                                                      .withOpacity(
+                                                                          0.35)),
+                                                        ),
+                                                ),
+                                                Icon(Icons.arrow_drop_down,
+                                                    color: themeNotifier
+                                                                    .status ==
+                                                                true ||
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .platformBrightness ==
+                                                                Brightness.dark
+                                                        ? Colors.grey.shade400
+                                                        : Colors.grey.shade700)
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text('Keterangan :'),
+                                SizedBox(height: 6),
+                                InputPrimary(
+                                  controller: noteController,
+                                  maxLines: 10,
+                                  hintText: 'Masukkan Keterangan',
+                                  validator: (value) => null,
+                                ),
+                              ],
+                            ),
+                          if (listInspectionPhoto.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Foto Tindakan Inspection :'),
+                                  SizedBox(height: 6),
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.width / 4,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: listInspectionPhoto.length,
+                                      itemBuilder: (context, index) {
+                                        final imagePath =
+                                            listInspectionPhoto[index];
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 12),
+                                          child: InspectionPhoto(
+                                            imagePath: imagePath,
+                                            onTapView: () {
+                                              showFoto(context, imagePath);
+                                            },
+                                            onTapRemove: () {
+                                              listInspectionPhoto
+                                                  .remove(imagePath);
+                                              setState(() {});
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 12),
+                                ],
+                              ),
+                            ),
+                          SizedBox(height: 12),
+                          // InkWell(
+                          //   onTap: () {
+                          //     if (listInspectionPhoto.length < 5) {
+                          //       showDialogOptionTakeFoto(
+                          //         context,
+                          //         onTapCamera: () async {
+                          //           final result = await CameraService.getImage(
+                          //             context,
+                          //             imageSource: ImageSource.camera,
                           //           );
-                          //         }).toList(),
-                          //         onChanged: (String? value) {
-                          //           if (value != null) {
-                          //             userConsultation = value;
+                          //           if (result != null) {
+                          //             listInspectionPhoto.add(result);
                           //             setState(() {});
                           //           }
                           //         },
+                          //         onTapGalery: () async {
+                          //           final result = await CameraService.getImage(
+                          //             context,
+                          //             imageSource: ImageSource.gallery,
+                          //           );
+                          //           if (result != null) {
+                          //             listInspectionPhoto.add(result);
+                          //             setState(() {});
+                          //           }
+                          //         },
+                          //       );
+                          //     } else {
+                          //       FlushBarManager.showFlushBarWarning(
+                          //           _navigationService.navigatorKey.currentContext!,
+                          //           "Foto Inspection",
+                          //           "Maksimal 5 foto yang dapat Anda lampirkan");
+                          //     }
+                          //   },
+                          //   child: Card(
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(10.0),
+                          //     ),
+                          //     color: Colors.green,
+                          //     child: SizedBox(
+                          //       width: MediaQuery.of(context).size.width,
+                          //       child: Padding(
+                          //         padding: const EdgeInsets.all(16.0),
+                          //         child: Text(
+                          //           "ATTACHMENT",
+                          //           style: Style.whiteBold14,
+                          //           textAlign: TextAlign.center,
+                          //         ),
                           //       ),
-                          //     )
-                          //   ],
+                          //     ),
+                          //   ),
                           // ),
-                          Text('Keterangan :'),
-                          SizedBox(height: 6),
-                          InputPrimary(
-                            controller: noteController,
-                            maxLines: 10,
-                            hintText: 'Masukkan Keterangan',
-                            validator: (value) => null,
-                          ),
-                        ],
-                      ),
-                    SizedBox(height: 12),
-                    if (listInspectionPhoto.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Foto Tindakan Inspection :'),
-                          SizedBox(height: 6),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.width / 4,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: listInspectionPhoto.length,
-                              itemBuilder: (context, index) {
-                                final imagePath = listInspectionPhoto[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: InspectionPhoto(
-                                    imagePath: imagePath,
-                                    onTapView: () {
-                                      showFoto(context, imagePath);
-                                    },
-                                    onTapRemove: () {
-                                      listInspectionPhoto.remove(imagePath);
-                                      setState(() {});
-                                    },
+                          InkWell(
+                            onTap: () async {
+                              await submit();
+                            },
+                            child: Card(
+                              color: Palette.primaryColorProd,
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    "SUBMIT",
+                                    style: Style.whiteBold14,
+                                    textAlign: TextAlign.center,
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
-                          SizedBox(height: 12),
                         ],
                       ),
-                    SizedBox(height: 12),
-                    InkWell(
-                      onTap: () {
-                        if (listInspectionPhoto.length < 5) {
-                          showDialogOptionTakeFoto(
-                            context,
-                            onTapCamera: () async {
-                              final result = await CameraService.getImage(
-                                context,
-                                imageSource: ImageSource.camera,
-                              );
-                              if (result != null) {
-                                listInspectionPhoto.add(result);
-                                setState(() {});
-                              }
-                            },
-                            onTapGalery: () async {
-                              final result = await CameraService.getImage(
-                                context,
-                                imageSource: ImageSource.gallery,
-                              );
-                              if (result != null) {
-                                listInspectionPhoto.add(result);
-                                setState(() {});
-                              }
-                            },
-                          );
-                        } else {
-                          FlushBarManager.showFlushBarWarning(
-                              _navigationService.navigatorKey.currentContext!,
-                              "Foto Inspection",
-                              "Maksimal 5 foto yang dapat Anda lampirkan");
-                        }
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        color: Colors.green,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              "ATTACHMENT",
-                              style: Style.whiteBold14,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await submit();
-                      },
-                      child: Card(
-                        color: Palette.primaryColorProd,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text(
-                              "SUBMIT",
-                              style: Style.whiteBold14,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

@@ -130,11 +130,25 @@ class InspectionItem extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 12),
-              Text(
-                ConvertHelper.titleCase(
-                    data.status.replaceAll(RegExp(r'_'), ' ')),
-                style: Style.whiteBold12.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.normal),
+              Column(
+                children: [
+                  Text(
+                    ConvertHelper.titleCase(
+                      data.status
+                          .replaceAll(RegExp(r'_'), ' ')
+                          .replaceAll(RegExp(r'-'), ' '),
+                    ),
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    ConvertHelper.intToBool(data.isSynchronize)
+                        ? 'Uploaded'
+                        : 'Need Uploaded',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  )
+                ],
               )
             ],
           ),

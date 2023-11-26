@@ -278,6 +278,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
             selectedUserInspection != null ? selectedUserInspection!.id : '-',
         status: 'waiting',
         description: desctiptionController.text,
+        isSynchronize: 0,
         attachments: listInspectionPhoto,
         responses: [],
       );

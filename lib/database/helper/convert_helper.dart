@@ -24,4 +24,8 @@ class ConvertHelper {
 
     return double.parse('0');
   }
+
+  static bool intToBool(int value) {
+    return value == 1;
+  }
 }

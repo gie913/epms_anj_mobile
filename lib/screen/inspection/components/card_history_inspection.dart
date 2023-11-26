@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:flutter/material.dart';
@@ -33,11 +34,24 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 1.5,
               child: imagePath.contains('http')
-                  ? Image.network(
-                      imagePath,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.5,
-                      fit: BoxFit.fill,
+                  ? FutureBuilder(
+                      future: InspectionService.isInternetConnectionExist(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == true) {
+                          return Image.network(
+                            imagePath,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            fit: BoxFit.fill,
+                          );
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            color: Colors.orange,
+                          );
+                        }
+                      },
                     )
                   : Image.file(
                       File(imagePath),
@@ -71,7 +85,10 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                 ),
                 Text(
                   ConvertHelper.titleCase(
-                      widget.data.status.replaceAll(RegExp(r'_'), ' ')),
+                    widget.data.status
+                        .replaceAll(RegExp(r'_'), ' ')
+                        .replaceAll(RegExp(r'-'), ' '),
+                  ),
                   style: Style.whiteBold12.copyWith(
                       color: Colors.white, fontWeight: FontWeight.normal),
                 ),
@@ -95,6 +112,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
               ],
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Submitted By :',
@@ -113,9 +131,10 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
             ),
             if (widget.data.reassignedToName.isNotEmpty)
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Re-Assign To :',
+                    'Reassign To :',
                     style: Style.whiteBold12.copyWith(
                         color: Colors.white, fontWeight: FontWeight.normal),
                   ),
@@ -131,6 +150,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
               ),
             if (widget.data.consultedWithName.isNotEmpty)
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Consulted With :',
@@ -140,23 +160,29 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                   SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      widget.data.reassignedToName,
+                      widget.data.consultedWithName,
                       style: Style.whiteBold12.copyWith(
                           color: Colors.white, fontWeight: FontWeight.normal),
                     ),
                   )
                 ],
               ),
-            Text(
-              'Deskripsi :',
-              style: Style.whiteBold12
-                  .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
-            ),
-            Text(
-              widget.data.description,
-              style: Style.whiteBold12
-                  .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
-            ),
+            if (widget.data.description.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Deskripsi :',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    widget.data.description,
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
             if (widget.data.attachments.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,22 +207,50 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                               showFoto(context, image);
                             },
                             child: (image.toString().contains('http'))
-                                ? Image.network(
-                                    image,
-                                    width:
-                                        MediaQuery.of(context).size.width / 6,
-                                    height:
-                                        MediaQuery.of(context).size.width / 6,
-                                    fit: BoxFit.fill,
+                                ? FutureBuilder(
+                                    future: InspectionService
+                                        .isInternetConnectionExist(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.data == true) {
+                                        return Image.network(
+                                          image,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          fit: BoxFit.fill,
+                                        );
+                                      } else {
+                                        return Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              6,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              6,
+                                          color: Colors.orange,
+                                        );
+                                      }
+                                    },
                                   )
-                                : Image.file(
-                                    File(image),
-                                    width:
-                                        MediaQuery.of(context).size.width / 6,
-                                    height:
-                                        MediaQuery.of(context).size.width / 6,
-                                    fit: BoxFit.fill,
-                                  ),
+                                : (image.toString().isNotEmpty)
+                                    ? Image.file(
+                                        File(image),
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                6,
+                                        height:
+                                            MediaQuery.of(context).size.width /
+                                                6,
+                                        fit: BoxFit.fill,
+                                      )
+                                    : const SizedBox(),
                           ),
                         );
                       },

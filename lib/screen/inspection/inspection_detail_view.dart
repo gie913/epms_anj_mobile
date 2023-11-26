@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
@@ -45,11 +46,24 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 1.5,
               child: (imagePath.contains('http'))
-                  ? Image.network(
-                      imagePath,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.5,
-                      fit: BoxFit.fill,
+                  ? FutureBuilder(
+                      future: InspectionService.isInternetConnectionExist(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == true) {
+                          return Image.network(
+                            imagePath,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            fit: BoxFit.fill,
+                          );
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.5,
+                            color: Colors.orange,
+                          );
+                        }
+                      },
                     )
                   : Image.file(
                       File(imagePath),
@@ -144,6 +158,18 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                   ],
                 ),
                 SizedBox(height: 12),
+                Row(
+                  children: [
+                    Text('Status :'),
+                    SizedBox(width: 12),
+                    Expanded(
+                        child: Text(
+                            ConvertHelper.titleCase(widget.data.status
+                                .replaceAll(RegExp(r'_'), ' ')),
+                            textAlign: TextAlign.end))
+                  ],
+                ),
+                SizedBox(height: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -163,13 +189,37 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                                 showFoto(context, image);
                               },
                               child: (image.toString().contains('http'))
-                                  ? Image.network(
-                                      image,
-                                      width:
-                                          MediaQuery.of(context).size.width / 4,
-                                      height:
-                                          MediaQuery.of(context).size.width / 4,
-                                      fit: BoxFit.fill,
+                                  ? FutureBuilder(
+                                      future: InspectionService
+                                          .isInternetConnectionExist(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.data == true) {
+                                          return Image.network(
+                                            image,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                4,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                4,
+                                            fit: BoxFit.fill,
+                                          );
+                                        } else {
+                                          return Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                4,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                4,
+                                            color: Colors.orange,
+                                          );
+                                        }
+                                      },
                                     )
                                   : Image.file(
                                       File(image),
@@ -195,18 +245,6 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                   validator: (value) => null,
                   readOnly: true,
                 ),
-                Row(
-                  children: [
-                    Text('Status :'),
-                    SizedBox(width: 12),
-                    Expanded(
-                        child: Text(
-                            ConvertHelper.titleCase(widget.data.status
-                                .replaceAll(RegExp(r'_'), ' ')),
-                            textAlign: TextAlign.end))
-                  ],
-                ),
-                SizedBox(height: 12),
                 Text('Riwayat Tindakan :'),
                 if (widget.data.responses.isNotEmpty)
                   ...widget.data.responses

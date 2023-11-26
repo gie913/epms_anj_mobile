@@ -22,6 +22,7 @@ class TicketInspectionEntity {
   static String closedAt = 'closed_at';
   static String closedBy = 'closed_by';
   static String closedByName = 'closed_by_name';
+  static String isSynchronize = 'is_synchronize';
   static String attachments = 'attachments';
   static String responses = 'responses';
 }
