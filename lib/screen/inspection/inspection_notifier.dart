@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:epms/base/common/locator.dart';
+import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
@@ -14,21 +15,25 @@ class InspectionNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
   NavigatorService get navigationService => _navigationService;
 
+  DialogService _dialogService = locator<DialogService>();
+  DialogService get dialogService => _dialogService;
+
   List<TicketInspectionModel> _listMyInspection = [];
   List<TicketInspectionModel> get listMyInspection => _listMyInspection;
 
   List<TicketInspectionModel> _listTodoInspection = [];
   List<TicketInspectionModel> get listTodoInspection => _listTodoInspection;
 
-  Future<void> initData(BuildContext context) async {
-    // await getMyInspection(context);
-    // await getTodoInspection(context);
+  Future<void> initData() async {
+    await updateMyInspectionFromLocal();
+    await updateTodoInspectionFromLocal();
+    log('list My Inspection : $_listMyInspection');
+    log('list Todo Inspection : $_listTodoInspection');
   }
 
   Future<void> updateMyInspectionFromLocal() async {
     final data = await DatabaseTicketInspection.selectData();
     _listMyInspection = data;
-    log('list My Inspection : $_listMyInspection');
     notifyListeners();
   }
 
@@ -38,7 +43,7 @@ class InspectionNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getMyInspection(BuildContext context) async {
+  Future<void> getDataInspection(BuildContext context) async {
     final isInternetExist = await InspectionService.isInternetConnectionExist();
     if (isInternetExist) {
       await InspectionRepository().getMyInspection(
@@ -46,38 +51,77 @@ class InspectionNotifier extends ChangeNotifier {
         (context, data) async {
           await DatabaseTicketInspection.addAllData(data);
           await updateMyInspectionFromLocal();
+          await InspectionRepository().getToDoInspection(
+            context,
+            (context, data) async {
+              await DatabaseTodoInspection.addAllData(data);
+              await updateTodoInspectionFromLocal();
+            },
+            (context, errorMessage) {},
+          );
         },
-        (context, errorMessage) {},
+        (context, errorMessage) async {
+          await InspectionRepository().getToDoInspection(
+            context,
+            (context, data) async {
+              await DatabaseTodoInspection.addAllData(data);
+              await updateTodoInspectionFromLocal();
+            },
+            (context, errorMessage) {},
+          );
+        },
       );
     } else {
       await updateMyInspectionFromLocal();
-    }
-  }
-
-  Future<void> getTodoInspection(BuildContext context) async {
-    final isInternetExist = await InspectionService.isInternetConnectionExist();
-    if (isInternetExist) {
-      await InspectionRepository().getToDoInspection(
-        context,
-        (context, data) async {
-          await DatabaseTodoInspection.addAllData(data);
-          await updateTodoInspectionFromLocal();
-        },
-        (context, errorMessage) {},
-      );
-    } else {
       await updateTodoInspectionFromLocal();
     }
   }
 
+  // Future<void> getMyInspection(BuildContext context) async {
+  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
+  //   if (isInternetExist) {
+  //     await InspectionRepository().getMyInspection(
+  //       context,
+  //       (context, data) async {
+  //         await DatabaseTicketInspection.addAllData(data);
+  //         await updateMyInspectionFromLocal();
+  //       },
+  //       (context, errorMessage) {},
+  //     );
+  //   } else {
+  //     await updateMyInspectionFromLocal();
+  //   }
+  // }
+
+  // Future<void> getTodoInspection(BuildContext context) async {
+  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
+  //   if (isInternetExist) {
+  //     await InspectionRepository().getToDoInspection(
+  //       context,
+  //       (context, data) async {
+  //         await DatabaseTodoInspection.addAllData(data);
+  //         await updateTodoInspectionFromLocal();
+  //       },
+  //       (context, errorMessage) {},
+  //     );
+  //   } else {
+  //     await updateTodoInspectionFromLocal();
+  //   }
+  // }
+
   Future<void> uploadAndSynch(BuildContext context) async {
-    final data = await DatabaseTicketInspection.selectData();
-    final dataToDoInspection = await DatabaseTodoInspection.selectData();
+    final dataMyInspection =
+        await DatabaseTicketInspection.selectDataNeedUpload();
+    final dataToDoInspection =
+        await DatabaseTodoInspection.selectDataNeedUpload();
+    log('data my inspection unupload : $dataMyInspection');
+    log('data todo inspection unupload : $dataToDoInspection');
     final isInternetExist = await InspectionService.isInternetConnectionExist();
 
     if (isInternetExist) {
-      if (data.isNotEmpty) {
-        for (final ticketInspection in data) {
+      _dialogService.showLoadingDialog(title: "Upload Data");
+      if (dataMyInspection.isNotEmpty) {
+        for (final ticketInspection in dataMyInspection) {
           await InspectionRepository().createInspection(
             context,
             ticketInspection,
@@ -95,50 +139,56 @@ class InspectionNotifier extends ChangeNotifier {
         if (dataToDoInspection.isNotEmpty) {
           for (final toDoInspection in dataToDoInspection) {
             if (toDoInspection.responses.isNotEmpty) {
+              final responseInspection = toDoInspection.responses.last;
+
               await InspectionRepository().createResponseInspection(
                 context,
                 toDoInspection,
+                responseInspection,
                 (context, successMessage) async {
                   await Future.delayed(const Duration(seconds: 1));
-                  log('ToDo Inspection Code : ${toDoInspection.code} $successMessage');
+                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
                 },
                 (context, errorMessage) async {
                   await Future.delayed(const Duration(seconds: 1));
-                  log('ToDo Inspection Code : ${toDoInspection.code} $errorMessage');
+                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
                 },
               );
             }
           }
 
-          await getMyInspection(context);
-          await getTodoInspection(context);
+          await getDataInspection(context);
+          _dialogService.popDialog();
         } else {
-          await getMyInspection(context);
-          await getTodoInspection(context);
+          await getDataInspection(context);
+          _dialogService.popDialog();
         }
       } else if (dataToDoInspection.isNotEmpty) {
         for (final toDoInspection in dataToDoInspection) {
           if (toDoInspection.responses.isNotEmpty) {
+            final responseInspection = toDoInspection.responses.last;
+
             await InspectionRepository().createResponseInspection(
               context,
               toDoInspection,
+              responseInspection,
               (context, successMessage) async {
                 await Future.delayed(const Duration(seconds: 1));
-                log('ToDo Inspection Code : ${toDoInspection.code} $successMessage');
+                log('Response Inspection Code : ${responseInspection.code} $successMessage');
               },
               (context, errorMessage) async {
                 await Future.delayed(const Duration(seconds: 1));
-                log('ToDo Inspection Code : ${toDoInspection.code} $errorMessage');
+                log('Response Inspection Code : ${responseInspection.code} $errorMessage');
               },
             );
           }
         }
 
-        await getMyInspection(context);
-        await getTodoInspection(context);
+        await getDataInspection(context);
+        _dialogService.popDialog();
       } else {
-        await getMyInspection(context);
-        await getTodoInspection(context);
+        await getDataInspection(context);
+        _dialogService.popDialog();
       }
     } else {
       FlushBarManager.showFlushBarWarning(

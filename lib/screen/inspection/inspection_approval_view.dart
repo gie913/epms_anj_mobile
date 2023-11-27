@@ -149,6 +149,46 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
       // }
     }
 
+    if (selectedAction != null && selectedAction == 'revise') {
+      if (noteController.text.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon mengisi keterangan terlebih dahulu",
+        );
+        return false;
+      }
+
+      // if (listInspectionPhoto.isEmpty) {
+      //   FlushBarManager.showFlushBarWarning(
+      //     context,
+      //     "Form Belum Lengkap",
+      //     "Mohon melampirkan bukti foto",
+      //   );
+      //   return false;
+      // }
+    }
+
+    if (selectedAction != null && selectedAction == 'consulted') {
+      if (noteController.text.isEmpty) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon mengisi keterangan terlebih dahulu",
+        );
+        return false;
+      }
+
+      // if (listInspectionPhoto.isEmpty) {
+      //   FlushBarManager.showFlushBarWarning(
+      //     context,
+      //     "Form Belum Lengkap",
+      //     "Mohon melampirkan bukti foto",
+      //   );
+      //   return false;
+      // }
+    }
+
     return true;
   }
 
@@ -700,6 +740,20 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                 ),
                               ],
                             ),
+                          if (selectedAction == 'revise')
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Keterangan :'),
+                                SizedBox(height: 6),
+                                InputPrimary(
+                                  controller: noteController,
+                                  maxLines: 10,
+                                  hintText: 'Masukkan Keterangan',
+                                  validator: (value) => null,
+                                ),
+                              ],
+                            ),
                           if (selectedAction == 'need_consultation')
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -779,6 +833,20 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                     ),
                                   ],
                                 ),
+                                Text('Keterangan :'),
+                                SizedBox(height: 6),
+                                InputPrimary(
+                                  controller: noteController,
+                                  maxLines: 10,
+                                  hintText: 'Masukkan Keterangan',
+                                  validator: (value) => null,
+                                ),
+                              ],
+                            ),
+                          if (selectedAction == 'consulted')
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text('Keterangan :'),
                                 SizedBox(height: 6),
                                 InputPrimary(

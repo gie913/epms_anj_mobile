@@ -1,6 +1,4 @@
-import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
-import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
 import 'package:epms/screen/inspection/inspection_notifier.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +12,6 @@ class TabMyInspection extends StatefulWidget {
 }
 
 class _TabMyInspectionState extends State<TabMyInspection> {
-  NavigatorService _navigationService = locator<NavigatorService>();
-
   @override
   Widget build(BuildContext context) {
     return Consumer<InspectionNotifier>(
@@ -31,7 +27,7 @@ class _TabMyInspectionState extends State<TabMyInspection> {
                     return InspectionItem(
                       data: data,
                       onTap: () {
-                        _navigationService.push(
+                        provider.navigationService.push(
                           Routes.INSPECTION_DETAIL,
                           arguments: data,
                         );

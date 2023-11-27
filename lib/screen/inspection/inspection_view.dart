@@ -1,8 +1,7 @@
-import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
-import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/screen/inspection/components/tab_on_going.dart';
 import 'package:epms/screen/inspection/components/tab_to_do.dart';
 import 'package:epms/screen/inspection/components/tab_my_inspection.dart';
 import 'package:epms/screen/inspection/inspection_notifier.dart';
@@ -17,13 +16,11 @@ class InspectionView extends StatefulWidget {
 }
 
 class _InspectionViewState extends State<InspectionView> {
-  NavigatorService _navigationService = locator<NavigatorService>();
-
   int tabBarIndex = 0;
 
   @override
   void initState() {
-    context.read<InspectionNotifier>().initData(context);
+    context.read<InspectionNotifier>().initData();
     super.initState();
   }
 
@@ -33,7 +30,7 @@ class _InspectionViewState extends State<InspectionView> {
       builder: (context, provider, _) {
         return DefaultTabController(
           initialIndex: 0,
-          length: 2,
+          length: 3,
           child: MediaQuery(
             data: Style.mediaQueryText(context),
             child: Scaffold(
@@ -46,8 +43,11 @@ class _InspectionViewState extends State<InspectionView> {
                     setState(() {});
                   },
                   tabs: [
-                    Tab(icon: Text("My Inspection")),
+                    Tab(
+                        icon:
+                            Text("My Inspection", textAlign: TextAlign.center)),
                     Tab(icon: Text("To Do")),
+                    Tab(icon: Text("On Going")),
                   ],
                 ),
               ),
@@ -57,10 +57,7 @@ class _InspectionViewState extends State<InspectionView> {
                   Expanded(
                     child: TabBarView(
                       physics: NeverScrollableScrollPhysics(),
-                      children: [
-                        TabMyInspection(),
-                        TabToDo(),
-                      ],
+                      children: [TabMyInspection(), TabToDo(), TabOnGoing()],
                     ),
                   ),
                   if (tabBarIndex == 0)
@@ -68,7 +65,8 @@ class _InspectionViewState extends State<InspectionView> {
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                       child: InkWell(
                         onTap: () async {
-                          await _navigationService.push(Routes.INSPECTION_FORM);
+                          await provider.navigationService
+                              .push(Routes.INSPECTION_FORM);
                           await provider.updateMyInspectionFromLocal();
                         },
                         child: Card(

@@ -453,6 +453,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                             onChanged: (value) {
                               if (value != null) {
                                 selectedCategory = value;
+                                selectedCompany = null;
+                                selectedDivision = null;
+                                selectedUserInspection = null;
                                 log('selectedCategory : $selectedCategory');
                                 setState(() {});
                               }

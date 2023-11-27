@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:epms/base/api/api_configuration.dart';
 import 'package:epms/common_manager/storage_manager.dart';
+import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/my_inspection_response.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/todo_inspection_response.dart';
@@ -33,9 +34,9 @@ class InspectionRepository extends APIConfiguration {
       var responseMyInspection =
           await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
       log('cek url : $urlMyInspection');
-      log('cek response get my inspection : ${responseMyInspection.body}');
       MyInspectionResponse res =
           MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
+      log('cek response get my inspection : ${res.data}');
 
       if (res.success) {
         onSuccess(context, res.data);
@@ -78,9 +79,10 @@ class InspectionRepository extends APIConfiguration {
       var responseToDoInspection =
           await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
       log('cek url : $urlToDoInspection');
-      log('cek response todo inspection : ${responseToDoInspection.body}');
+
       TodoInspectionResponse res = TodoInspectionResponse.fromJson(
           jsonDecode(responseToDoInspection.body));
+      log('cek response todo inspection : ${res.data}');
 
       if (res.success) {
         onSuccess(context, res.data);
@@ -199,6 +201,7 @@ class InspectionRepository extends APIConfiguration {
   Future<void> createResponseInspection(
     BuildContext context,
     TicketInspectionModel ticketInspection,
+    HistoryInspectionModel responseInspection,
     Function(BuildContext context, dynamic successMessage) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
@@ -215,7 +218,7 @@ class InspectionRepository extends APIConfiguration {
       var url =
           'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/response/create';
       var request = http.MultipartRequest("POST", Uri.parse(url));
-      for (final image in ticketInspection.responses.last.attachments) {
+      for (final image in responseInspection.attachments) {
         if (image.toString().contains('http')) {
           var response = await http.get(Uri.parse(image));
           List imageName = image.toString().split('/');
@@ -249,20 +252,15 @@ class InspectionRepository extends APIConfiguration {
           request.files.add(multipartFile);
         }
       }
-      request.fields['code'] = ticketInspection.responses.last.code;
-      request.fields['tr_time'] = ticketInspection.responses.last.trTime;
-      request.fields['description'] =
-          ticketInspection.responses.last.description;
-      request.fields['reassigned_to'] =
-          ticketInspection.responses.last.reassignedTo;
-      request.fields['gps_lng'] =
-          jsonEncode(ticketInspection.responses.last.gpsLng);
-      request.fields['gps_lat'] =
-          jsonEncode(ticketInspection.responses.last.gpsLat);
+      request.fields['code'] = responseInspection.code;
+      request.fields['tr_time'] = responseInspection.trTime;
+      request.fields['description'] = responseInspection.description;
+      request.fields['reassigned_to'] = responseInspection.reassignedTo;
+      request.fields['gps_lng'] = jsonEncode(responseInspection.gpsLng);
+      request.fields['gps_lat'] = jsonEncode(responseInspection.gpsLat);
       request.fields['t_inspection_id'] = ticketInspection.id;
-      request.fields['status'] = ticketInspection.responses.last.status;
-      request.fields['consulted_with'] =
-          ticketInspection.responses.last.consultedWith;
+      request.fields['status'] = responseInspection.status;
+      request.fields['consulted_with'] = responseInspection.consultedWith;
       request.headers.addAll(headers);
       var response = await request.send();
 

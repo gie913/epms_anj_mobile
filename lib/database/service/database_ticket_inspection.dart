@@ -41,26 +41,32 @@ class DatabaseTicketInspection {
   static Future<void> addAllData(List<TicketInspectionModel> data) async {
     Database db = await DatabaseHelper().database;
 
-    var mapList = await db.query(ticketInspectionTable);
-    var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
-      return TicketInspectionModel.fromDatabase(e);
-    }));
-    List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+    await db.delete(ticketInspectionTable);
 
-    for (var i = 0; i < data.length; i++) {
-      if (!dataFromLocalCode.contains(data[i].code)) {
-        await db.insert(ticketInspectionTable, data[i].toDatabase());
-      } else {
-        final dataFromLocalIndex = dataFromLocalCode.indexOf(data[i].code);
-        final dataFromLocalItem = dataFromLocal[dataFromLocalIndex];
-        await db.update(
-          ticketInspectionTable,
-          dataFromLocalItem.toDatabase(),
-          where: '${TicketInspectionEntity.code}=?',
-          whereArgs: [dataFromLocalItem.code],
-        );
-      }
+    final batch = db.batch();
+    for (final item in data) {
+      batch.insert(ticketInspectionTable, item.toDatabase());
     }
+    await batch.commit();
+
+    // var mapList = await db.query(ticketInspectionTable);
+    // var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
+    //   return TicketInspectionModel.fromDatabase(e);
+    // }));
+    // List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+
+    // for (var i = 0; i < data.length; i++) {
+    //   if (!dataFromLocalCode.contains(data[i].code)) {
+    //     await db.insert(ticketInspectionTable, data[i].toDatabase());
+    //   } else {
+    //     await db.update(
+    //       ticketInspectionTable,
+    //       data[i].toDatabase(),
+    //       where: '${TicketInspectionEntity.code}=?',
+    //       whereArgs: [data[i].code],
+    //     );
+    //   }
+    // }
   }
 
   static Future<void> insertData(TicketInspectionModel data) async {
@@ -77,6 +83,21 @@ class DatabaseTicketInspection {
   static Future<List<TicketInspectionModel>> selectData() async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(ticketInspectionTable);
+    var data = List<TicketInspectionModel>.from(mapList.map((e) {
+      return TicketInspectionModel.fromDatabase(e);
+    }));
+    data.sort((a, b) =>
+        DateTime.parse(b.submittedAt).compareTo(DateTime.parse(a.submittedAt)));
+    return data;
+  }
+
+  static Future<List<TicketInspectionModel>> selectDataNeedUpload() async {
+    Database db = await DatabaseHelper().database;
+    var mapList = await db.query(
+      ticketInspectionTable,
+      where: '${TicketInspectionEntity.isSynchronize}=?',
+      whereArgs: [0],
+    );
     var data = List<TicketInspectionModel>.from(mapList.map((e) {
       return TicketInspectionModel.fromDatabase(e);
     }));

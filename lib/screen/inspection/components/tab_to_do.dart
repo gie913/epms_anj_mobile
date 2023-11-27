@@ -1,11 +1,7 @@
 import 'dart:developer';
 
-import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
-import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
-import 'package:epms/database/service/database_todo_inspection.dart';
-import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
 import 'package:epms/screen/inspection/inspection_notifier.dart';
 import 'package:flutter/material.dart';
@@ -19,20 +15,6 @@ class TabToDo extends StatefulWidget {
 }
 
 class _TabToDoState extends State<TabToDo> {
-  NavigatorService _navigationService = locator<NavigatorService>();
-  List<TicketInspectionModel> listToDo = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<void> getTodoInspectionFromLocal() async {
-    final data = await DatabaseTodoInspection.selectData();
-    listToDo = data;
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<InspectionNotifier>(
@@ -54,7 +36,7 @@ class _TabToDoState extends State<TabToDo> {
                           if (data.status == 'waiting' ||
                               data.status == 'on_progress' ||
                               data.status == 'revise') {
-                            await _navigationService.push(
+                            await provider.navigationService.push(
                               Routes.INSPECTION_ASSIGNMENT_DETAIL,
                               arguments: data,
                             );
@@ -64,7 +46,7 @@ class _TabToDoState extends State<TabToDo> {
                               data.status == 'need_consultation' ||
                               data.status == 'consulted' ||
                               data.status == 'close') {
-                            await _navigationService.push(
+                            await provider.navigationService.push(
                               Routes.INSPECTION_APPROVAL,
                               arguments: data,
                             );
@@ -75,7 +57,7 @@ class _TabToDoState extends State<TabToDo> {
                               data.status == 'on_progress' ||
                               data.status == 'reassign' ||
                               data.status == 'complete') {
-                            await _navigationService.push(
+                            await provider.navigationService.push(
                               Routes.INSPECTION_ASSIGNMENT_DETAIL,
                               arguments: data,
                             );
@@ -85,7 +67,7 @@ class _TabToDoState extends State<TabToDo> {
                               data.status == 'need_consultation' ||
                               data.status == 'consulted' ||
                               data.status == 'close') {
-                            await _navigationService.push(
+                            await provider.navigationService.push(
                               Routes.INSPECTION_APPROVAL,
                               arguments: data,
                             );

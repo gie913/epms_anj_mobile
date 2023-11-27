@@ -44,6 +44,8 @@ import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/model/m_config_schema.dart';
 import 'package:epms/model/sync_response_revamp.dart';
@@ -51,6 +53,7 @@ import 'package:epms/model/synch_inspection_data.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/home/logout_repository.dart';
 import 'package:epms/screen/home_inspection/home_inspection_notifier.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
@@ -77,8 +80,11 @@ class SynchNotifier extends ChangeNotifier {
           context, mConfigSchema.estateCode!, onSuccessSynch, onErrorSynch);
     } else {
       log('Synch Inspection');
-      SynchRepository()
-          .synchInspection(context, onSuccessSynchInspection, onErrorSynch);
+      SynchRepository().synchInspection(
+        context,
+        onSuccessSynchInspection,
+        onErrorSynchEpmsInspection,
+      );
     }
   }
 
@@ -88,8 +94,32 @@ class SynchNotifier extends ChangeNotifier {
 
   onSuccessSynchInspection(
       BuildContext context, SynchInspectionData data) async {
-    await saveDatabaseInspection(context, data);
-    _navigationService.push(Routes.HOME_INSPECTION_PAGE);
+    await saveDatabaseSynchInspection(context, data);
+    await InspectionRepository().getMyInspection(
+      context,
+      (context, data) async {
+        _dataText = "Synch data my inspection";
+        notifyListeners();
+        await DatabaseTicketInspection.addAllData(data);
+
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            _dataText = "Synch data todo inspection";
+            notifyListeners();
+            await DatabaseTodoInspection.addAllData(data);
+
+            _navigationService.push(Routes.HOME_INSPECTION_PAGE);
+          },
+          (context, errorMessage) {
+            onErrorSynchEpmsInspection(context, errorMessage);
+          },
+        );
+      },
+      (context, errorMessage) {
+        onErrorSynchEpmsInspection(context, errorMessage);
+      },
+    );
   }
 
   onErrorSynch(BuildContext context, String message) {
@@ -103,12 +133,27 @@ class SynchNotifier extends ChangeNotifier {
         onPressNo: HomeNotifier().doLogOut);
   }
 
+  onErrorSynchEpmsInspection(BuildContext context, String message) {
+    print(message);
+    _dialogService.showOptionDialog(
+      title: "Gagal Synch",
+      subtitle: "$message",
+      buttonTextYes: "Ulang",
+      buttonTextNo: "Log Out",
+      onPressYes: onClickReSynch,
+      onPressNo: () {
+        HomeInspectionNotifier().logOut();
+      },
+    );
+  }
+
   onClickReSynch() {
     _dialogService.popDialog();
     _navigationService.push(Routes.SYNCH_PAGE);
   }
 
-  saveDatabaseInspection(BuildContext context, SynchInspectionData data) async {
+  saveDatabaseSynchInspection(
+      BuildContext context, SynchInspectionData data) async {
     try {
       _dataText = "Synch data user inspection";
       notifyListeners();

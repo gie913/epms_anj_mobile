@@ -217,11 +217,11 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width /
-                                              4,
+                                              6,
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .width /
-                                              4,
+                                              6,
                                           fit: BoxFit.fill,
                                         );
                                       } else {

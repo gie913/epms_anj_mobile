@@ -108,6 +108,7 @@ class InspectionItem extends StatelessWidget {
                         ],
                       ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'User Assign :',
@@ -144,7 +145,7 @@ class InspectionItem extends StatelessWidget {
                   Text(
                     ConvertHelper.intToBool(data.isSynchronize)
                         ? 'Uploaded'
-                        : 'Need Uploaded',
+                        : 'Need Upload',
                     style: Style.whiteBold12.copyWith(
                         color: Colors.white, fontWeight: FontWeight.normal),
                   )
