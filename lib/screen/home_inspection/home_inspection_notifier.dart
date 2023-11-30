@@ -4,7 +4,6 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/database/helper/database_helper.dart';
-import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/oph.dart';
@@ -35,9 +34,8 @@ class HomeInspectionNotifier extends ChangeNotifier {
   }
 
   Future<void> updateCountInspection() async {
-    final listMyInspection = await DatabaseTicketInspection.selectData();
     final listTodoInspection = await DatabaseTodoInspection.selectData();
-    _countInspection = listMyInspection.length + listTodoInspection.length;
+    _countInspection = listTodoInspection.length;
     notifyListeners();
   }
 
@@ -69,6 +67,7 @@ class HomeInspectionNotifier extends ChangeNotifier {
 
   Future<void> logOut() async {
     _dialogService.popDialog();
+
     _dialogService.showLoadingDialog(title: "Logging Out");
 
     await LogOutRepository()

@@ -28,12 +28,12 @@ class DatabaseSubordinateInspection {
        ${SubordinateInspectionEntity.assignee} TEXT,
        ${SubordinateInspectionEntity.assigneeId} TEXT,
        ${SubordinateInspectionEntity.status} TEXT,
-       ${SubordinateInspectionEntity.statusCategory} TEXT,
        ${SubordinateInspectionEntity.description} TEXT,
        ${SubordinateInspectionEntity.closedAt} TEXT,
        ${SubordinateInspectionEntity.closedBy} TEXT,
        ${SubordinateInspectionEntity.closedByName} TEXT,
        ${SubordinateInspectionEntity.isSynchronize} INTEGER,
+       ${SubordinateInspectionEntity.isClosed} INTEGER,
        ${SubordinateInspectionEntity.attachments} TEXT,
        ${SubordinateInspectionEntity.responses} TEXT)
     ''');

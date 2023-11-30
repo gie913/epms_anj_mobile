@@ -35,9 +35,10 @@ class InspectionRepository extends APIConfiguration {
       var responseMyInspection =
           await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
       log('cek url : $urlMyInspection');
+      log('cek response get my inspection : ${responseMyInspection.body}');
+
       MyInspectionResponse res =
           MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
-      log('cek response get my inspection : ${res.data}');
 
       if (res.success) {
         onSuccess(context, res.data);
@@ -80,81 +81,13 @@ class InspectionRepository extends APIConfiguration {
       var responseToDoInspection =
           await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
       log('cek url : $urlToDoInspection');
+      log('cek response todo inspection : ${responseToDoInspection.body}');
 
       TodoInspectionResponse res = TodoInspectionResponse.fromJson(
           jsonDecode(responseToDoInspection.body));
-      log('cek response todo inspection : ${res.data}');
-
-      List<TicketInspectionModel> listTodoInspection = [];
-
-      for (var item in res.data.notYet) {
-        final todoInspection = TicketInspectionModel(
-          id: item.id,
-          code: item.code,
-          trTime: item.trTime,
-          mCompanyId: item.mCompanyId,
-          mCompanyName: item.mCompanyName,
-          mCompanyAlias: item.mCompanyAlias,
-          mTeamId: item.mTeamId,
-          mTeamName: item.mTeamName,
-          mDivisionId: item.mDivisionId,
-          mDivisionName: item.mDivisionName,
-          mDivisionEstateCode: item.mDivisionEstateCode,
-          gpsLng: item.gpsLng,
-          gpsLat: item.gpsLat,
-          submittedAt: item.submittedAt,
-          submittedBy: item.submittedBy,
-          submittedByName: item.submittedByName,
-          assignee: item.assignee,
-          assigneeId: item.assigneeId,
-          status: item.status,
-          statusCategory: 'not_yet',
-          description: item.description,
-          closedAt: item.closedAt,
-          closedBy: item.closedBy,
-          closedByName: item.closedByName,
-          isSynchronize: item.isSynchronize,
-          attachments: item.attachments,
-          responses: item.responses,
-        );
-        listTodoInspection.add(todoInspection);
-      }
-
-      // for (var item in res.data.done) {
-      //   final todoInspection = TicketInspectionModel(
-      //     id: item.id,
-      //     code: item.code,
-      //     trTime: item.trTime,
-      //     mCompanyId: item.mCompanyId,
-      //     mCompanyName: item.mCompanyName,
-      //     mCompanyAlias: item.mCompanyAlias,
-      //     mTeamId: item.mTeamId,
-      //     mTeamName: item.mTeamName,
-      //     mDivisionId: item.mDivisionId,
-      //     mDivisionName: item.mDivisionName,
-      //     mDivisionEstateCode: item.mDivisionEstateCode,
-      //     gpsLng: item.gpsLng,
-      //     gpsLat: item.gpsLat,
-      //     submittedAt: item.submittedAt,
-      //     submittedBy: item.submittedBy,
-      //     submittedByName: item.submittedByName,
-      //     assignee: item.assignee,
-      //     assigneeId: item.assigneeId,
-      //     status: item.status,
-      //     statusCategory: 'done',
-      //     description: item.description,
-      //     closedAt: item.closedAt,
-      //     closedBy: item.closedBy,
-      //     closedByName: item.closedByName,
-      //     isSynchronize: item.isSynchronize,
-      //     attachments: item.attachments,
-      //     responses: item.responses,
-      //   );
-      //   listTodoInspection.add(todoInspection);
-      // }
 
       if (res.success) {
-        onSuccess(context, listTodoInspection);
+        onSuccess(context, res.data);
       } else {
         onError(context, res.message);
       }

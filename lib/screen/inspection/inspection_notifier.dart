@@ -148,6 +148,9 @@ class InspectionNotifier extends ChangeNotifier {
             (context, errorMessage) async {
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
+              if (errorMessage == 'Tidak Ada Koneksi Internet') {
+                _dialogService.popDialog();
+              }
             },
           );
         }
@@ -168,6 +171,9 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, errorMessage) async {
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                  if (errorMessage == 'Tidak Ada Koneksi Internet') {
+                    _dialogService.popDialog();
+                  }
                 },
               );
             }
@@ -195,6 +201,9 @@ class InspectionNotifier extends ChangeNotifier {
               (context, errorMessage) async {
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                if (errorMessage == 'Tidak Ada Koneksi Internet') {
+                  _dialogService.popDialog();
+                }
               },
             );
           }

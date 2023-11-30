@@ -28,12 +28,12 @@ class DatabaseTicketInspection {
        ${TicketInspectionEntity.assignee} TEXT,
        ${TicketInspectionEntity.assigneeId} TEXT,
        ${TicketInspectionEntity.status} TEXT,
-       ${TicketInspectionEntity.statusCategory} TEXT,
        ${TicketInspectionEntity.description} TEXT,
        ${TicketInspectionEntity.closedAt} TEXT,
        ${TicketInspectionEntity.closedBy} TEXT,
        ${TicketInspectionEntity.closedByName} TEXT,
        ${TicketInspectionEntity.isSynchronize} INTEGER,
+       ${TicketInspectionEntity.isClosed} INTEGER,
        ${TicketInspectionEntity.attachments} TEXT,
        ${TicketInspectionEntity.responses} TEXT)
     ''');

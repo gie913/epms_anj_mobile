@@ -1,4 +1,6 @@
 import 'package:epms/base/common/routes.dart';
+import 'package:epms/base/ui/palette.dart';
+import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
 import 'package:epms/screen/inspection/inspection_notifier.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,9 @@ class _TabMyInspectionState extends State<TabMyInspection> {
                   itemBuilder: (context, index) {
                     final data = provider.listMyInspection[index];
                     return InspectionItem(
+                      bgColor: ConvertHelper.intToBool(data.isClosed)
+                          ? Colors.grey.shade800
+                          : Palette.primaryColorProd,
                       data: data,
                       onTap: () {
                         provider.navigationService.push(

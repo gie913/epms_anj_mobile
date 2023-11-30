@@ -28,4 +28,12 @@ class ConvertHelper {
   static bool intToBool(int value) {
     return value == 1;
   }
+
+  static int boolToInt(bool value) {
+    if (value == true) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
 }

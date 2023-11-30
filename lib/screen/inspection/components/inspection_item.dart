@@ -150,8 +150,8 @@ class InspectionItem extends StatelessWidget {
                   ),
                   Text(
                     ConvertHelper.intToBool(data.isSynchronize)
-                        ? 'Uploaded'
-                        : 'Need Upload',
+                        ? 'Synchronized'
+                        : 'Need Synch',
                     style: Style.whiteBold12.copyWith(
                         color: Colors.white, fontWeight: FontWeight.normal),
                   )

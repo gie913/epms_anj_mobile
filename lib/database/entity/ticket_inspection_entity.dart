@@ -18,12 +18,12 @@ class TicketInspectionEntity {
   static String assignee = 'assignee';
   static String assigneeId = 'assignee_id';
   static String status = 'status';
-  static String statusCategory = 'status_category';
   static String description = 'description';
   static String closedAt = 'closed_at';
   static String closedBy = 'closed_by';
   static String closedByName = 'closed_by_name';
   static String isSynchronize = 'is_synchronize';
+  static String isClosed = 'is_closed';
   static String attachments = 'attachments';
   static String responses = 'responses';
 }

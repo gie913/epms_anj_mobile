@@ -274,7 +274,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         assignee: widget.data.assignee,
         assigneeId: widget.data.assigneeId,
         status: selectedAction ?? '',
-        statusCategory: 'done',
         description: widget.data.description,
         closedAt: widget.data.closedAt,
         closedBy: widget.data.closedBy,
@@ -601,16 +600,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                         children: [
                           Row(
                             children: [
-                              Text('Lokasi Tindakan :'),
-                              SizedBox(width: 12),
-                              Expanded(
-                                  child: Text('$longitude,$latitude',
-                                      textAlign: TextAlign.end))
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
                               Expanded(child: Text('Action :')),
                               SizedBox(width: 12),
                               Expanded(
@@ -845,6 +834,20 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                               ],
                             ),
                           if (selectedAction == 'consulted')
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Keterangan :'),
+                                SizedBox(height: 6),
+                                InputPrimary(
+                                  controller: noteController,
+                                  maxLines: 10,
+                                  hintText: 'Masukkan Keterangan',
+                                  validator: (value) => null,
+                                ),
+                              ],
+                            ),
+                          if (selectedAction == 'close')
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

@@ -1,10 +1,10 @@
-import 'package:epms/model/todo_inspection_data.dart';
+import 'package:epms/model/ticket_inspection_model.dart';
 
 class TodoInspectionResponse {
   const TodoInspectionResponse({
     this.success = false,
     this.message = '',
-    this.data = const TodoInspectionData(),
+    this.data = const [],
   });
 
   factory TodoInspectionResponse.fromJson(Map<String, dynamic> json) =>
@@ -12,20 +12,24 @@ class TodoInspectionResponse {
         success: json['success'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] != null
-            ? TodoInspectionData.fromJson(json['data'])
-            : const TodoInspectionData(),
+            ? List<TicketInspectionModel>.from((json['data'] as List).map(
+                (e) {
+                  return TicketInspectionModel.fromJson(e);
+                },
+              ))
+            : const <TicketInspectionModel>[],
       );
 
   final bool success;
   final String message;
-  final TodoInspectionData data;
+  final List<TicketInspectionModel> data;
 
   Map<String, dynamic> toJson() {
     final tempData = <String, dynamic>{};
 
     tempData['success'] = success;
     tempData['message'] = message;
-    tempData['data'] = data.toJson();
+    tempData['data'] = List.from(data.map((e) => e.toJson()));
 
     return tempData;
   }

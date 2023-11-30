@@ -332,7 +332,6 @@ class _InspectionAssignmentDetailViewState
         assignee: widget.data.assignee,
         assigneeId: widget.data.assigneeId,
         status: selectedAction ?? '',
-        statusCategory: 'done',
         description: widget.data.description,
         closedAt: widget.data.closedAt,
         closedBy: widget.data.closedBy,

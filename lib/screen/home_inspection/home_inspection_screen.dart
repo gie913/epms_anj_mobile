@@ -2,6 +2,10 @@ import 'package:epms/base/constants/image_assets.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
+import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/inspection_service.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/screen/home_inspection/home_inspection_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -165,7 +169,38 @@ class _HomeInspectionScreenState extends State<HomeInspectionScreen> {
                                 textStyle: const TextStyle(
                                     fontSize: 20, color: Colors.white),
                               ),
-                              onPressed: () {
+                              onPressed: () async {
+                                final dataMyInspection =
+                                    await DatabaseTicketInspection
+                                        .selectDataNeedUpload();
+                                final dataToDoInspection =
+                                    await DatabaseTodoInspection
+                                        .selectDataNeedUpload();
+                                final isInternetExist = await InspectionService
+                                    .isInternetConnectionExist();
+
+                                final totalDataInspectionUnUpload =
+                                    dataMyInspection.length +
+                                        dataToDoInspection.length;
+
+                                if (!isInternetExist) {
+                                  FlushBarManager.showFlushBarWarning(
+                                    context,
+                                    "Gagal Logout",
+                                    "Anda tidak memiliki akses internet",
+                                  );
+                                  return;
+                                }
+
+                                if (totalDataInspectionUnUpload != 0) {
+                                  FlushBarManager.showFlushBarWarning(
+                                    context,
+                                    "Gagal Logout",
+                                    "Anda memiliki inspection yang belum di upload",
+                                  );
+                                  return;
+                                }
+
                                 homeInspectionNotifier.showPopUpLogOut();
                               },
                               child: Text("KELUAR",
