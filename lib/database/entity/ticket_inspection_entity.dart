@@ -18,6 +18,7 @@ class TicketInspectionEntity {
   static String assignee = 'assignee';
   static String assigneeId = 'assignee_id';
   static String status = 'status';
+  static String statusCategory = 'status_category';
   static String description = 'description';
   static String closedAt = 'closed_at';
   static String closedBy = 'closed_by';

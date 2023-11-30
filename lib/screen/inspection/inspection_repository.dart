@@ -5,6 +5,7 @@ import 'package:epms/base/api/api_configuration.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/my_inspection_response.dart';
+import 'package:epms/model/my_subordinate_response.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/todo_inspection_response.dart';
 import 'package:flutter/cupertino.dart';
@@ -84,8 +85,76 @@ class InspectionRepository extends APIConfiguration {
           jsonDecode(responseToDoInspection.body));
       log('cek response todo inspection : ${res.data}');
 
+      List<TicketInspectionModel> listTodoInspection = [];
+
+      for (var item in res.data.notYet) {
+        final todoInspection = TicketInspectionModel(
+          id: item.id,
+          code: item.code,
+          trTime: item.trTime,
+          mCompanyId: item.mCompanyId,
+          mCompanyName: item.mCompanyName,
+          mCompanyAlias: item.mCompanyAlias,
+          mTeamId: item.mTeamId,
+          mTeamName: item.mTeamName,
+          mDivisionId: item.mDivisionId,
+          mDivisionName: item.mDivisionName,
+          mDivisionEstateCode: item.mDivisionEstateCode,
+          gpsLng: item.gpsLng,
+          gpsLat: item.gpsLat,
+          submittedAt: item.submittedAt,
+          submittedBy: item.submittedBy,
+          submittedByName: item.submittedByName,
+          assignee: item.assignee,
+          assigneeId: item.assigneeId,
+          status: item.status,
+          statusCategory: 'not_yet',
+          description: item.description,
+          closedAt: item.closedAt,
+          closedBy: item.closedBy,
+          closedByName: item.closedByName,
+          isSynchronize: item.isSynchronize,
+          attachments: item.attachments,
+          responses: item.responses,
+        );
+        listTodoInspection.add(todoInspection);
+      }
+
+      // for (var item in res.data.done) {
+      //   final todoInspection = TicketInspectionModel(
+      //     id: item.id,
+      //     code: item.code,
+      //     trTime: item.trTime,
+      //     mCompanyId: item.mCompanyId,
+      //     mCompanyName: item.mCompanyName,
+      //     mCompanyAlias: item.mCompanyAlias,
+      //     mTeamId: item.mTeamId,
+      //     mTeamName: item.mTeamName,
+      //     mDivisionId: item.mDivisionId,
+      //     mDivisionName: item.mDivisionName,
+      //     mDivisionEstateCode: item.mDivisionEstateCode,
+      //     gpsLng: item.gpsLng,
+      //     gpsLat: item.gpsLat,
+      //     submittedAt: item.submittedAt,
+      //     submittedBy: item.submittedBy,
+      //     submittedByName: item.submittedByName,
+      //     assignee: item.assignee,
+      //     assigneeId: item.assigneeId,
+      //     status: item.status,
+      //     statusCategory: 'done',
+      //     description: item.description,
+      //     closedAt: item.closedAt,
+      //     closedBy: item.closedBy,
+      //     closedByName: item.closedByName,
+      //     isSynchronize: item.isSynchronize,
+      //     attachments: item.attachments,
+      //     responses: item.responses,
+      //   );
+      //   listTodoInspection.add(todoInspection);
+      // }
+
       if (res.success) {
-        onSuccess(context, res.data);
+        onSuccess(context, listTodoInspection);
       } else {
         onError(context, res.message);
       }
@@ -100,6 +169,51 @@ class InspectionRepository extends APIConfiguration {
       onError(context, 'Response Format Gagal');
     } catch (exception) {
       log('cek error get todo inspection : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> getMySubordinate(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek mySubordinateInspectionToken : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlMySubordinate =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/mysubordinate';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
+      log('cek url : $urlMySubordinate');
+      MySubordinateResponse res = MySubordinateResponse.fromJson(
+          jsonDecode(responseMySubordinate.body));
+      log('cek response get my subordinate : ${res.data}');
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error get my subordinate : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error get my subordinate : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error get my subordinate : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error get my subordinate : $exception');
       onError(context, exception.toString());
       rethrow;
     }

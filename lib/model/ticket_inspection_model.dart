@@ -24,6 +24,7 @@ class TicketInspectionModel {
     this.assignee = '',
     this.assigneeId = '',
     this.status = '',
+    this.statusCategory = '',
     this.description = '',
     this.closedAt = '',
     this.closedBy = '',
@@ -54,6 +55,7 @@ class TicketInspectionModel {
         assignee: json['assignee'] ?? '',
         assigneeId: json['assignee_id'] ?? '',
         status: json['status'] ?? '',
+        statusCategory: json['status_category'] ?? '',
         description: json['description'] ?? '',
         closedAt: json['closed_at'] ?? '',
         closedBy: json['closed_by'] ?? '',
@@ -92,6 +94,7 @@ class TicketInspectionModel {
         assignee: json['assignee'] ?? '',
         assigneeId: json['assignee_id'] ?? '',
         status: json['status'] ?? '',
+        statusCategory: json['status_category'] ?? '',
         description: json['description'] ?? '',
         closedAt: json['closed_at'] ?? '',
         closedBy: json['closed_by'] ?? '',
@@ -130,6 +133,7 @@ class TicketInspectionModel {
   final String assignee;
   final String assigneeId;
   final String status;
+  final String statusCategory;
   final String description;
   final String closedAt;
   final String closedBy;
@@ -160,6 +164,7 @@ class TicketInspectionModel {
     tempData['assignee'] = assignee;
     tempData['assignee_id'] = assigneeId;
     tempData['status'] = status;
+    tempData['status_category'] = statusCategory;
     tempData['description'] = description;
     tempData['closed_at'] = closedAt;
     tempData['closed_by'] = closedBy;
@@ -193,6 +198,7 @@ class TicketInspectionModel {
     tempData['assignee'] = assignee;
     tempData['assignee_id'] = assigneeId;
     tempData['status'] = status;
+    tempData['status_category'] = statusCategory;
     tempData['description'] = description;
     tempData['closed_at'] = closedAt;
     tempData['closed_by'] = closedBy;
@@ -207,6 +213,6 @@ class TicketInspectionModel {
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, attachments: $attachments, responses: $responses)';
+    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, status_category: $statusCategory, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, attachments: $attachments, responses: $responses)';
   }
 }

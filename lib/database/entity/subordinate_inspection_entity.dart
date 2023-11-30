@@ -1,4 +1,4 @@
-class TodoInspectionEntity {
+class SubordinateInspectionEntity {
   static String id = 'id';
   static String code = 'code';
   static String trTime = 'tr_time';

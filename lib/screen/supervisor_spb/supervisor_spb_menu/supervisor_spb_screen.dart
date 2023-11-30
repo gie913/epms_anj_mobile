@@ -177,51 +177,57 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                               fontSize: 20,
                                               color: Colors.white),
                                         ),
-                                        child: supervisorSPBMenuEntries[
-                                                        index - 2]
-                                                    .toUpperCase() ==
-                                                'INSPECTION'
-                                            ? Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                    Text(
-                                                        "${supervisorSPBMenuEntries[index - 2].toUpperCase()}",
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                    SizedBox(width: 10),
-                                                    Row(children: [
-                                                      countInspection == 0
-                                                          ? SizedBox()
-                                                          : Row(children: [
-                                                              Icon(
-                                                                  Icons.warning,
-                                                                  color: Colors
-                                                                      .yellow),
-                                                              SizedBox(
-                                                                  width: 10),
-                                                              Text(
-                                                                  "$countInspection",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold)),
-                                                            ])
-                                                    ])
-                                                  ])
-                                            : Text(
-                                                supervisorSPBMenuEntries[
-                                                        index - 2]
-                                                    .toUpperCase(),
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
+                                        child: Text(
+                                            supervisorSPBMenuEntries[index - 2]
+                                                .toUpperCase(),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold)),
+                                        // child: supervisorSPBMenuEntries[
+                                        //                 index - 2]
+                                        //             .toUpperCase() ==
+                                        //         'INSPECTION'
+                                        //     ? Row(
+                                        //         mainAxisAlignment:
+                                        //             MainAxisAlignment.center,
+                                        //         children: [
+                                        //             Text(
+                                        //                 "${supervisorSPBMenuEntries[index - 2].toUpperCase()}",
+                                        //                 style: TextStyle(
+                                        //                     fontSize: 14,
+                                        //                     fontWeight:
+                                        //                         FontWeight
+                                        //                             .bold)),
+                                        //             SizedBox(width: 10),
+                                        //             Row(children: [
+                                        //               countInspection == 0
+                                        //                   ? SizedBox()
+                                        //                   : Row(children: [
+                                        //                       Icon(
+                                        //                           Icons.warning,
+                                        //                           color: Colors
+                                        //                               .yellow),
+                                        //                       SizedBox(
+                                        //                           width: 10),
+                                        //                       Text(
+                                        //                           "$countInspection",
+                                        //                           style: TextStyle(
+                                        //                               fontSize:
+                                        //                                   14,
+                                        //                               fontWeight:
+                                        //                                   FontWeight
+                                        //                                       .bold)),
+                                        //                     ])
+                                        //             ])
+                                        //           ])
+                                        //     : Text(
+                                        //         supervisorSPBMenuEntries[
+                                        //                 index - 2]
+                                        //             .toUpperCase(),
+                                        //         style: TextStyle(
+                                        //             fontSize: 14,
+                                        //             fontWeight:
+                                        //                 FontWeight.bold)),
                                       ),
                       );
                     }),

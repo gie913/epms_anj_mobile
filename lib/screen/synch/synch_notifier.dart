@@ -36,6 +36,7 @@ import 'package:epms/database/service/database_material.dart';
 import 'package:epms/database/service/database_mc_oph.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_member_inspection.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_auth.dart';
@@ -109,7 +110,19 @@ class SynchNotifier extends ChangeNotifier {
             notifyListeners();
             await DatabaseTodoInspection.addAllData(data);
 
-            _navigationService.push(Routes.HOME_INSPECTION_PAGE);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                _dataText = "Synch data subordinate inspection";
+                notifyListeners();
+                await DatabaseSubordinateInspection.addAllData(data);
+
+                _navigationService.push(Routes.HOME_INSPECTION_PAGE);
+              },
+              (context, errorMessage) {
+                onErrorSynchEpmsInspection(context, errorMessage);
+              },
+            );
           },
           (context, errorMessage) {
             onErrorSynchEpmsInspection(context, errorMessage);

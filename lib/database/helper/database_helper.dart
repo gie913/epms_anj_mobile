@@ -35,6 +35,7 @@ import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_detail.dart';
 import 'package:epms/database/service/database_spb_loader.dart';
 import 'package:epms/database/service/database_spb_supervise.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_auth.dart';
@@ -111,6 +112,7 @@ class DatabaseHelper {
     // Inspection
     DatabaseTicketInspection().createTable(db);
     DatabaseTodoInspection().createTable(db);
+    DatabaseSubordinateInspection().createTable(db);
     DatabaseUserInspectionConfig().createTable(db);
     DatabaseUserInspection().createTable(db);
     DatabaseTeamInspection().createTable(db);
@@ -131,6 +133,7 @@ class DatabaseHelper {
   void deleteMasterDataInspection() {
     DatabaseTicketInspection.deleteTable();
     DatabaseTodoInspection.deleteTable();
+    DatabaseSubordinateInspection.deleteTable();
     DatabaseUserInspectionConfig.deleteTable();
     DatabaseUserInspection.deleteTable();
     DatabaseTeamInspection.deleteTable();

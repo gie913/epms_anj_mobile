@@ -5,6 +5,7 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
@@ -24,11 +25,17 @@ class InspectionNotifier extends ChangeNotifier {
   List<TicketInspectionModel> _listTodoInspection = [];
   List<TicketInspectionModel> get listTodoInspection => _listTodoInspection;
 
+  List<TicketInspectionModel> _listSubordinateInspection = [];
+  List<TicketInspectionModel> get listSubordinateInspection =>
+      _listSubordinateInspection;
+
   Future<void> initData() async {
     await updateMyInspectionFromLocal();
     await updateTodoInspectionFromLocal();
+    await updateSubordinateInspectionFromLocal();
     log('list My Inspection : $_listMyInspection');
     log('list Todo Inspection : $_listTodoInspection');
+    log('list Subordinate Inspection : $_listSubordinateInspection');
   }
 
   Future<void> updateMyInspectionFromLocal() async {
@@ -40,6 +47,12 @@ class InspectionNotifier extends ChangeNotifier {
   Future<void> updateTodoInspectionFromLocal() async {
     final data = await DatabaseTodoInspection.selectData();
     _listTodoInspection = data;
+    notifyListeners();
+  }
+
+  Future<void> updateSubordinateInspectionFromLocal() async {
+    final data = await DatabaseSubordinateInspection.selectData();
+    _listSubordinateInspection = data;
     notifyListeners();
   }
 
@@ -56,8 +69,25 @@ class InspectionNotifier extends ChangeNotifier {
             (context, data) async {
               await DatabaseTodoInspection.addAllData(data);
               await updateTodoInspectionFromLocal();
+              await InspectionRepository().getMySubordinate(
+                context,
+                (context, data) async {
+                  await DatabaseSubordinateInspection.addAllData(data);
+                  await updateSubordinateInspectionFromLocal();
+                },
+                (context, errorMessage) {},
+              );
             },
-            (context, errorMessage) {},
+            (context, errorMessage) async {
+              await InspectionRepository().getMySubordinate(
+                context,
+                (context, data) async {
+                  await DatabaseSubordinateInspection.addAllData(data);
+                  await updateSubordinateInspectionFromLocal();
+                },
+                (context, errorMessage) {},
+              );
+            },
           );
         },
         (context, errorMessage) async {
@@ -66,48 +96,34 @@ class InspectionNotifier extends ChangeNotifier {
             (context, data) async {
               await DatabaseTodoInspection.addAllData(data);
               await updateTodoInspectionFromLocal();
+              await InspectionRepository().getMySubordinate(
+                context,
+                (context, data) async {
+                  await DatabaseSubordinateInspection.addAllData(data);
+                  await updateSubordinateInspectionFromLocal();
+                },
+                (context, errorMessage) {},
+              );
             },
-            (context, errorMessage) {},
+            (context, errorMessage) async {
+              await InspectionRepository().getMySubordinate(
+                context,
+                (context, data) async {
+                  await DatabaseSubordinateInspection.addAllData(data);
+                  await updateSubordinateInspectionFromLocal();
+                },
+                (context, errorMessage) {},
+              );
+            },
           );
         },
       );
     } else {
       await updateMyInspectionFromLocal();
       await updateTodoInspectionFromLocal();
+      await updateSubordinateInspectionFromLocal();
     }
   }
-
-  // Future<void> getMyInspection(BuildContext context) async {
-  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
-  //   if (isInternetExist) {
-  //     await InspectionRepository().getMyInspection(
-  //       context,
-  //       (context, data) async {
-  //         await DatabaseTicketInspection.addAllData(data);
-  //         await updateMyInspectionFromLocal();
-  //       },
-  //       (context, errorMessage) {},
-  //     );
-  //   } else {
-  //     await updateMyInspectionFromLocal();
-  //   }
-  // }
-
-  // Future<void> getTodoInspection(BuildContext context) async {
-  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
-  //   if (isInternetExist) {
-  //     await InspectionRepository().getToDoInspection(
-  //       context,
-  //       (context, data) async {
-  //         await DatabaseTodoInspection.addAllData(data);
-  //         await updateTodoInspectionFromLocal();
-  //       },
-  //       (context, errorMessage) {},
-  //     );
-  //   } else {
-  //     await updateTodoInspectionFromLocal();
-  //   }
-  // }
 
   Future<void> uploadAndSynch(BuildContext context) async {
     final dataMyInspection =

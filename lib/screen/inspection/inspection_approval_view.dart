@@ -274,6 +274,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         assignee: widget.data.assignee,
         assigneeId: widget.data.assigneeId,
         status: selectedAction ?? '',
+        statusCategory: 'done',
         description: widget.data.description,
         closedAt: widget.data.closedAt,
         closedBy: widget.data.closedBy,

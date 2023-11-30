@@ -28,6 +28,7 @@ class DatabaseTodoInspection {
        ${TodoInspectionEntity.assignee} TEXT,
        ${TodoInspectionEntity.assigneeId} TEXT,
        ${TodoInspectionEntity.status} TEXT,
+       ${TodoInspectionEntity.statusCategory} TEXT,
        ${TodoInspectionEntity.description} TEXT,
        ${TodoInspectionEntity.closedAt} TEXT,
        ${TodoInspectionEntity.closedBy} TEXT,

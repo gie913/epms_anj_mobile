@@ -5,17 +5,23 @@ import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:flutter/material.dart';
 
 class InspectionItem extends StatelessWidget {
-  const InspectionItem({super.key, required this.onTap, required this.data});
+  const InspectionItem({
+    super.key,
+    required this.onTap,
+    required this.data,
+    this.bgColor,
+  });
 
   final Function() onTap;
   final TicketInspectionModel data;
+  final Color? bgColor;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Card(
-        color: Palette.primaryColorProd,
+        color: bgColor ?? Palette.primaryColorProd,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
