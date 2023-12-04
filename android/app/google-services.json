@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "380168768251",
+    "project_id": "epms-b2e11",
+    "storage_bucket": "epms-b2e11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380168768251:android:497d0c07d5eff039c33e5e",
+        "android_client_info": {
+          "package_name": "com.anj.epms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOXyvHZ1GA7BtvSC1EbPCUdvdDroMTAWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
