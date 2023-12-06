@@ -53,6 +53,7 @@ class _KeraniPanenScreenState extends State<KeraniPanenScreen> {
               },
             ),
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             automaticallyImplyLeading: false,
             elevation: 0,
             actions: [

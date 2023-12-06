@@ -34,6 +34,7 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
           appBar: AppBar(
             automaticallyImplyLeading: false,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             elevation: 0,
             actions: [
               Consumer<ThemeNotifier>(

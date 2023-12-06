@@ -46,6 +46,7 @@ class _KeraniKirimScreenState extends State<KeraniKirimScreen> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             automaticallyImplyLeading: false,
             elevation: 0,
             actions: [

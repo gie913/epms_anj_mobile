@@ -33,6 +33,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
             automaticallyImplyLeading: false,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             actions: [
               Consumer<ThemeNotifier>(
                   builder: (context, theme, child) => Flexible(

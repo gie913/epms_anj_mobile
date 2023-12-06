@@ -5,6 +5,12 @@ import 'package:flutter/material.dart';
 class ThemeNotifier with ChangeNotifier {
   final darkTheme = ThemeData(
     fontFamily: "DIN Pro",
+    brightness: Brightness.dark,
+    colorScheme: ThemeData.dark().colorScheme.copyWith(
+          primary: Colors.white,
+          onPrimary: Colors.black,
+          secondary: Colors.orange,
+        ),
     primaryColor: Color(0xFF212121),
     dividerTheme: DividerThemeData(color: Colors.grey),
     appBarTheme: AppBarTheme(
@@ -18,11 +24,12 @@ class ThemeNotifier with ChangeNotifier {
       ),
     ),
     scaffoldBackgroundColor: Colors.black,
-    dividerColor: Colors.black,
-    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange).copyWith(
-      background: Colors.black,
-      brightness: Brightness.dark,
-    ),
+    dividerColor: Colors.white,
+    // colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange).copyWith(
+    //   background: Colors.black,
+    //   brightness: Brightness.dark,
+    // ),
+    useMaterial3: true,
   );
 
   final lightTheme = ThemeData(
@@ -45,7 +52,8 @@ class ThemeNotifier with ChangeNotifier {
     colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.orange,
       brightness: Brightness.light,
-    ).copyWith(background: Palette.greenColorLight),
+    ).copyWith(background: Colors.white),
+    useMaterial3: true,
   );
 
   ThemeData? _themeData;
