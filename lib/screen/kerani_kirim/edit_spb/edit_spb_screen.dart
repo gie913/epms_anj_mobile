@@ -1,4 +1,3 @@
-
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/model/spb.dart';
@@ -15,7 +14,12 @@ class EditSPBScreen extends StatefulWidget {
   final SPB spb;
   final List<SPBDetail> listSPBDetail;
   final List<SPBLoader> listSPBLoader;
-  const EditSPBScreen({Key? key, required this.spb, required this.listSPBDetail, required this.listSPBLoader}) : super(key: key);
+  const EditSPBScreen(
+      {Key? key,
+      required this.spb,
+      required this.listSPBDetail,
+      required this.listSPBLoader})
+      : super(key: key);
 
   @override
   State<EditSPBScreen> createState() => _EditSPBScreenState();
@@ -24,14 +28,24 @@ class EditSPBScreen extends StatefulWidget {
 class _EditSPBScreenState extends State<EditSPBScreen> {
   @override
   void initState() {
-    context.read<EditSPBNotifier>().onInitEdit(context,widget.spb, widget.listSPBDetail, widget.listSPBLoader);
+    context.read<EditSPBNotifier>().onInitEdit(
+        context, widget.spb, widget.listSPBDetail, widget.listSPBLoader);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => NavigatorService().onWillPopForm(context),
+    return PopScope(
+      // onWillPop: () async => NavigatorService().onWillPopForm(context),
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop == false) {
+          final res = await NavigatorService().onWillPopForm(context);
+          if (res) {
+            Navigator.pop(context);
+          }
+        }
+      },
       child: Consumer<EditSPBNotifier>(builder: (context, editSPB, child) {
         return DefaultTabController(
           initialIndex: 0,

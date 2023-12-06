@@ -27,8 +27,10 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      // onWillPop: () async => false,
+      canPop: false,
+      onPopInvoked: (didPop) {},
       child: Consumer<SupervisorFormNotifier>(
         builder: (context, supervisor, child) {
           return Scaffold(

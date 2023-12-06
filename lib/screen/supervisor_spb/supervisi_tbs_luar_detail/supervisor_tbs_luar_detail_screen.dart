@@ -35,12 +35,25 @@ class _SupervisorTBSLuarDetailScreenState
   Widget build(BuildContext context) {
     return Consumer<SupervisorTBSLuarDetailNotifier>(
         builder: (context, notifier, child) {
-      return WillPopScope(
-        onWillPop: () async {
-          if (notifier.onEdit) {
-            return NavigatorService().onWillPopForm(context);
-          } else {
-            return true;
+      return PopScope(
+        // onWillPop: () async {
+        //   if (notifier.onEdit) {
+        //     return NavigatorService().onWillPopForm(context);
+        //   } else {
+        //     return true;
+        //   }
+        // },
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop == false) {
+            if (notifier.onEdit) {
+              final res = await NavigatorService().onWillPopForm(context);
+              if (res) {
+                Navigator.pop(context);
+              }
+            } else {
+              Navigator.pop(context);
+            }
           }
         },
         child: DefaultTabController(

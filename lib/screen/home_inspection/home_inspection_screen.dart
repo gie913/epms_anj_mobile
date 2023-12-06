@@ -26,8 +26,10 @@ class _HomeInspectionScreenState extends State<HomeInspectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async => false,
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {},
+        // onWillPop: () async => false,
         child: Consumer<HomeInspectionNotifier>(
           builder: (context, homeInspectionNotifier, _) {
             return MediaQuery(

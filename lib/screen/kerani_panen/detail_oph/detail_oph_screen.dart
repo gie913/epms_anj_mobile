@@ -14,7 +14,8 @@ class DetailOPHScreen extends StatefulWidget {
   final String method;
   final bool restan;
 
-  const DetailOPHScreen({Key? key, required this.oph, required this.method, required this.restan})
+  const DetailOPHScreen(
+      {Key? key, required this.oph, required this.method, required this.restan})
       : super(key: key);
 
   @override
@@ -33,14 +34,32 @@ class _DetailOPHScreenState extends State<DetailOPHScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<DetailOPHNotifier>(builder: (context, notifier, child) {
-      return WillPopScope(
-        onWillPop: () async {
-          if (notifier.onEdit) {
-            return NavigatorService().onWillPopForm(context);
-          } else if (notifier.onChangeCard) {
-            return NavigatorService().onWillPopForm(context);
-          } else {
-            return true;
+      return PopScope(
+        // onWillPop: () async {
+        //   if (notifier.onEdit) {
+        //     return NavigatorService().onWillPopForm(context);
+        //   } else if (notifier.onChangeCard) {
+        //     return NavigatorService().onWillPopForm(context);
+        //   } else {
+        //     return true;
+        //   }
+        // },
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop == false) {
+            if (notifier.onEdit) {
+              final res = await NavigatorService().onWillPopForm(context);
+              if (res) {
+                Navigator.pop(context);
+              }
+            } else if (notifier.onChangeCard) {
+              final res = await NavigatorService().onWillPopForm(context);
+              if (res) {
+                Navigator.pop(context);
+              }
+            } else {
+              Navigator.pop(context);
+            }
           }
         },
         child: DefaultTabController(
@@ -62,8 +81,7 @@ class _DetailOPHScreenState extends State<DetailOPHScreen> {
                   ],
                 ),
               ),
-              body: TabBarView(
-                  children: <Widget>[
+              body: TabBarView(children: <Widget>[
                 DetailOPHTab(),
                 notifier.onEdit ? DetailOPHEditFruit() : DetailOPHFruit()
               ]),

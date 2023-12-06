@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 
 class DeviceInfoService {
@@ -12,21 +12,24 @@ class DeviceInfoService {
   /// not in main
   Future<void> initPlatform() async {
     try {
+      final deviceInfo = DeviceInfoPlugin();
+
       if (Platform.isAndroid) {
-        deviceData = getAndroidDeviceInfo(await deviceInfo.androidInfo);
+        final androidInfo = await deviceInfo.androidInfo;
+        // deviceData = getAndroidDeviceInfo(await deviceInfo.androidInfo);
         deviceDataGeneral = DeviceInfoGeneral(
-          deviceId: deviceData["id"],
-          deviceType: deviceData["device"],
-          deviceName: deviceData["brand"],
+          deviceId: androidInfo.id,
+          deviceType: androidInfo.device,
+          deviceName: androidInfo.brand,
         );
       } else if (Platform.isIOS) {
-        deviceData = getIosDeviceInfo(await deviceInfo.iosInfo);
+        final iosInfo = await deviceInfo.iosInfo;
+        // deviceData = getIosDeviceInfo(await deviceInfo.iosInfo);
         deviceDataGeneral = DeviceInfoGeneral(
-          deviceId: deviceData["identifierForVendor"] +
-              "-" +
-              deviceData["isPhysicalDevice"],
-          deviceType: deviceData["model"],
-          deviceName: deviceData["name"],
+          deviceId:
+              '${iosInfo.identifierForVendor}-${iosInfo.isPhysicalDevice}',
+          deviceType: iosInfo.model,
+          deviceName: iosInfo.name,
         );
       }
     } on PlatformException {
@@ -64,7 +67,7 @@ class DeviceInfoService {
       'tags': build.tags,
       'type': build.type,
       'isPhysicalDevice': build.isPhysicalDevice,
-      'androidId': build.androidId,
+      // 'androidId': build.androidId,
       'systemFeatures': build.systemFeatures,
     };
   }
@@ -109,8 +112,8 @@ class DeviceInfoGeneral {
       );
 
   Map<String, dynamic> toMap() => {
-    "deviceId": deviceId,
-    "deviceType": deviceType,
-    "deviceName": deviceName,
-  };
+        "deviceId": deviceId,
+        "deviceType": deviceType,
+        "deviceName": deviceName,
+      };
 }

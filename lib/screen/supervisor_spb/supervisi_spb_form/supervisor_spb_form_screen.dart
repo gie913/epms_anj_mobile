@@ -24,8 +24,17 @@ class _SupervisorSPBFormScreenState extends State<SupervisorSPBFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async => NavigatorService().onWillPopForm(context),
+    return PopScope(
+        // onWillPop: () async => NavigatorService().onWillPopForm(context),
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop == false) {
+            final res = await NavigatorService().onWillPopForm(context);
+            if (res) {
+              Navigator.pop(context);
+            }
+          }
+        },
         child: Consumer<SupervisorSPBFormNotifier>(
             builder: (context, notifier, child) {
           return DefaultTabController(

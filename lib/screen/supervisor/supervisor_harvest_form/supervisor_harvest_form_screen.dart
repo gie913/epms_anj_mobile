@@ -25,8 +25,17 @@ class _SupervisorHarvestFormScreenState
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => NavigatorService().onWillPopForm(context),
+    return PopScope(
+      // onWillPop: () async => NavigatorService().onWillPopForm(context),
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop == false) {
+          final res = await NavigatorService().onWillPopForm(context);
+          if (res) {
+            Navigator.pop(context);
+          }
+        }
+      },
       child: DefaultTabController(
         initialIndex: 0,
         length: 2,

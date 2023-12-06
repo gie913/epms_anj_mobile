@@ -1,4 +1,3 @@
-
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/screen/kerani_kirim/form_spb/form_spb_detail_tab.dart';
@@ -24,8 +23,16 @@ class _FormSPBScreenState extends State<FormSPBScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => NavigatorService().onWillPopForm(context),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop == false) {
+          final res = await NavigatorService().onWillPopForm(context);
+          if (res) {
+            Navigator.pop(context);
+          }
+        }
+      },
       child: Consumer<FormSPBNotifier>(builder: (context, formSPB, child) {
         return DefaultTabController(
           initialIndex: 0,

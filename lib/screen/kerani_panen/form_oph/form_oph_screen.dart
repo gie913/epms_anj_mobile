@@ -14,7 +14,6 @@ class FormOPHScreen extends StatefulWidget {
 }
 
 class _FormOPHScreenState extends State<FormOPHScreen> {
-
   @override
   void initState() {
     context.read<FormOPHNotifier>().generateVariable();
@@ -25,8 +24,17 @@ class _FormOPHScreenState extends State<FormOPHScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => NavigatorService().onWillPopForm(context),
+    return PopScope(
+      // onWillPop: () async => NavigatorService().onWillPopForm(context),
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop == false) {
+          final res = await NavigatorService().onWillPopForm(context);
+          if (res) {
+            Navigator.pop(context);
+          }
+        }
+      },
       child: Consumer<FormOPHNotifier>(builder: (context, formOPH, child) {
         return DefaultTabController(
           initialIndex: 0,

@@ -25,8 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Consumer<LoginNotifier>(
       builder: (context, login, child) {
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          // onWillPop: () async => false,
+          canPop: false,
+          onPopInvoked: (didPop) {},
           child: MediaQuery(
             data: Style.mediaQueryText(context),
             child: Scaffold(

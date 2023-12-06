@@ -30,45 +30,59 @@ class _DetailSuperviseHarvestScreenState
   @override
   Widget build(BuildContext context) {
     return Consumer<DetailSuperviseHarvestNotifier>(
-      builder: (context, notifier, child) {
-        return WillPopScope(
-          onWillPop: () async {
+        builder: (context, notifier, child) {
+      return PopScope(
+        // onWillPop: () async {
+        //   if (notifier.onEdit) {
+        //     return NavigatorService().onWillPopForm(context);
+        //   } else {
+        //     return true;
+        //   }
+        // },
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop == false) {
             if (notifier.onEdit) {
-              return NavigatorService().onWillPopForm(context);
+              final res = await NavigatorService().onWillPopForm(context);
+              if (res) {
+                Navigator.pop(context);
+              }
             } else {
-              return true;
+              Navigator.pop(context);
             }
-          },
-          child: DefaultTabController(
-            initialIndex: 0,
-            length: 2,
-            child: MediaQuery(
-              data: Style.mediaQueryText(context),
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text('Detail Laporan Supervisi'),
-                  bottom: TabBar(
-                    tabs: <Widget>[
-                      Tab(
-                        icon: Text("Form"),
-                      ),
-                      Tab(
-                        icon: Text("Hasil"),
-                      ),
-                    ],
-                  ),
-                ),
-                body: TabBarView(
-                  children: <Widget>[
-                    SuperviseHarvestDetailTab(),
-                    notifier.onEdit ? SuperviseDetailEditFruit() : SuperviseHarvestDetailFruit()
+          }
+        },
+        child: DefaultTabController(
+          initialIndex: 0,
+          length: 2,
+          child: MediaQuery(
+            data: Style.mediaQueryText(context),
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Detail Laporan Supervisi'),
+                bottom: TabBar(
+                  tabs: <Widget>[
+                    Tab(
+                      icon: Text("Form"),
+                    ),
+                    Tab(
+                      icon: Text("Hasil"),
+                    ),
                   ],
                 ),
               ),
+              body: TabBarView(
+                children: <Widget>[
+                  SuperviseHarvestDetailTab(),
+                  notifier.onEdit
+                      ? SuperviseDetailEditFruit()
+                      : SuperviseHarvestDetailFruit()
+                ],
+              ),
             ),
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 }

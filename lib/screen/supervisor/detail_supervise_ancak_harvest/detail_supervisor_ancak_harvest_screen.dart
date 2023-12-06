@@ -12,7 +12,8 @@ import 'edit_supervisor_ancak_fruit.dart';
 class DetailSuperviseAncakHarvestScreen extends StatefulWidget {
   final OPHSuperviseAncak ophSuperviseAncak;
 
-  const DetailSuperviseAncakHarvestScreen({Key? key, required this.ophSuperviseAncak})
+  const DetailSuperviseAncakHarvestScreen(
+      {Key? key, required this.ophSuperviseAncak})
       : super(key: key);
 
   @override
@@ -24,7 +25,9 @@ class _DetailSuperviseAncakHarvestScreenState
     extends State<DetailSuperviseAncakHarvestScreen> {
   @override
   void initState() {
-    context.read<DetailSupervisorAncakNotifier>().onInit(widget.ophSuperviseAncak);
+    context
+        .read<DetailSupervisorAncakNotifier>()
+        .onInit(widget.ophSuperviseAncak);
     super.initState();
   }
 
@@ -32,44 +35,58 @@ class _DetailSuperviseAncakHarvestScreenState
   Widget build(BuildContext context) {
     return Consumer<DetailSupervisorAncakNotifier>(
         builder: (context, notifier, child) {
-          return WillPopScope(
-            onWillPop: () async {
-              if (notifier.onEdit) {
-                return NavigatorService().onWillPopForm(context);
-              } else {
-                return true;
+      return PopScope(
+        // onWillPop: () async {
+        //   if (notifier.onEdit) {
+        //     return NavigatorService().onWillPopForm(context);
+        //   } else {
+        //     return true;
+        //   }
+        // },
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop == false) {
+            if (notifier.onEdit) {
+              final res = await NavigatorService().onWillPopForm(context);
+              if (res) {
+                Navigator.pop(context);
               }
-            },
-            child: DefaultTabController(
-              initialIndex: 0,
-              length: 2,
-              child: MediaQuery(
-                data: Style.mediaQueryText(context),
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: Text('Detail Laporan Supervisi Ancak Panen'),
-                    bottom: TabBar(
-                      tabs: <Widget>[
-                        Tab(
-                          icon: Text("Form"),
-                        ),
-                        Tab(
-                          icon: Text("Hasil"),
-                        ),
-                      ],
+            } else {
+              Navigator.pop(context);
+            }
+          }
+        },
+        child: DefaultTabController(
+          initialIndex: 0,
+          length: 2,
+          child: MediaQuery(
+            data: Style.mediaQueryText(context),
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Detail Laporan Supervisi Ancak Panen'),
+                bottom: TabBar(
+                  tabs: <Widget>[
+                    Tab(
+                      icon: Text("Form"),
                     ),
-                  ),
-                  body: TabBarView(
-                    children: <Widget>[
-                      DetailSupervisorAncakTab(),
-                      notifier.onEdit ? EditSupervisorAncakFormFruit() : DetailSupervisorAncakFormFruit()
-                    ],
-                  ),
+                    Tab(
+                      icon: Text("Hasil"),
+                    ),
+                  ],
                 ),
               ),
+              body: TabBarView(
+                children: <Widget>[
+                  DetailSupervisorAncakTab(),
+                  notifier.onEdit
+                      ? EditSupervisorAncakFormFruit()
+                      : DetailSupervisorAncakFormFruit()
+                ],
+              ),
             ),
-          );
-        }
-    );
+          ),
+        ),
+      );
+    });
   }
 }

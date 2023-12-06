@@ -86,12 +86,14 @@ class _CameraScreenState extends State<CameraScreen>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // final CameraController? cameraController = controller;
-        // cameraController?.dispose();
-        return true;
-      },
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {},
+      // onWillPop: () async {
+      //   // final CameraController? cameraController = controller;
+      //   // cameraController?.dispose();
+      //   return true;
+      // },
       child: Scaffold(
         // backgroundColor: Palette.primaryColorProd,
         body: Column(

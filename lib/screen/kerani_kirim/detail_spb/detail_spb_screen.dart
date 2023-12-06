@@ -38,14 +38,27 @@ class _DetailSPBScreenState extends State<DetailSPBScreen> {
         length: detailSPB.isSPBExist ? 3 : 1,
         child: MediaQuery(
           data: Style.mediaQueryText(context),
-          child: WillPopScope(
-            onWillPop: () async {
-              if (detailSPB.onChangeCard) {
-                return NavigatorService().onWillPopForm(context);
-              } else {
-                return true;
+          child: PopScope(
+            canPop: false,
+            onPopInvoked: (didPop) async {
+              if (didPop == false) {
+                if (detailSPB.onChangeCard) {
+                  final res = await NavigatorService().onWillPopForm(context);
+                  if (res) {
+                    Navigator.pop(context);
+                  }
+                } else {
+                  Navigator.pop(context);
+                }
               }
             },
+            // onWillPop: () async {
+            //   if (detailSPB.onChangeCard) {
+            //     return NavigatorService().onWillPopForm(context);
+            //   } else {
+            //     return true;
+            //   }
+            // },
             child: Scaffold(
               appBar: AppBar(
                 title: Text('Detail SPB'),

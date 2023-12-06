@@ -24,8 +24,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => true,
+    return PopScope(
+      // onWillPop: () async => true,
+      canPop: true,
+      onPopInvoked: (didPop) {},
       child:
           Consumer<AttendanceNotifier>(builder: (context, attendance, child) {
         return MediaQuery(
@@ -92,7 +94,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   width: 180,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                           "${attendance.tAttendanceList[index].attendanceEmployeeCode}"),

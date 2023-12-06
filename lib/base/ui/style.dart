@@ -127,6 +127,6 @@ class Style {
       fontWeight: FontWeight.bold, fontSize: 28, color: Palette.redColorLight);
 
   static mediaQueryText(BuildContext context) {
-    return MediaQuery.of(context).copyWith(textScaleFactor: 1.22);
+    return MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.22));
   }
 }

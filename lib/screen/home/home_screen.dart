@@ -21,8 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeNotifier>(builder: (context, notifier, child) {
-      return WillPopScope(
-        onWillPop: () async => false,
+      return PopScope(
+        // onWillPop: () async => false,
+        canPop: false,
+        onPopInvoked: (didPop) {},
         child: Scaffold(
           body: notifier.role != null
               ? MediaQuery(
