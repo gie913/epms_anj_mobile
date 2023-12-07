@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:380168768251:android:59f7c72d7aae204dc33e5e",
+        "android_client_info": {
+          "package_name": "com.anj.emps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOXyvHZ1GA7BtvSC1EbPCUdvdDroMTAWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:380168768251:android:497d0c07d5eff039c33e5e",
         "android_client_info": {
           "package_name": "com.anj.epms"
