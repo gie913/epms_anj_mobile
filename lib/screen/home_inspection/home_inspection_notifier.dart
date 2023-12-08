@@ -9,6 +9,7 @@ import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/user_inspection_config_model.dart';
 import 'package:epms/screen/home/logout_repository.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class HomeInspectionNotifier extends ChangeNotifier {
@@ -74,10 +75,13 @@ class HomeInspectionNotifier extends ChangeNotifier {
         .doPostLogOutInspection(onSuccessLogOut, onErrorLogOut);
   }
 
-  onSuccessLogOut(String successMsg) {
+  onSuccessLogOut(String successMsg) async {
     StorageManager.deleteData("inspectionToken");
     StorageManager.deleteData("inspectionTokenExpired");
     DatabaseHelper().deleteMasterDataInspection();
+    final topic = await StorageManager.readData('topic');
+    await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+    StorageManager.deleteData("topic");
     _dialogService.popDialog();
     _navigationService.push(Routes.LOGIN_PAGE);
   }

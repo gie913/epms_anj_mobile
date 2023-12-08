@@ -20,7 +20,7 @@ class _InspectionViewState extends State<InspectionView> {
 
   @override
   void initState() {
-    context.read<InspectionNotifier>().initData();
+    context.read<InspectionNotifier>().initData(context);
     super.initState();
   }
 
@@ -44,10 +44,24 @@ class _InspectionViewState extends State<InspectionView> {
                   },
                   tabs: [
                     Tab(
-                        icon:
-                            Text("My Inspection", textAlign: TextAlign.center)),
-                    Tab(icon: Text("To Do")),
-                    Tab(icon: Text("On Going")),
+                      icon: Text(
+                        "My Inspection",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    Tab(
+                      icon: Text(
+                        "To Do",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    Tab(
+                      icon: Text(
+                        "On Going",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ],
                 ),
               ),

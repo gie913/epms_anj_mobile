@@ -29,13 +29,11 @@ class InspectionNotifier extends ChangeNotifier {
   List<TicketInspectionModel> get listSubordinateInspection =>
       _listSubordinateInspection;
 
-  Future<void> initData() async {
-    await updateMyInspectionFromLocal();
-    await updateTodoInspectionFromLocal();
-    await updateSubordinateInspectionFromLocal();
-    log('list My Inspection : $_listMyInspection');
-    log('list Todo Inspection : $_listTodoInspection');
-    log('list Subordinate Inspection : $_listSubordinateInspection');
+  Future<void> initData(BuildContext context) async {
+    // await updateMyInspectionFromLocal();
+    // await updateTodoInspectionFromLocal();
+    // await updateSubordinateInspectionFromLocal();
+    await getDataInspection(context);
   }
 
   Future<void> updateMyInspectionFromLocal() async {
@@ -74,8 +72,15 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
-                (context, errorMessage) {},
+                (context, errorMessage) {
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                },
               );
             },
             (context, errorMessage) async {
@@ -84,8 +89,15 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
-                (context, errorMessage) {},
+                (context, errorMessage) {
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                },
               );
             },
           );
@@ -101,8 +113,15 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
-                (context, errorMessage) {},
+                (context, errorMessage) {
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                },
               );
             },
             (context, errorMessage) async {
@@ -111,8 +130,15 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
-                (context, errorMessage) {},
+                (context, errorMessage) {
+                  log('list My Inspection : $_listMyInspection');
+                  log('list Todo Inspection : $_listTodoInspection');
+                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                },
               );
             },
           );
@@ -122,6 +148,9 @@ class InspectionNotifier extends ChangeNotifier {
       await updateMyInspectionFromLocal();
       await updateTodoInspectionFromLocal();
       await updateSubordinateInspectionFromLocal();
+      log('list My Inspection : $_listMyInspection');
+      log('list Todo Inspection : $_listTodoInspection');
+      log('list Subordinate Inspection : $_listSubordinateInspection');
     }
   }
 

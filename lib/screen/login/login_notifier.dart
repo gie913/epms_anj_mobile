@@ -42,6 +42,7 @@ import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/login_inspection_data.dart';
 import 'package:epms/model/login_response.dart';
 import 'package:epms/screen/login/login_repository.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 
@@ -127,7 +128,7 @@ class LoginNotifier extends ChangeNotifier {
   onSuccessLoginInspection(
       BuildContext context, LoginInspectionData data) async {
     _loading = false;
-    await saveDatabaseInspection(context, data);
+    await saveDatabaseInspection(context, _username.text, data);
     FlushBarManager.showFlushBarSuccess(
         context, "Login Berhasil", "Anda berhasil login");
     _navigationService.push(Routes.SYNCH_PAGE);
@@ -155,11 +156,15 @@ class LoginNotifier extends ChangeNotifier {
   }
 
   Future<void> saveDatabaseInspection(
-      BuildContext context, LoginInspectionData data) async {
+      BuildContext context, String username, LoginInspectionData data) async {
     StorageManager.saveData("inspectionToken", data.token);
     StorageManager.saveData('inspectionTokenExpired', data.tokenExpiredAt);
+    StorageManager.saveData("userName", username);
+    StorageManager.saveData('topic', 'production_user_${data.user.username}');
     await DatabaseUserInspectionConfig.insetData(data.user);
     await DatabaseAccessInspection.insetData(data.access);
+    await FirebaseMessaging.instance
+        .subscribeToTopic('development_user_${data.user.username}');
   }
 
   onPressResetData(BuildContext context) {

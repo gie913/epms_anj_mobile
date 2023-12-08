@@ -13,8 +13,8 @@ class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
 
   final _androidChannel = const AndroidNotificationChannel(
-    'high_importance_channel',
-    'High Importance Notifications',
+    '@string/default_notification_channel_id',
+    'ePMS Notification',
     description: 'This channel is used for importance notifications',
     importance: Importance.defaultImportance,
   );
@@ -59,6 +59,10 @@ class FirebaseApi {
     FirebaseMessaging.onMessage.listen((message) {
       final notification = message.notification;
       if (notification == null) return;
+
+      print('Title : ${message.notification?.title}');
+      print('Body : ${message.notification?.body}');
+      print('Payload : ${message.data}');
 
       _localNotifications.show(
           notification.hashCode,
