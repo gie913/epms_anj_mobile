@@ -76,9 +76,30 @@ class SynchNotifier extends ChangeNotifier {
     String? apiServer = await StorageManager.readData('apiServer');
     if (apiServer != null) {
       log('Synch Epms');
-      MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
-      SynchRepository().doPostSynch(
-          context, mConfigSchema.estateCode!, onSuccessSynch, onErrorSynch);
+      final isLoginEpmsSuccess =
+          await StorageManager.readData('is_login_epms_success');
+      final isLoginInspectionSuccess =
+          await StorageManager.readData('is_login_inspection_success');
+
+      if (isLoginEpmsSuccess == true && isLoginInspectionSuccess == false) {
+        MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
+        SynchRepository().doPostSynch(
+            context, mConfigSchema.estateCode!, onSuccessSynch, onErrorSynch);
+      } else if (isLoginEpmsSuccess == false &&
+          isLoginInspectionSuccess == true) {
+        SynchRepository().synchInspection(
+          context,
+          onSuccessSynchInspection,
+          onErrorSynchEpmsInspection,
+        );
+      } else if (isLoginEpmsSuccess == true &&
+          isLoginInspectionSuccess == true) {
+        SynchRepository().synchInspection(
+          context,
+          onSuccessSynchInspectionNew,
+          onErrorSynch,
+        );
+      }
     } else {
       log('Synch Inspection');
       SynchRepository().synchInspection(
@@ -92,6 +113,8 @@ class SynchNotifier extends ChangeNotifier {
   onSuccessSynch(BuildContext context, SynchResponse synchResponse) {
     saveDatabase(context, synchResponse);
   }
+
+  onSuccessSynchNew(BuildContext context, SynchResponse synchResponse) {}
 
   onSuccessSynchInspection(
       BuildContext context, SynchInspectionData data) async {
@@ -131,6 +154,55 @@ class SynchNotifier extends ChangeNotifier {
       },
       (context, errorMessage) {
         onErrorSynchEpmsInspection(context, errorMessage);
+      },
+    );
+  }
+
+  onSuccessSynchInspectionNew(
+      BuildContext context, SynchInspectionData data) async {
+    await saveDatabaseSynchInspection(context, data);
+    await InspectionRepository().getMyInspection(
+      context,
+      (context, data) async {
+        _dataText = "Synch data my inspection";
+        notifyListeners();
+        await DatabaseTicketInspection.addAllData(data);
+
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            _dataText = "Synch data todo inspection";
+            notifyListeners();
+            await DatabaseTodoInspection.addAllData(data);
+
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                _dataText = "Synch data subordinate inspection";
+                notifyListeners();
+                await DatabaseSubordinateInspection.addAllData(data);
+
+                MConfigSchema mConfigSchema =
+                    await DatabaseMConfig().selectMConfig();
+                SynchRepository().doPostSynch(
+                  context,
+                  mConfigSchema.estateCode!,
+                  onSuccessSynch,
+                  onErrorSynch,
+                );
+              },
+              (context, errorMessage) {
+                onErrorSynch(context, errorMessage);
+              },
+            );
+          },
+          (context, errorMessage) {
+            onErrorSynch(context, errorMessage);
+          },
+        );
+      },
+      (context, errorMessage) {
+        onErrorSynch(context, errorMessage);
       },
     );
   }

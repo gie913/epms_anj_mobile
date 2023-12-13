@@ -30,10 +30,10 @@ class InspectionNotifier extends ChangeNotifier {
       _listSubordinateInspection;
 
   Future<void> initData(BuildContext context) async {
-    // await updateMyInspectionFromLocal();
-    // await updateTodoInspectionFromLocal();
-    // await updateSubordinateInspectionFromLocal();
-    await getDataInspection(context);
+    await updateMyInspectionFromLocal();
+    await updateTodoInspectionFromLocal();
+    await updateSubordinateInspectionFromLocal();
+    // await getDataInspection(context);
   }
 
   Future<void> updateMyInspectionFromLocal() async {

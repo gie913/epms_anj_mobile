@@ -7,10 +7,7 @@ class SupervisorDialog extends StatefulWidget {
   final Supervisor supervisor;
   final Function()? onPress;
 
-  const SupervisorDialog(
-      {Key? key,
-        required this.supervisor,
-        this.onPress})
+  const SupervisorDialog({Key? key, required this.supervisor, this.onPress})
       : super(key: key);
 
   @override
@@ -31,7 +28,8 @@ class _SupervisorDialogState extends State<SupervisorDialog> {
               borderRadius: BorderRadius.all(Radius.circular(15))),
           title: Center(child: Text("Supervisi Kemandoran")),
           content: Container(
-              height: MediaQuery.of(context).size.height*0.35,
+            height: MediaQuery.of(context).size.height * 0.35,
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   Text("Mandor:"),
@@ -62,7 +60,9 @@ class _SupervisorDialogState extends State<SupervisorDialog> {
                   Text("${widget.supervisor.keraniKirimName}",
                       style: Style.textBold14),
                 ],
-              )),
+              ),
+            ),
+          ),
           actions: <Widget>[
             Padding(
                 padding: const EdgeInsets.all(8.0),

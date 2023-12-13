@@ -143,4 +143,16 @@ class DatabaseHelper {
     DatabaseCompanyInspection.deleteTable();
     DatabaseDivisionInspection.deleteTable();
   }
+
+  void deleteMasterDataInspectionReSynch() {
+    DatabaseTicketInspection.deleteTable();
+    DatabaseTodoInspection.deleteTable();
+    DatabaseSubordinateInspection.deleteTable();
+    DatabaseUserInspection.deleteTable();
+    DatabaseTeamInspection.deleteTable();
+    DatabaseMemberInspection.deleteTable();
+    DatabaseActionInspection.deleteTable();
+    DatabaseCompanyInspection.deleteTable();
+    DatabaseDivisionInspection.deleteTable();
+  }
 }

@@ -2,6 +2,7 @@ import 'package:epms/base/constants/image_assets.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
+import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/database/service/database_laporan_restan.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/model/laporan_restan.dart';
@@ -21,6 +22,7 @@ class KeraniScreen extends StatefulWidget {
 class _KeraniScreenState extends State<KeraniScreen> {
   Supervisor? supervisor;
   int countRestan = 0;
+  bool isShowMenuInspection = false;
 
   @override
   void initState() {
@@ -30,19 +32,22 @@ class _KeraniScreenState extends State<KeraniScreen> {
   }
 
   getSupervisor() async {
+    final isLoginInspectionSuccess =
+        await StorageManager.readData('is_login_inspection_success');
     Supervisor? _supervisor = await DatabaseSupervisor().selectSupervisor();
     List<LaporanRestan> count =
         await DatabaseLaporanRestan().selectLaporanRestan();
     setState(() {
       countRestan = count.length;
       supervisor = _supervisor;
+      isShowMenuInspection = isLoginInspectionSuccess;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeNotifier>(
-      builder: (context, home, child) {
+      builder: (context, homeNotifier, child) {
         return Consumer<ThemeNotifier>(
           builder: (context, themeNotifier, child) {
             return Scaffold(
@@ -54,6 +59,11 @@ class _KeraniScreenState extends State<KeraniScreen> {
                     KeraniNotifier().navigateToSupervisionForm();
                   },
                 ),
+                surfaceTintColor: themeNotifier.status == true ||
+                        MediaQuery.of(context).platformBrightness ==
+                            Brightness.dark
+                    ? Colors.transparent
+                    : Colors.white10,
                 backgroundColor: themeNotifier.status == true ||
                         MediaQuery.of(context).platformBrightness ==
                             Brightness.dark
@@ -384,25 +394,62 @@ class _KeraniScreenState extends State<KeraniScreen> {
                                   SizedBox(width: 4),
                                   countRestan == 0
                                       ? const SizedBox()
-                                      : Expanded(
-                                          child: Row(children: [
-                                            Icon(Icons.warning,
-                                                color: Colors.yellow, size: 18),
-                                            SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text("$countRestan",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  )),
-                                            ),
-                                          ]),
-                                        ),
+                                      : Row(children: [
+                                          Icon(Icons.warning,
+                                              color: Colors.yellow),
+                                          SizedBox(width: 10),
+                                          Text("$countRestan",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold)),
+                                        ])
                                 ]),
                           ),
                         ),
+                        if (isShowMenuInspection)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextButton(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Palette.primaryColorProd,
+                                  minimumSize: Size(
+                                      MediaQuery.of(context).size.width, 50),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      side: BorderSide(
+                                          color: Palette.primaryColorProd)),
+                                  padding: const EdgeInsets.all(16.0),
+                                  textStyle: const TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  KeraniNotifier()
+                                      .onClickedMenu(context, 'INSPECTION');
+                                },
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("INSPECTION",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold)),
+                                      SizedBox(width: 10),
+                                      homeNotifier.countInspection == 0
+                                          ? const SizedBox()
+                                          : Row(children: [
+                                              Icon(Icons.warning,
+                                                  color: Colors.yellow),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                  "${homeNotifier.countInspection}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ])
+                                    ])),
+                          ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextButton(
@@ -553,12 +600,13 @@ class _KeraniScreenState extends State<KeraniScreen> {
                           padding: EdgeInsets.only(top: 16),
                           child: Column(
                             children: [
-                              Text("${home.configSchema.employeeCode}",
+                              Text("${homeNotifier.configSchema.employeeCode}",
                                   style: Style.textBold14),
-                              Text("${home.configSchema.employeeName}",
+                              Text("${homeNotifier.configSchema.employeeName}",
                                   style: Style.textBold14),
                               SizedBox(height: 20),
-                              Text("Estate ${home.configSchema.estateCode}",
+                              Text(
+                                  "Estate ${homeNotifier.configSchema.estateCode}",
                                   style: Style.textBold14),
                               SizedBox(height: 30),
                               InkWell(

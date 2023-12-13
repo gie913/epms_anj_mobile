@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    context.read<HomeNotifier>().onInitHome();
+    context.read<HomeNotifier>().onInitHome(context);
     super.initState();
   }
 

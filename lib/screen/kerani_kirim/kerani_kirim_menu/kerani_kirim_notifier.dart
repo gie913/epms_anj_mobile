@@ -1,26 +1,36 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
+import 'package:epms/common_manager/connection_manager.dart';
+import 'package:epms/common_manager/delete_master.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/file_manager.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
+import 'package:epms/database/helper/database_helper.dart';
+import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_detail.dart';
 import 'package:epms/database/service/database_spb_loader.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
 import 'package:epms/model/spb_loader.dart';
+import 'package:epms/model/sync_response_revamp.dart';
 import 'package:epms/screen/home/home_notifier.dart';
+import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_spb_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
+import 'package:provider/provider.dart';
 
 class KeraniKirimNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -133,7 +143,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
     );
   }
 
-  onClickMenu(List<String> deliveryMenuEntries, int index) async {
+  onClickMenu(BuildContext context, String menu) async {
     final now = DateTime.now();
     String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
@@ -141,7 +151,17 @@ class KeraniKirimNotifier extends ChangeNotifier {
     print('dateNow : $dateNow');
     print('dateLogin : $dateLogin');
 
-    switch (deliveryMenuEntries[index - 2].toUpperCase()) {
+    switch (menu.toUpperCase()) {
+      case "INSPECTION":
+        if (dateLogin == dateNow) {
+          await _navigationService.push(Routes.INSPECTION);
+          await context.read<HomeNotifier>().updateCountInspection();
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
+        } else {
+          dialogReLogin();
+        }
+        break;
       case "BUAT FORM SPB":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.SPB_FORM_PAGE);
@@ -226,6 +246,87 @@ class KeraniKirimNotifier extends ChangeNotifier {
             onPressNo: _dialogService.popDialog);
         break;
     }
+  }
+
+  reSynch() {
+    _dialogService.showOptionDialog(
+        title: "Sinkronisasi Ulang",
+        subtitle: "Anda yakin ingin synch ulang?",
+        buttonTextYes: "Ya",
+        buttonTextNo: "Tidak",
+        onPressYes: onPressYes,
+        onPressNo: onPressNo);
+  }
+
+  onPressYes() {
+    _dialogService.popDialog();
+    ConnectionManager().checkConnection().then((value) {
+      if (value == ConnectivityResult.none) {
+        FlushBarManager.showFlushBarWarning(
+            _navigationService.navigatorKey.currentContext!,
+            "Koneksi",
+            "Tidak ada koneksi internet");
+      } else {
+        DatabaseMConfig().selectMConfig().then((value) {
+          _dialogService.showLoadingDialog(title: "Mohon tunggu");
+          SynchRepository().doPostSynch(
+              _navigationService.navigatorKey.currentContext!,
+              value.estateCode!,
+              onSuccessSynch,
+              onErrorSynch);
+        });
+      }
+    });
+  }
+
+  onSuccessSynch(BuildContext context, SynchResponse synchResponse) async {
+    _dialogService.popDialog();
+    final isLoginInspectionSuccess =
+        await StorageManager.readData('is_login_inspection_success');
+
+    if (isLoginInspectionSuccess == true) {
+      final dataMyInspection =
+          await DatabaseTicketInspection.selectDataNeedUpload();
+      final dataToDoInspection =
+          await DatabaseTodoInspection.selectDataNeedUpload();
+
+      final totalDataInspectionUnUpload =
+          dataMyInspection.length + dataToDoInspection.length;
+
+      if (totalDataInspectionUnUpload != 0) {
+        FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Gagal Sinkronisasi Ulang",
+          "Anda memiliki inspection yang belum di upload",
+        );
+        return;
+      }
+
+      DatabaseHelper().deleteMasterDataInspectionReSynch();
+      DeleteMaster().deleteMasterData().then((value) {
+        if (value) {
+          _navigationService.push(Routes.SYNCH_PAGE);
+        }
+      });
+    } else {
+      DeleteMaster().deleteMasterData().then((value) {
+        if (value) {
+          _navigationService.push(Routes.SYNCH_PAGE);
+        }
+      });
+    }
+  }
+
+  onErrorSynch(BuildContext context, String response) {
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarWarning(
+        _navigationService.navigatorKey.currentContext!,
+        "Koneksi",
+        "Tidak terkoneksi jaringan lokal");
+  }
+
+  onPressNo() {
+    _dialogService.popDialog();
   }
 
   exportJson(BuildContext context) async {

@@ -99,16 +99,48 @@ class LoginNotifier extends ChangeNotifier {
       log('Login Epms');
       if (_formKey.currentState!.validate()) {
         _loading = true;
-        LoginRepository().doPostLogin(context, _username.text, _password.text,
-            onSuccessLogin, onErrorLogin);
+        LoginRepository().doPostLogin(
+          context,
+          _username.text,
+          _password.text,
+          onSuccessLogin,
+          (context, errorMessage) async {
+            StorageManager.saveData('is_login_epms_success', false);
+            await LoginRepository().loginInspection(
+              context,
+              _username.text,
+              _password.text,
+              onSuccessLoginInspection,
+              (context, errorMessage) async {
+                StorageManager.saveData('is_login_inspection_success', false);
+                onErrorLogin(context, errorMessage);
+                _loading = false;
+                notifyListeners();
+              },
+            );
+          },
+        );
         notifyListeners();
       }
     } else {
       log('Login Inspection');
       if (_formKey.currentState!.validate()) {
         _loading = true;
-        LoginRepository().loginInspection(context, _username.text,
-            _password.text, onSuccessLoginInspection, onErrorLogin);
+        LoginRepository().loginInspection(
+          context,
+          _username.text,
+          _password.text,
+          onSuccessLoginInspection,
+          (context, errorMessage) {
+            StorageManager.saveData('is_login_inspection_success', false);
+            _loading = false;
+            _dialogService.showNoOptionDialog(
+                subtitle: "$errorMessage",
+                title: 'Gagal Login',
+                onPress: _dialogService.popDialog);
+            notifyListeners();
+          },
+        );
         notifyListeners();
       }
       // FlushBarManager.showFlushBarWarning(
@@ -116,17 +148,42 @@ class LoginNotifier extends ChangeNotifier {
     }
   }
 
-  onSuccessLogin(BuildContext context, LoginResponse loginResponse) {
-    _loading = false;
-    saveDatabase(context, _username.text, loginResponse);
-    FlushBarManager.showFlushBarSuccess(
-        context, "Login Berhasil", "Anda berhasil login");
-    _navigationService.push(Routes.SYNCH_PAGE);
-    notifyListeners();
+  onSuccessLogin(BuildContext context, LoginResponse loginResponse) async {
+    // _loading = false;
+    StorageManager.saveData('is_login_epms_success', true);
+    await saveDatabase(context, _username.text, loginResponse);
+    await LoginRepository().loginInspection(
+      context,
+      _username.text,
+      _password.text,
+      onSuccessLoginInspection,
+      (context, errorMessage) async {
+        StorageManager.saveData('is_login_inspection_success', false);
+        await saveDatabase(context, _username.text, loginResponse);
+
+        final isLoginEpmsSuccess =
+            await StorageManager.readData('is_login_epms_success');
+        final isLoginInspectionSuccess =
+            await StorageManager.readData('is_login_inspection_success');
+        if (isLoginEpmsSuccess != false || isLoginInspectionSuccess != false) {
+          _navigationService.push(Routes.SYNCH_PAGE);
+        } else {
+          onErrorLogin(context, errorMessage);
+        }
+
+        _loading = false;
+        notifyListeners();
+      },
+    );
+    // FlushBarManager.showFlushBarSuccess(
+    //     context, "Login Berhasil", "Anda berhasil login");
+    // _navigationService.push(Routes.SYNCH_PAGE);
+    // notifyListeners();
   }
 
   onSuccessLoginInspection(
       BuildContext context, LoginInspectionData data) async {
+    StorageManager.saveData('is_login_inspection_success', true);
     _loading = false;
     await saveDatabaseInspection(context, _username.text, data);
     FlushBarManager.showFlushBarSuccess(
@@ -160,7 +217,7 @@ class LoginNotifier extends ChangeNotifier {
     StorageManager.saveData("inspectionToken", data.token);
     StorageManager.saveData('inspectionTokenExpired', data.tokenExpiredAt);
     StorageManager.saveData("userName", username);
-    StorageManager.saveData('topic', 'production_user_${data.user.username}');
+    StorageManager.saveData('topic', 'development_user_${data.user.username}');
     await DatabaseUserInspectionConfig.insetData(data.user);
     await DatabaseAccessInspection.insetData(data.access);
     await FirebaseMessaging.instance

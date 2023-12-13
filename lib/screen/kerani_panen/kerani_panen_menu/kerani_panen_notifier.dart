@@ -12,9 +12,12 @@ import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
+import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/service/database_attendance.dart';
 import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_oph.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/supervisor.dart';
 import 'package:epms/model/sync_response_revamp.dart';
@@ -25,6 +28,7 @@ import 'package:epms/screen/upload/upload_image_repository.dart';
 import 'package:epms/screen/upload/upload_oph_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
+import 'package:provider/provider.dart';
 
 class KeraniPanenNotifier extends ChangeNotifier {
   NavigatorService _navigationService = locator<NavigatorService>();
@@ -145,13 +149,22 @@ class KeraniPanenNotifier extends ChangeNotifier {
         onPress: HomeNotifier().doLogOut);
   }
 
-  onClickedMenu(BuildContext context, List<String> harvesterMenuEntries,
-      int index) async {
+  onClickedMenu(BuildContext context, String menu) async {
     final now = DateTime.now();
     String dateNow = TimeManager.dateWithDash(now);
     String? dateLogin = await StorageManager.readData("lastSynchDate");
     final dateLoginParse = DateTime.parse(dateLogin!);
-    switch (harvesterMenuEntries[index - 2].toUpperCase()) {
+    switch (menu.toUpperCase()) {
+      case "INSPECTION":
+        if (dateLogin == dateNow) {
+          await _navigationService.push(Routes.INSPECTION);
+          await context.read<HomeNotifier>().updateCountInspection();
+        } else if (dateLoginParse.year != now.year) {
+          dialogSettingDateTime();
+        } else {
+          dialogReLogin();
+        }
+        break;
       case "ABSENSI":
         if (dateLogin == dateNow) {
           _navigationService.push(Routes.ATTENDANCE_PAGE);
@@ -279,13 +292,42 @@ class KeraniPanenNotifier extends ChangeNotifier {
         onPressNo: onPressNo);
   }
 
-  onSuccessSynch(BuildContext context, SynchResponse synchResponse) {
+  onSuccessSynch(BuildContext context, SynchResponse synchResponse) async {
     _dialogService.popDialog();
-    DeleteMaster().deleteMasterData().then((value) {
-      if (value) {
-        _navigationService.push(Routes.SYNCH_PAGE);
+    final isLoginInspectionSuccess =
+        await StorageManager.readData('is_login_inspection_success');
+
+    if (isLoginInspectionSuccess == true) {
+      final dataMyInspection =
+          await DatabaseTicketInspection.selectDataNeedUpload();
+      final dataToDoInspection =
+          await DatabaseTodoInspection.selectDataNeedUpload();
+
+      final totalDataInspectionUnUpload =
+          dataMyInspection.length + dataToDoInspection.length;
+
+      if (totalDataInspectionUnUpload != 0) {
+        FlushBarManager.showFlushBarWarning(
+          _navigationService.navigatorKey.currentContext!,
+          "Gagal Sinkronisasi Ulang",
+          "Anda memiliki inspection yang belum di upload",
+        );
+        return;
       }
-    });
+
+      DatabaseHelper().deleteMasterDataInspectionReSynch();
+      DeleteMaster().deleteMasterData().then((value) {
+        if (value) {
+          _navigationService.push(Routes.SYNCH_PAGE);
+        }
+      });
+    } else {
+      DeleteMaster().deleteMasterData().then((value) {
+        if (value) {
+          _navigationService.push(Routes.SYNCH_PAGE);
+        }
+      });
+    }
   }
 
   onErrorSynch(BuildContext context, String response) {

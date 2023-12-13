@@ -9,6 +9,7 @@ final List<String> harvesterMenuEntries = <String>[
   'RENCANA PANEN HARI INI',
   'LAPORAN PANEN HARIAN',
   'LAPORAN RESTAN HARI INI',
+  'INSPECTION',
   'ADMINISTRASI OPH',
   'UPLOAD DATA',
   'KELUAR'
@@ -94,6 +95,7 @@ final List<Color> colorCodesDelivery = <Color>[
 ];
 
 final List<Color> colorCodesHarvester = <Color>[
+  Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,
   Palette.primaryColorProd,
