@@ -527,6 +527,36 @@ class _InspectionAssignmentDetailViewState
                       validator: (value) => null,
                       readOnly: true,
                     ),
+                    InkWell(
+                      onTap: () {
+                        _navigationService.push(
+                          Routes.INSPECTION_LOCATION,
+                          arguments: {
+                            'longitude': widget.data.gpsLng,
+                            'latitude': widget.data.gpsLat,
+                          },
+                        );
+                      },
+                      child: Card(
+                        color: Palette.primaryColorProd,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Text(
+                              "Lihat Lokasi Inspection",
+                              style: Style.whiteBold14,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
                     Text('Riwayat Tindakan :'),
                     if (widget.data.responses.isNotEmpty)
                       ...widget.data.responses

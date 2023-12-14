@@ -10,6 +10,7 @@ import 'package:epms/screen/inspection/inspection_approval_view.dart';
 import 'package:epms/screen/inspection/inspection_assignment_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_form_view.dart';
+import 'package:epms/screen/inspection/inspection_location_view.dart';
 import 'package:epms/screen/inspection/inspection_page.dart';
 import 'package:epms/screen/inspection/inspection_user_view.dart';
 import 'package:epms/screen/kerani_kirim/administration_spb/administration_spb_screen.dart';
@@ -282,6 +283,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case Routes.INSPECTION_USER:
       return MaterialPageRoute(
         builder: (context) => InspectionUserView(),
+      );
+    case Routes.INSPECTION_LOCATION:
+      final arguments =
+          settings.arguments != null ? settings.arguments as Map : {};
+      return MaterialPageRoute(
+        builder: (context) => InspectionLocationView(
+          latitude: arguments['latitude'],
+          longitude: arguments['longitude'],
+        ),
       );
     default:
       return MaterialPageRoute(
