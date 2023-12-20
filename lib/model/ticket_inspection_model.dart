@@ -29,6 +29,7 @@ class TicketInspectionModel {
     this.closedBy = '',
     this.closedByName = '',
     this.isSynchronize = 0,
+    this.isNewResponse = 0,
     this.isClosed = 0,
     this.attachments = const [],
     this.responses = const <HistoryInspectionModel>[],
@@ -60,6 +61,7 @@ class TicketInspectionModel {
         closedBy: json['closed_by'] ?? '',
         closedByName: json['closed_by_name'] ?? '',
         isSynchronize: json['is_synchronize'] ?? 1,
+        isNewResponse: json['is_new_response'] ?? 0,
         isClosed: ConvertHelper.boolToInt(json['is_closed']),
         attachments: json['attachments'] != null
             ? List.from((json['attachments'] as List).map((e) => e))
@@ -99,6 +101,7 @@ class TicketInspectionModel {
         closedBy: json['closed_by'] ?? '',
         closedByName: json['closed_by_name'] ?? '',
         isSynchronize: json['is_synchronize'] ?? 0,
+        isNewResponse: json['is_new_response'] ?? 0,
         isClosed: json['is_closed'] ?? 0,
         attachments: json['attachments'] != null
             ? List.from(
@@ -138,6 +141,7 @@ class TicketInspectionModel {
   final String closedBy;
   final String closedByName;
   final int isSynchronize;
+  final int isNewResponse;
   final int isClosed;
   final List attachments;
   final List<HistoryInspectionModel> responses;
@@ -169,6 +173,7 @@ class TicketInspectionModel {
     tempData['closed_by'] = closedBy;
     tempData['closed_by_name'] = closedByName;
     tempData['is_synchronize'] = isSynchronize;
+    tempData['is_new_response'] = isNewResponse;
     tempData['is_closed'] = isClosed;
     tempData['attachments'] = List.from(attachments.map((e) => e));
     tempData['responses'] = List.from(responses.map((e) => e.toJson()));
@@ -203,6 +208,7 @@ class TicketInspectionModel {
     tempData['closed_by'] = closedBy;
     tempData['closed_by_name'] = closedByName;
     tempData['is_synchronize'] = isSynchronize;
+    tempData['is_new_response'] = isNewResponse;
     tempData['is_closed'] = isClosed;
     tempData['attachments'] = jsonEncode(List.from(attachments.map((e) => e)));
     tempData['responses'] =
@@ -213,6 +219,6 @@ class TicketInspectionModel {
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, is_closed: $isClosed, attachments: $attachments, responses: $responses)';
+    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, is_new_response: $isNewResponse, is_closed: $isClosed, attachments: $attachments, responses: $responses)';
   }
 }

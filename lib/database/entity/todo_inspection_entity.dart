@@ -23,6 +23,7 @@ class TodoInspectionEntity {
   static String closedBy = 'closed_by';
   static String closedByName = 'closed_by_name';
   static String isSynchronize = 'is_synchronize';
+  static String isNewResponse = 'is_new_response';
   static String isClosed = 'is_closed';
   static String attachments = 'attachments';
   static String responses = 'responses';
