@@ -42,32 +42,32 @@ class DatabaseSubordinateInspection {
   static Future<void> addAllData(List<TicketInspectionModel> data) async {
     Database db = await DatabaseHelper().database;
 
-    await db.delete(subordinateInspectionTable);
+    // await db.delete(subordinateInspectionTable);
 
-    final batch = db.batch();
-    for (final item in data) {
-      batch.insert(subordinateInspectionTable, item.toDatabase());
-    }
-    await batch.commit();
-
-    // var mapList = await db.query(subordinateInspectionTable);
-    // var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
-    //   return TicketInspectionModel.fromDatabase(e);
-    // }));
-    // List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
-
-    // for (var i = 0; i < data.length; i++) {
-    //   if (!dataFromLocalCode.contains(data[i].code)) {
-    //     await db.insert(subordinateInspectionTable, data[i].toDatabase());
-    //   } else {
-    //     await db.update(
-    //       subordinateInspectionTable,
-    //       data[i].toDatabase(),
-    //       where: '${SubordinateInspectionEntity.code}=?',
-    //       whereArgs: [data[i].code],
-    //     );
-    //   }
+    // final batch = db.batch();
+    // for (final item in data) {
+    //   batch.insert(subordinateInspectionTable, item.toDatabase());
     // }
+    // await batch.commit();
+
+    var mapList = await db.query(subordinateInspectionTable);
+    var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
+      return TicketInspectionModel.fromDatabase(e);
+    }));
+    List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+
+    for (var i = 0; i < data.length; i++) {
+      if (!dataFromLocalCode.contains(data[i].code)) {
+        await db.insert(subordinateInspectionTable, data[i].toDatabase());
+      } else {
+        await db.update(
+          subordinateInspectionTable,
+          data[i].toDatabase(),
+          where: '${SubordinateInspectionEntity.code}=?',
+          whereArgs: [data[i].code],
+        );
+      }
+    }
   }
 
   static Future<List<TicketInspectionModel>> selectData() async {

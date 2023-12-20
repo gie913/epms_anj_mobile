@@ -75,25 +75,11 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.data.code,
-                  style: Style.whiteBold12.copyWith(
-                      color: Colors.white, fontWeight: FontWeight.normal),
-                ),
-                Text(
-                  ConvertHelper.titleCase(
-                    widget.data.status
-                        .replaceAll(RegExp(r'_'), ' ')
-                        .replaceAll(RegExp(r'-'), ' '),
-                  ),
-                  style: Style.whiteBold12.copyWith(
-                      color: Colors.white, fontWeight: FontWeight.normal),
-                ),
-              ],
-            ),
+            // Text(
+            //   widget.data.code,
+            //   style: Style.whiteBold12
+            //       .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
+            // ),
             Row(
               children: [
                 Text(
@@ -111,6 +97,31 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                 )
               ],
             ),
+            Divider(color: Colors.white24, height: 1),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  'Status :',
+                  style: Style.whiteBold12.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.normal),
+                ),
+                SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    ConvertHelper.titleCase(
+                      widget.data.status
+                          .replaceAll(RegExp(r'_'), ' ')
+                          .replaceAll(RegExp(r'-'), ' '),
+                    ),
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                )
+              ],
+            ),
+            Divider(color: Colors.white24, height: 1),
+            SizedBox(height: 4),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -130,47 +141,63 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
               ],
             ),
             if (widget.data.reassignedToName.isNotEmpty)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Column(
                 children: [
-                  Text(
-                    'Reassign To :',
-                    style: Style.whiteBold12.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.normal),
+                  Divider(color: Colors.white24, height: 1),
+                  SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reassign To :',
+                        style: Style.whiteBold12.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.normal),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.data.reassignedToName,
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      widget.data.reassignedToName,
-                      style: Style.whiteBold12.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.normal),
-                    ),
-                  )
                 ],
               ),
             if (widget.data.consultedWithName.isNotEmpty)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Column(
                 children: [
-                  Text(
-                    'Consulted With :',
-                    style: Style.whiteBold12.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.normal),
+                  Divider(color: Colors.white24, height: 1),
+                  SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Consulted With :',
+                        style: Style.whiteBold12.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.normal),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.data.consultedWithName,
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      widget.data.consultedWithName,
-                      style: Style.whiteBold12.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.normal),
-                    ),
-                  )
                 ],
               ),
             if (widget.data.description.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Divider(color: Colors.white24, height: 1),
+                  SizedBox(height: 4),
                   Text(
                     'Deskripsi :',
                     style: Style.whiteBold12.copyWith(
@@ -187,6 +214,8 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Divider(color: Colors.white24, height: 1),
+                  SizedBox(height: 4),
                   Text(
                     'Attachment :',
                     style: Style.whiteBold12.copyWith(

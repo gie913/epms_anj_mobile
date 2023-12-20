@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/location_service.dart';
-import 'package:epms/model/marker_detail_model.dart';
+// import 'package:epms/model/marker_detail_model.dart';
 import 'package:epms/model/marker_model.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
@@ -25,7 +25,7 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
   MapShapeSource? _shapeSource;
   List<MarkerModel> _data = [];
 
-  List<MarkerDetailModel> _dataDetail = [];
+  // List<MarkerDetailModel> _dataDetail = [];
   MapZoomPanBehavior? _zoomPanBehavior;
 
   double longitude = 0;
@@ -93,16 +93,16 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
       enableDoubleTapZooming: true,
     );
 
-    _dataDetail = [
-      MarkerDetailModel(
-        latLng: MapLatLng(widget.latitude, widget.longitude),
-        place: 'Inspection Location',
-      ),
-      MarkerDetailModel(
-        latLng: MapLatLng(latitude, longitude),
-        place: 'My Location',
-      ),
-    ];
+    // _dataDetail = [
+    //   MarkerDetailModel(
+    //     latLng: MapLatLng(widget.latitude, widget.longitude),
+    //     place: 'Inspection Location',
+    //   ),
+    //   MarkerDetailModel(
+    //     latLng: MapLatLng(latitude, longitude),
+    //     place: 'My Location',
+    //   ),
+    // ];
 
     _data = [
       MarkerModel('Inspection Location', widget.latitude, widget.longitude),
@@ -110,8 +110,8 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
     ];
 
     _shapeSource = MapShapeSource.asset(
-      'assets/indonesia.json',
-      shapeDataField: 'state',
+      'assets/smm.json',
+      shapeDataField: 'name',
       dataCount: _data.length,
       primaryValueMapper: (index) {
         return _data[index].country;
@@ -136,50 +136,17 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
         body: _shapeSource != null
             ? SfMaps(
                 layers: [
-                  // MapShapeLayer(
-                  //   source: _shapeSource!,
-                  //   zoomPanBehavior: _zoomPanBehavior,
-                  //   initialMarkersCount: _data.length,
-                  //   markerBuilder: (context, index) {
-                  //     return MapMarker(
-                  //       latitude: _data[index].latitude,
-                  //       longitude: _data[index].longitude,
-                  //       child: Icon(
-                  //         Icons.location_on,
-                  //         color: _data[index].country == 'My Location'
-                  //             ? Colors.green
-                  //             : Colors.red,
-                  //       ),
-                  //     );
-                  //   },
-                  //   sublayers: [
-                  //     MapPolylineLayer(
-                  //       polylines: List<MapPolyline>.generate(
-                  //         polylines.length,
-                  //         (int index) {
-                  //           return MapPolyline(
-                  //             points: polylines[index],
-                  //             color: Colors.blue,
-                  //             strokeCap: StrokeCap.round,
-                  //             width: 2,
-                  //           );
-                  //         },
-                  //       ).toSet(),
-                  //     ),
-                  //   ],
-                  // ),
-                  MapTileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  MapShapeLayer(
+                    source: _shapeSource!,
                     zoomPanBehavior: _zoomPanBehavior,
-                    initialMarkersCount: _dataDetail.length,
+                    initialMarkersCount: _data.length,
                     markerBuilder: (context, index) {
                       return MapMarker(
-                        latitude: _dataDetail[index].latLng.latitude,
-                        longitude: _dataDetail[index].latLng.longitude,
+                        latitude: _data[index].latitude,
+                        longitude: _data[index].longitude,
                         child: Icon(
                           Icons.location_on,
-                          color: _dataDetail[index].place == 'My Location'
+                          color: _data[index].country == 'My Location'
                               ? Colors.green
                               : Colors.red,
                         ),
@@ -201,6 +168,39 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
                       ),
                     ],
                   ),
+                  // MapTileLayer(
+                  //   urlTemplate:
+                  //       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  //   zoomPanBehavior: _zoomPanBehavior,
+                  //   initialMarkersCount: _dataDetail.length,
+                  //   markerBuilder: (context, index) {
+                  //     return MapMarker(
+                  //       latitude: _dataDetail[index].latLng.latitude,
+                  //       longitude: _dataDetail[index].latLng.longitude,
+                  //       child: Icon(
+                  //         Icons.location_on,
+                  //         color: _dataDetail[index].place == 'My Location'
+                  //             ? Colors.green
+                  //             : Colors.red,
+                  //       ),
+                  //     );
+                  //   },
+                  //   sublayers: [
+                  //     MapPolylineLayer(
+                  //       polylines: List<MapPolyline>.generate(
+                  //         polylines.length,
+                  //         (int index) {
+                  //           return MapPolyline(
+                  //             points: polylines[index],
+                  //             color: Colors.blue,
+                  //             strokeCap: StrokeCap.round,
+                  //             width: 2,
+                  //           );
+                  //         },
+                  //       ).toSet(),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               )
             : const SizedBox(),

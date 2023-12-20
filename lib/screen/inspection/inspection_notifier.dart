@@ -72,11 +72,21 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  FlushBarManager.showFlushBarSuccess(
+                    context,
+                    "Berhasil Synchronize",
+                    "Data Inspection Berhasil Diperbaharui",
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
                 (context, errorMessage) {
+                  FlushBarManager.showFlushBarError(
+                    context,
+                    "Gagal Synchronize",
+                    errorMessage,
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
@@ -89,11 +99,21 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  FlushBarManager.showFlushBarSuccess(
+                    context,
+                    "Berhasil Synchronize",
+                    "Data Inspection Berhasil Diperbaharui",
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
                 (context, errorMessage) {
+                  FlushBarManager.showFlushBarError(
+                    context,
+                    "Gagal Synchronize",
+                    errorMessage,
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
@@ -113,11 +133,21 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  FlushBarManager.showFlushBarSuccess(
+                    context,
+                    "Berhasil Synchronize",
+                    "Data Inspection Berhasil Diperbaharui",
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
                 (context, errorMessage) {
+                  FlushBarManager.showFlushBarError(
+                    context,
+                    "Gagal Synchronize",
+                    errorMessage,
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
@@ -130,11 +160,21 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  FlushBarManager.showFlushBarSuccess(
+                    context,
+                    "Berhasil Synchronize",
+                    "Data Inspection Berhasil Diperbaharui",
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
                 (context, errorMessage) {
+                  FlushBarManager.showFlushBarError(
+                    context,
+                    "Gagal Synchronize",
+                    errorMessage,
+                  );
                   log('list My Inspection : $_listMyInspection');
                   log('list Todo Inspection : $_listTodoInspection');
                   log('list Subordinate Inspection : $_listSubordinateInspection');
@@ -171,6 +211,8 @@ class InspectionNotifier extends ChangeNotifier {
             context,
             ticketInspection,
             (context, successMessage) async {
+              await DatabaseTicketInspection.deleteTicketByCode(
+                  ticketInspection);
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
@@ -194,6 +236,7 @@ class InspectionNotifier extends ChangeNotifier {
                 toDoInspection,
                 responseInspection,
                 (context, successMessage) async {
+                  await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $successMessage');
                 },
@@ -224,6 +267,7 @@ class InspectionNotifier extends ChangeNotifier {
               toDoInspection,
               responseInspection,
               (context, successMessage) async {
+                await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $successMessage');
               },

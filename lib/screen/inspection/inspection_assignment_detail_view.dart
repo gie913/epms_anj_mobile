@@ -8,6 +8,7 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
@@ -15,6 +16,8 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_action_inspection.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
@@ -25,6 +28,7 @@ import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +47,7 @@ class InspectionAssignmentDetailView extends StatefulWidget {
 class _InspectionAssignmentDetailViewState
     extends State<InspectionAssignmentDetailView> {
   NavigatorService _navigationService = locator<NavigatorService>();
+  DialogService _dialogService = locator<DialogService>();
 
   String responseId = '';
   UserInspectionConfigModel user = const UserInspectionConfigModel();
@@ -292,6 +297,142 @@ class _InspectionAssignmentDetailViewState
     setState(() {});
   }
 
+  Future<void> createResponse(
+    BuildContext context, {
+    required TicketInspectionModel toDoInspection,
+    required HistoryInspectionModel responseInspection,
+  }) async {
+    _dialogService.showLoadingDialog(title: "Upload Data");
+    await InspectionRepository().createResponseInspection(
+      context,
+      toDoInspection,
+      responseInspection,
+      (context, successMessage) async {
+        await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+        await getDataInspection(context);
+      },
+      (context, errorMessage) async {
+        _dialogService.popDialog();
+        FlushBarManager.showFlushBarError(
+          context,
+          "Gagal Upload",
+          errorMessage,
+        );
+      },
+    );
+  }
+
+  Future<void> getDataInspection(BuildContext context) async {
+    await InspectionRepository().getMyInspection(
+      context,
+      (context, data) async {
+        await DatabaseTicketInspection.addAllData(data);
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+      (context, errorMessage) async {
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> submit() async {
     if (validateForm()) {
       final dataHistory = HistoryInspectionModel(
@@ -341,7 +482,17 @@ class _InspectionAssignmentDetailViewState
         responses: listHistoryInspection,
       );
       await DatabaseTodoInspection.updateData(dataInspection);
-      _navigationService.pop();
+      final isInternetExist =
+          await InspectionService.isInternetConnectionExist();
+      if (isInternetExist) {
+        await createResponse(
+          context,
+          toDoInspection: dataInspection,
+          responseInspection: dataInspection.responses.last,
+        );
+      } else {
+        _navigationService.pop();
+      }
     }
   }
 
@@ -686,16 +837,16 @@ class _InspectionAssignmentDetailViewState
                                 ],
                               ),
                             ),
-                          Row(
-                            children: [
-                              Text('Lokasi Tindakan :'),
-                              SizedBox(width: 12),
-                              Expanded(
-                                  child: Text('$longitude,$latitude',
-                                      textAlign: TextAlign.end))
-                            ],
-                          ),
-                          SizedBox(height: 8),
+                          // Row(
+                          //   children: [
+                          //     Text('Lokasi Tindakan :'),
+                          //     SizedBox(width: 12),
+                          //     Expanded(
+                          //         child: Text('$longitude,$latitude',
+                          //             textAlign: TextAlign.end))
+                          //   ],
+                          // ),
+                          // SizedBox(height: 8),
                           Text('Tindakan :'),
                           SizedBox(height: 6),
                           InputPrimary(
@@ -704,7 +855,7 @@ class _InspectionAssignmentDetailViewState
                             hintText: 'Masukkan Tindakan',
                             validator: (value) => null,
                           ),
-                          SizedBox(height: 12),
+                          // SizedBox(height: 12),
                           if (listInspectionPhoto.isNotEmpty)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,14 +8,18 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
 import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
+import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_division_inspection.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
+import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/company_inspection_model.dart';
@@ -26,6 +30,7 @@ import 'package:epms/model/user_inspection_config_model.dart';
 import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -40,6 +45,7 @@ class InspectionFormView extends StatefulWidget {
 
 class _InspectionFormViewState extends State<InspectionFormView> {
   NavigatorService _navigationService = locator<NavigatorService>();
+  DialogService _dialogService = locator<DialogService>();
 
   UserInspectionConfigModel user = const UserInspectionConfigModel();
 
@@ -253,6 +259,140 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     }
   }
 
+  Future<void> getDataInspection(BuildContext context) async {
+    await InspectionRepository().getMyInspection(
+      context,
+      (context, data) async {
+        await DatabaseTicketInspection.addAllData(data);
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+      (context, errorMessage) async {
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> uploadInspection(
+    BuildContext context, {
+    required TicketInspectionModel ticketInspection,
+  }) async {
+    _dialogService.showLoadingDialog(title: "Upload Data");
+    await InspectionRepository().createInspection(
+      context,
+      ticketInspection,
+      (context, successMessage) async {
+        await DatabaseTicketInspection.deleteTicketByCode(ticketInspection);
+        await getDataInspection(context);
+      },
+      (context, errorMessage) async {
+        _dialogService.popDialog();
+        FlushBarManager.showFlushBarError(
+          context,
+          "Gagal Upload",
+          errorMessage,
+        );
+      },
+    );
+  }
+
   Future<void> createInspection() async {
     if (validateForm()) {
       final ticketInspection = TicketInspectionModel(
@@ -283,7 +423,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
         responses: [],
       );
       await DatabaseTicketInspection.insertData(ticketInspection);
-      _navigationService.pop();
+      final isInternetExist =
+          await InspectionService.isInternetConnectionExist();
+      if (isInternetExist) {
+        uploadInspection(context, ticketInspection: ticketInspection);
+      } else {
+        _navigationService.pop();
+      }
     }
   }
 

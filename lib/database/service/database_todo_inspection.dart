@@ -42,32 +42,33 @@ class DatabaseTodoInspection {
   static Future<void> addAllData(List<TicketInspectionModel> data) async {
     Database db = await DatabaseHelper().database;
 
-    await db.delete(todoInspectionTable);
+    // await db.delete(todoInspectionTable);
 
-    final batch = db.batch();
-    for (final item in data) {
-      batch.insert(todoInspectionTable, item.toDatabase());
-    }
-    await batch.commit();
-
-    // var mapList = await db.query(todoInspectionTable);
-    // var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
-    //   return TicketInspectionModel.fromDatabase(e);
-    // }));
-    // List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
-
-    // for (var i = 0; i < data.length; i++) {
-    //   if (!dataFromLocalCode.contains(data[i].code)) {
-    //     await db.insert(todoInspectionTable, data[i].toDatabase());
-    //   } else {
-    //     await db.update(
-    //       todoInspectionTable,
-    //       data[i].toDatabase(),
-    //       where: '${TodoInspectionEntity.code}=?',
-    //       whereArgs: [data[i].code],
-    //     );
-    //   }
+    // final batch = db.batch();
+    // for (final item in data) {
+    //   batch.insert(todoInspectionTable, item.toDatabase());
     // }
+    // await batch.commit();
+
+    var mapList = await db.query(todoInspectionTable);
+    var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
+      return TicketInspectionModel.fromDatabase(e);
+    }));
+    List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+
+    for (var i = 0; i < data.length; i++) {
+      if (!dataFromLocalCode.contains(data[i].code)) {
+        await db.insert(todoInspectionTable, data[i].toDatabase());
+      } else {
+        await db.update(
+          todoInspectionTable,
+          data[i].toDatabase(),
+          where:
+              '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+          whereArgs: [data[i].code, 1],
+        );
+      }
+    }
   }
 
   static Future<void> insertData(TicketInspectionModel data) async {
@@ -101,6 +102,15 @@ class DatabaseTodoInspection {
       return TicketInspectionModel.fromDatabase(e);
     }));
     return data;
+  }
+
+  static Future<void> deleteTodoByCode(TicketInspectionModel data) async {
+    Database db = await DatabaseHelper().database;
+    db.delete(
+      todoInspectionTable,
+      where: '${TodoInspectionEntity.code}=?',
+      whereArgs: [data.code],
+    );
   }
 
   static void deleteTable() async {

@@ -7,6 +7,8 @@ import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/base/ui/theme_notifier.dart';
+import 'package:epms/common_manager/camera_service.dart';
+import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
@@ -14,6 +16,8 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_action_inspection.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
+import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
@@ -24,7 +28,9 @@ import 'package:epms/model/user_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
 import 'package:epms/screen/inspection/components/inspection_photo.dart';
+import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +45,7 @@ class InspectionApprovalView extends StatefulWidget {
 
 class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   NavigatorService _navigationService = locator<NavigatorService>();
+  DialogService _dialogService = locator<DialogService>();
 
   String responseId = '';
   UserInspectionConfigModel user = const UserInspectionConfigModel();
@@ -228,6 +235,142 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
     setState(() {});
   }
 
+  Future<void> createResponse(
+    BuildContext context, {
+    required TicketInspectionModel toDoInspection,
+    required HistoryInspectionModel responseInspection,
+  }) async {
+    _dialogService.showLoadingDialog(title: "Upload Data");
+    await InspectionRepository().createResponseInspection(
+      context,
+      toDoInspection,
+      responseInspection,
+      (context, successMessage) async {
+        await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+        await getDataInspection(context);
+      },
+      (context, errorMessage) async {
+        _dialogService.popDialog();
+        FlushBarManager.showFlushBarError(
+          context,
+          "Gagal Upload",
+          errorMessage,
+        );
+      },
+    );
+  }
+
+  Future<void> getDataInspection(BuildContext context) async {
+    await InspectionRepository().getMyInspection(
+      context,
+      (context, data) async {
+        await DatabaseTicketInspection.addAllData(data);
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+      (context, errorMessage) async {
+        await InspectionRepository().getToDoInspection(
+          context,
+          (context, data) async {
+            await DatabaseTodoInspection.addAllData(data);
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+          (context, errorMessage) async {
+            await InspectionRepository().getMySubordinate(
+              context,
+              (context, data) async {
+                await DatabaseSubordinateInspection.addAllData(data);
+                _dialogService.popDialog();
+                _navigationService.pop();
+                FlushBarManager.showFlushBarSuccess(
+                  context,
+                  "Berhasil Upload",
+                  'Data Berhasil Di Upload',
+                );
+              },
+              (context, errorMessage) {
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarError(
+                  context,
+                  "Gagal Upload",
+                  errorMessage,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> submit() async {
     if (validateForm()) {
       final dataHistory = HistoryInspectionModel(
@@ -283,7 +426,17 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         responses: listHistoryInspection,
       );
       await DatabaseTodoInspection.updateData(dataInspection);
-      _navigationService.pop();
+      final isInternetExist =
+          await InspectionService.isInternetConnectionExist();
+      if (isInternetExist) {
+        await createResponse(
+          context,
+          toDoInspection: dataInspection,
+          responseInspection: dataInspection.responses.last,
+        );
+      } else {
+        _navigationService.pop();
+      }
     }
   }
 
@@ -728,6 +881,105 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   hintText: 'Masukkan Tindakan',
                                   validator: (value) => null,
                                 ),
+                                if (listInspectionPhoto.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Foto Tindakan Inspection :'),
+                                        SizedBox(height: 6),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount:
+                                                listInspectionPhoto.length,
+                                            itemBuilder: (context, index) {
+                                              final imagePath =
+                                                  listInspectionPhoto[index];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: InspectionPhoto(
+                                                  imagePath: imagePath,
+                                                  onTapView: () {
+                                                    showFoto(
+                                                        context, imagePath);
+                                                  },
+                                                  onTapRemove: () {
+                                                    listInspectionPhoto
+                                                        .remove(imagePath);
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                      ],
+                                    ),
+                                  ),
+                                SizedBox(height: 12),
+                                InkWell(
+                                  onTap: () {
+                                    if (listInspectionPhoto.length < 5) {
+                                      showDialogOptionTakeFoto(
+                                        context,
+                                        onTapCamera: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.camera,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                        onTapGalery: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.gallery,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                      );
+                                    } else {
+                                      FlushBarManager.showFlushBarWarning(
+                                          _navigationService
+                                              .navigatorKey.currentContext!,
+                                          "Foto Inspection",
+                                          "Maksimal 5 foto yang dapat Anda lampirkan");
+                                    }
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    color: Colors.green,
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "ATTACHMENT",
+                                          style: Style.whiteBold14,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           if (selectedAction == 'revise')
@@ -741,6 +993,105 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   maxLines: 10,
                                   hintText: 'Masukkan Keterangan',
                                   validator: (value) => null,
+                                ),
+                                if (listInspectionPhoto.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Foto Tindakan Inspection :'),
+                                        SizedBox(height: 6),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount:
+                                                listInspectionPhoto.length,
+                                            itemBuilder: (context, index) {
+                                              final imagePath =
+                                                  listInspectionPhoto[index];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: InspectionPhoto(
+                                                  imagePath: imagePath,
+                                                  onTapView: () {
+                                                    showFoto(
+                                                        context, imagePath);
+                                                  },
+                                                  onTapRemove: () {
+                                                    listInspectionPhoto
+                                                        .remove(imagePath);
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                      ],
+                                    ),
+                                  ),
+                                SizedBox(height: 12),
+                                InkWell(
+                                  onTap: () {
+                                    if (listInspectionPhoto.length < 5) {
+                                      showDialogOptionTakeFoto(
+                                        context,
+                                        onTapCamera: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.camera,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                        onTapGalery: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.gallery,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                      );
+                                    } else {
+                                      FlushBarManager.showFlushBarWarning(
+                                          _navigationService
+                                              .navigatorKey.currentContext!,
+                                          "Foto Inspection",
+                                          "Maksimal 5 foto yang dapat Anda lampirkan");
+                                    }
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    color: Colors.green,
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "ATTACHMENT",
+                                          style: Style.whiteBold14,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -831,6 +1182,105 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   hintText: 'Masukkan Keterangan',
                                   validator: (value) => null,
                                 ),
+                                if (listInspectionPhoto.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Foto Tindakan Inspection :'),
+                                        SizedBox(height: 6),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount:
+                                                listInspectionPhoto.length,
+                                            itemBuilder: (context, index) {
+                                              final imagePath =
+                                                  listInspectionPhoto[index];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: InspectionPhoto(
+                                                  imagePath: imagePath,
+                                                  onTapView: () {
+                                                    showFoto(
+                                                        context, imagePath);
+                                                  },
+                                                  onTapRemove: () {
+                                                    listInspectionPhoto
+                                                        .remove(imagePath);
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                      ],
+                                    ),
+                                  ),
+                                SizedBox(height: 12),
+                                InkWell(
+                                  onTap: () {
+                                    if (listInspectionPhoto.length < 5) {
+                                      showDialogOptionTakeFoto(
+                                        context,
+                                        onTapCamera: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.camera,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                        onTapGalery: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.gallery,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                      );
+                                    } else {
+                                      FlushBarManager.showFlushBarWarning(
+                                          _navigationService
+                                              .navigatorKey.currentContext!,
+                                          "Foto Inspection",
+                                          "Maksimal 5 foto yang dapat Anda lampirkan");
+                                    }
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    color: Colors.green,
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "ATTACHMENT",
+                                          style: Style.whiteBold14,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           if (selectedAction == 'consulted')
@@ -844,6 +1294,105 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   maxLines: 10,
                                   hintText: 'Masukkan Keterangan',
                                   validator: (value) => null,
+                                ),
+                                if (listInspectionPhoto.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Foto Tindakan Inspection :'),
+                                        SizedBox(height: 6),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount:
+                                                listInspectionPhoto.length,
+                                            itemBuilder: (context, index) {
+                                              final imagePath =
+                                                  listInspectionPhoto[index];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: InspectionPhoto(
+                                                  imagePath: imagePath,
+                                                  onTapView: () {
+                                                    showFoto(
+                                                        context, imagePath);
+                                                  },
+                                                  onTapRemove: () {
+                                                    listInspectionPhoto
+                                                        .remove(imagePath);
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                      ],
+                                    ),
+                                  ),
+                                SizedBox(height: 12),
+                                InkWell(
+                                  onTap: () {
+                                    if (listInspectionPhoto.length < 5) {
+                                      showDialogOptionTakeFoto(
+                                        context,
+                                        onTapCamera: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.camera,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                        onTapGalery: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.gallery,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                      );
+                                    } else {
+                                      FlushBarManager.showFlushBarWarning(
+                                          _navigationService
+                                              .navigatorKey.currentContext!,
+                                          "Foto Inspection",
+                                          "Maksimal 5 foto yang dapat Anda lampirkan");
+                                    }
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    color: Colors.green,
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "ATTACHMENT",
+                                          style: Style.whiteBold14,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -859,99 +1408,107 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                   hintText: 'Masukkan Keterangan',
                                   validator: (value) => null,
                                 ),
-                              ],
-                            ),
-                          if (listInspectionPhoto.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Foto Tindakan Inspection :'),
-                                  SizedBox(height: 6),
-                                  SizedBox(
-                                    height:
-                                        MediaQuery.of(context).size.width / 4,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: listInspectionPhoto.length,
-                                      itemBuilder: (context, index) {
-                                        final imagePath =
-                                            listInspectionPhoto[index];
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 12),
-                                          child: InspectionPhoto(
-                                            imagePath: imagePath,
-                                            onTapView: () {
-                                              showFoto(context, imagePath);
-                                            },
-                                            onTapRemove: () {
-                                              listInspectionPhoto
-                                                  .remove(imagePath);
-                                              setState(() {});
+                                if (listInspectionPhoto.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Foto Tindakan Inspection :'),
+                                        SizedBox(height: 6),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              4,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount:
+                                                listInspectionPhoto.length,
+                                            itemBuilder: (context, index) {
+                                              final imagePath =
+                                                  listInspectionPhoto[index];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: InspectionPhoto(
+                                                  imagePath: imagePath,
+                                                  onTapView: () {
+                                                    showFoto(
+                                                        context, imagePath);
+                                                  },
+                                                  onTapRemove: () {
+                                                    listInspectionPhoto
+                                                        .remove(imagePath);
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              );
                                             },
                                           ),
-                                        );
-                                      },
+                                        ),
+                                        SizedBox(height: 12),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(height: 12),
-                                ],
-                              ),
+                                SizedBox(height: 12),
+                                InkWell(
+                                  onTap: () {
+                                    if (listInspectionPhoto.length < 5) {
+                                      showDialogOptionTakeFoto(
+                                        context,
+                                        onTapCamera: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.camera,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                        onTapGalery: () async {
+                                          final result =
+                                              await CameraService.getImage(
+                                            context,
+                                            imageSource: ImageSource.gallery,
+                                          );
+                                          if (result != null) {
+                                            listInspectionPhoto.add(result);
+                                            setState(() {});
+                                          }
+                                        },
+                                      );
+                                    } else {
+                                      FlushBarManager.showFlushBarWarning(
+                                          _navigationService
+                                              .navigatorKey.currentContext!,
+                                          "Foto Inspection",
+                                          "Maksimal 5 foto yang dapat Anda lampirkan");
+                                    }
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    color: Colors.green,
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "ATTACHMENT",
+                                          style: Style.whiteBold14,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          SizedBox(height: 12),
-                          // InkWell(
-                          //   onTap: () {
-                          //     if (listInspectionPhoto.length < 5) {
-                          //       showDialogOptionTakeFoto(
-                          //         context,
-                          //         onTapCamera: () async {
-                          //           final result = await CameraService.getImage(
-                          //             context,
-                          //             imageSource: ImageSource.camera,
-                          //           );
-                          //           if (result != null) {
-                          //             listInspectionPhoto.add(result);
-                          //             setState(() {});
-                          //           }
-                          //         },
-                          //         onTapGalery: () async {
-                          //           final result = await CameraService.getImage(
-                          //             context,
-                          //             imageSource: ImageSource.gallery,
-                          //           );
-                          //           if (result != null) {
-                          //             listInspectionPhoto.add(result);
-                          //             setState(() {});
-                          //           }
-                          //         },
-                          //       );
-                          //     } else {
-                          //       FlushBarManager.showFlushBarWarning(
-                          //           _navigationService.navigatorKey.currentContext!,
-                          //           "Foto Inspection",
-                          //           "Maksimal 5 foto yang dapat Anda lampirkan");
-                          //     }
-                          //   },
-                          //   child: Card(
-                          //     shape: RoundedRectangleBorder(
-                          //       borderRadius: BorderRadius.circular(10.0),
-                          //     ),
-                          //     color: Colors.green,
-                          //     child: SizedBox(
-                          //       width: MediaQuery.of(context).size.width,
-                          //       child: Padding(
-                          //         padding: const EdgeInsets.all(16.0),
-                          //         child: Text(
-                          //           "ATTACHMENT",
-                          //           style: Style.whiteBold14,
-                          //           textAlign: TextAlign.center,
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                           InkWell(
                             onTap: () async {
                               await submit();
