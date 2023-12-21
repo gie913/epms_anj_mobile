@@ -34,6 +34,7 @@ class DatabaseTicketInspection {
        ${TicketInspectionEntity.closedByName} TEXT,
        ${TicketInspectionEntity.isSynchronize} INTEGER,
        ${TicketInspectionEntity.isNewResponse} INTEGER,
+       ${TicketInspectionEntity.usingGps} INTEGER,
        ${TicketInspectionEntity.isClosed} INTEGER,
        ${TicketInspectionEntity.attachments} TEXT,
        ${TicketInspectionEntity.responses} TEXT)
@@ -88,6 +89,7 @@ class DatabaseTicketInspection {
           submittedBy: data[i].submittedBy,
           submittedByName: data[i].submittedByName,
           trTime: data[i].trTime,
+          usingGps: data[i].usingGps,
         );
         await db.insert(ticketInspectionTable, inspectionTemp.toDatabase());
       } else {
@@ -123,6 +125,7 @@ class DatabaseTicketInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             ticketInspectionTable,
@@ -161,6 +164,7 @@ class DatabaseTicketInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             ticketInspectionTable,

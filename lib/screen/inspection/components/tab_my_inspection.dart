@@ -63,6 +63,7 @@ class _TabMyInspectionState extends State<TabMyInspection> {
                           submittedBy: data.submittedBy,
                           submittedByName: data.submittedByName,
                           trTime: data.trTime,
+                          usingGps: data.usingGps,
                         );
                         await provider.navigationService.push(
                           Routes.INSPECTION_DETAIL,

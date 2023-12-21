@@ -211,6 +211,7 @@ class InspectionRepository extends APIConfiguration {
       request.fields['assigned_to'] = ticketInspection.assigneeId;
       request.fields['gps_lng'] = jsonEncode(ticketInspection.gpsLng);
       request.fields['gps_lat'] = jsonEncode(ticketInspection.gpsLat);
+      request.fields['using_gps'] = jsonEncode(ticketInspection.usingGps);
       request.fields['m_company_id'] = ticketInspection.mCompanyId;
       request.fields['m_division_id'] = ticketInspection.mDivisionId.isNotEmpty
           ? ticketInspection.mDivisionId

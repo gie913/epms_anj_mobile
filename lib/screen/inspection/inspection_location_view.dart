@@ -12,10 +12,12 @@ class InspectionLocationView extends StatefulWidget {
     super.key,
     this.longitude = 0,
     this.latitude = 0,
+    this.company = '',
   });
 
   final double longitude;
   final double latitude;
+  final String company;
 
   @override
   State<InspectionLocationView> createState() => _InspectionLocationViewState();

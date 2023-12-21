@@ -34,6 +34,7 @@ class DatabaseSubordinateInspection {
        ${SubordinateInspectionEntity.closedByName} TEXT,
        ${SubordinateInspectionEntity.isSynchronize} INTEGER,
        ${SubordinateInspectionEntity.isNewResponse} INTEGER,
+       ${SubordinateInspectionEntity.usingGps} INTEGER,
        ${SubordinateInspectionEntity.isClosed} INTEGER,
        ${SubordinateInspectionEntity.attachments} TEXT,
        ${SubordinateInspectionEntity.responses} TEXT)
@@ -88,6 +89,7 @@ class DatabaseSubordinateInspection {
           submittedBy: data[i].submittedBy,
           submittedByName: data[i].submittedByName,
           trTime: data[i].trTime,
+          usingGps: data[i].usingGps,
         );
         await db.insert(
             subordinateInspectionTable, inspectionTemp.toDatabase());
@@ -124,6 +126,7 @@ class DatabaseSubordinateInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             subordinateInspectionTable,
@@ -161,6 +164,7 @@ class DatabaseSubordinateInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             subordinateInspectionTable,

@@ -291,6 +291,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => InspectionLocationView(
           latitude: arguments['latitude'],
           longitude: arguments['longitude'],
+          company: arguments['company'],
         ),
       );
     default:

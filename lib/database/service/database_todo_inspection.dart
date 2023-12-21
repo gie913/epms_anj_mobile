@@ -34,6 +34,7 @@ class DatabaseTodoInspection {
        ${TodoInspectionEntity.closedByName} TEXT,
        ${TodoInspectionEntity.isSynchronize} INTEGER,
        ${TodoInspectionEntity.isNewResponse} INTEGER,
+       ${TodoInspectionEntity.usingGps} INTEGER,
        ${TodoInspectionEntity.isClosed} INTEGER,
        ${TodoInspectionEntity.attachments} TEXT,
        ${TodoInspectionEntity.responses} TEXT)
@@ -88,6 +89,7 @@ class DatabaseTodoInspection {
           submittedBy: data[i].submittedBy,
           submittedByName: data[i].submittedByName,
           trTime: data[i].trTime,
+          usingGps: data[i].usingGps,
         );
         await db.insert(todoInspectionTable, inspectionTemp.toDatabase());
       } else {
@@ -123,6 +125,7 @@ class DatabaseTodoInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             todoInspectionTable,
@@ -161,6 +164,7 @@ class DatabaseTodoInspection {
             submittedBy: data[i].submittedBy,
             submittedByName: data[i].submittedByName,
             trTime: data[i].trTime,
+            usingGps: data[i].usingGps,
           );
           await db.update(
             todoInspectionTable,

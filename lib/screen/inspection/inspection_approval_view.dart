@@ -68,6 +68,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
 
   final listInspectionPhoto = [];
 
+  bool isPreviewPhoto = false;
+
   @override
   void initState() {
     descriptionController.text = widget.data.description;
@@ -422,6 +424,9 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         closedBy: widget.data.closedBy,
         closedByName: widget.data.closedByName,
         isSynchronize: 0,
+        isClosed: widget.data.isClosed,
+        isNewResponse: widget.data.isNewResponse,
+        usingGps: widget.data.usingGps,
         attachments: widget.data.attachments,
         responses: listHistoryInspection,
       );
@@ -499,52 +504,6 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                 ),
               ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void showFoto(BuildContext context, String imagePath) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      useSafeArea: false,
-      builder: (context) {
-        return MediaQuery(
-          data: Style.mediaQueryText(context),
-          child: AlertDialog(
-            insetPadding: EdgeInsets.all(16),
-            content: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 1.5,
-              child: imagePath.contains('http')
-                  ? FutureBuilder(
-                      future: InspectionService.isInternetConnectionExist(),
-                      builder: (context, snapshot) {
-                        if (snapshot.data == true) {
-                          return Image.network(
-                            imagePath,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1.5,
-                            fit: BoxFit.fill,
-                          );
-                        } else {
-                          return Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1.5,
-                            color: Colors.orange,
-                          );
-                        }
-                      },
-                    )
-                  : Image.file(
-                      File(imagePath),
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.5,
-                      fit: BoxFit.fill,
-                    ),
             ),
           ),
         );
@@ -672,7 +631,18 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                 padding: const EdgeInsets.only(right: 8),
                                 child: InkWell(
                                   onTap: () {
-                                    showFoto(context, image);
+                                    setState(() {
+                                      isPreviewPhoto = true;
+                                    });
+                                    _dialogService.showDialogPreviewPhoto(
+                                      imagePath: image,
+                                      onTapClose: () {
+                                        setState(() {
+                                          isPreviewPhoto = false;
+                                        });
+                                        _dialogService.popDialog();
+                                      },
+                                    );
                                   },
                                   child: (image.toString().contains('http'))
                                       ? FutureBuilder(
@@ -690,7 +660,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                         .size
                                                         .width /
                                                     4,
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.cover,
                                               );
                                             } else {
                                               return Container(
@@ -717,7 +687,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                   .size
                                                   .width /
                                               4,
-                                          fit: BoxFit.fill,
+                                          fit: BoxFit.cover,
                                         ),
                                 ),
                               );
@@ -738,7 +708,25 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                     Text('Riwayat Tindakan :'),
                     if (widget.data.responses.isNotEmpty)
                       ...widget.data.responses
-                          .map((item) => CardHistoryInspection(data: item))
+                          .map(
+                            (item) => CardHistoryInspection(
+                              data: item,
+                              onPreviewPhoto: (value) {
+                                setState(() {
+                                  isPreviewPhoto = true;
+                                });
+                                _dialogService.showDialogPreviewPhoto(
+                                  imagePath: value,
+                                  onTapClose: () {
+                                    setState(() {
+                                      isPreviewPhoto = false;
+                                    });
+                                    _dialogService.popDialog();
+                                  },
+                                );
+                              },
+                            ),
+                          )
                           .toList()
                     else
                       Padding(
@@ -908,8 +896,21 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                 child: InspectionPhoto(
                                                   imagePath: imagePath,
                                                   onTapView: () {
-                                                    showFoto(
-                                                        context, imagePath);
+                                                    setState(() {
+                                                      isPreviewPhoto = true;
+                                                    });
+                                                    _dialogService
+                                                        .showDialogPreviewPhoto(
+                                                      imagePath: imagePath,
+                                                      onTapClose: () {
+                                                        setState(() {
+                                                          isPreviewPhoto =
+                                                              false;
+                                                        });
+                                                        _dialogService
+                                                            .popDialog();
+                                                      },
+                                                    );
                                                   },
                                                   onTapRemove: () {
                                                     listInspectionPhoto
@@ -1021,8 +1022,21 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                 child: InspectionPhoto(
                                                   imagePath: imagePath,
                                                   onTapView: () {
-                                                    showFoto(
-                                                        context, imagePath);
+                                                    setState(() {
+                                                      isPreviewPhoto = true;
+                                                    });
+                                                    _dialogService
+                                                        .showDialogPreviewPhoto(
+                                                      imagePath: imagePath,
+                                                      onTapClose: () {
+                                                        setState(() {
+                                                          isPreviewPhoto =
+                                                              false;
+                                                        });
+                                                        _dialogService
+                                                            .popDialog();
+                                                      },
+                                                    );
                                                   },
                                                   onTapRemove: () {
                                                     listInspectionPhoto
@@ -1209,8 +1223,21 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                 child: InspectionPhoto(
                                                   imagePath: imagePath,
                                                   onTapView: () {
-                                                    showFoto(
-                                                        context, imagePath);
+                                                    setState(() {
+                                                      isPreviewPhoto = true;
+                                                    });
+                                                    _dialogService
+                                                        .showDialogPreviewPhoto(
+                                                      imagePath: imagePath,
+                                                      onTapClose: () {
+                                                        setState(() {
+                                                          isPreviewPhoto =
+                                                              false;
+                                                        });
+                                                        _dialogService
+                                                            .popDialog();
+                                                      },
+                                                    );
                                                   },
                                                   onTapRemove: () {
                                                     listInspectionPhoto
@@ -1322,8 +1349,21 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                 child: InspectionPhoto(
                                                   imagePath: imagePath,
                                                   onTapView: () {
-                                                    showFoto(
-                                                        context, imagePath);
+                                                    setState(() {
+                                                      isPreviewPhoto = true;
+                                                    });
+                                                    _dialogService
+                                                        .showDialogPreviewPhoto(
+                                                      imagePath: imagePath,
+                                                      onTapClose: () {
+                                                        setState(() {
+                                                          isPreviewPhoto =
+                                                              false;
+                                                        });
+                                                        _dialogService
+                                                            .popDialog();
+                                                      },
+                                                    );
                                                   },
                                                   onTapRemove: () {
                                                     listInspectionPhoto
@@ -1435,8 +1475,21 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
                                                 child: InspectionPhoto(
                                                   imagePath: imagePath,
                                                   onTapView: () {
-                                                    showFoto(
-                                                        context, imagePath);
+                                                    setState(() {
+                                                      isPreviewPhoto = true;
+                                                    });
+                                                    _dialogService
+                                                        .showDialogPreviewPhoto(
+                                                      imagePath: imagePath,
+                                                      onTapClose: () {
+                                                        setState(() {
+                                                          isPreviewPhoto =
+                                                              false;
+                                                        });
+                                                        _dialogService
+                                                            .popDialog();
+                                                      },
+                                                    );
                                                   },
                                                   onTapRemove: () {
                                                     listInspectionPhoto

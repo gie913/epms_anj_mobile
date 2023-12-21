@@ -9,6 +9,7 @@ class DialogService {
   late Function(NFCDialogRequest) _showNFCDialogListener;
   late Function(LoadingDialogRequest) _showLoadingDialogListener;
   late Function(DialogScanOPHRequest) _showDialogScanOPHListener;
+  late Function(DialogPreviewPhotoRequest) _showDialogPreviewPhotoListener;
   late Function _popDialogListener;
   Completer? _dialogCompleter;
 
@@ -20,6 +21,7 @@ class DialogService {
     Function(NFCDialogRequest) showNFCDialogListener,
     Function(LoadingDialogRequest) showLoadingDialogListener,
     Function(DialogScanOPHRequest) showDialogScanOPHListener,
+    Function(DialogPreviewPhotoRequest) showDialogPreviewPhotoListener,
     Function popDialogListener,
   ) {
     _showNoOptionDialogListener = showNoOptionDialogListener;
@@ -28,6 +30,7 @@ class DialogService {
     _showNFCDialogListener = showNFCDialogListener;
     _showLoadingDialogListener = showLoadingDialogListener;
     _showDialogScanOPHListener = showDialogScanOPHListener;
+    _showDialogPreviewPhotoListener = showDialogPreviewPhotoListener;
     _popDialogListener = popDialogListener;
   }
 
@@ -108,13 +111,23 @@ class DialogService {
   }) {
     _dialogCompleter = Completer();
     _showDialogScanOPHListener(DialogScanOPHRequest(
-      onPress: onPress,
-      buttonText: buttonText,
-      subtitle: subtitle,
-      title: title,
-      lastOPH: lastOPH,
-      ophCount: ophCount
-    ));
+        onPress: onPress,
+        buttonText: buttonText,
+        subtitle: subtitle,
+        title: title,
+        lastOPH: lastOPH,
+        ophCount: ophCount));
+    return _dialogCompleter!.future;
+  }
+
+  Future showDialogPreviewPhoto({
+    required String imagePath,
+    required Function() onTapClose,
+  }) {
+    _dialogCompleter = Completer();
+    _showDialogPreviewPhotoListener(
+      DialogPreviewPhotoRequest(imagePath: imagePath, onTapClose: onTapClose),
+    );
     return _dialogCompleter!.future;
   }
 
@@ -206,5 +219,15 @@ class DialogScanOPHRequest {
     required this.lastOPH,
     required this.buttonText,
     required this.onPress,
+  });
+}
+
+class DialogPreviewPhotoRequest {
+  String imagePath;
+  Function()? onTapClose;
+
+  DialogPreviewPhotoRequest({
+    required this.imagePath,
+    required this.onTapClose,
   });
 }

@@ -1,5 +1,6 @@
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/widget/dialog_preview_photo.dart';
 import 'package:epms/widget/dialog_scan_oph.dart';
 import 'package:epms/widget/loading_dialog.dart';
 import 'package:epms/widget/nfc_read_dialog.dart';
@@ -8,15 +9,12 @@ import 'package:epms/widget/option_dialog.dart';
 import 'package:epms/widget/supervisor_dialog.dart';
 import 'package:flutter/material.dart';
 
-Widget builderDialog(BuildContext context, Widget? widget) =>
-    Navigator(
-      onGenerateRoute: (settings) =>
-          MaterialPageRoute(
-            builder: (context) =>
-                DialogManager(
-                  child: widget,
-                ),
-          ),
+Widget builderDialog(BuildContext context, Widget? widget) => Navigator(
+      onGenerateRoute: (settings) => MaterialPageRoute(
+        builder: (context) => DialogManager(
+          child: widget,
+        ),
+      ),
     );
 
 class DialogManager extends StatefulWidget {
@@ -43,6 +41,7 @@ class _DialogManagerState extends State<DialogManager> {
       _showNFCDialog,
       _showLoadingDialog,
       _showDialogScanOPH,
+      _showDialogPreviewPhoto,
       _popDialog,
     );
   }
@@ -56,13 +55,12 @@ class _DialogManagerState extends State<DialogManager> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) =>
-          NoOptionDialog(
-            title: request.title,
-            subtitle: request.subtitle,
-            onPress: request.onPress,
-            buttonText: 'OK',
-          ),
+      builder: (BuildContext context) => NoOptionDialog(
+        title: request.title,
+        subtitle: request.subtitle,
+        onPress: request.onPress,
+        buttonText: 'OK',
+      ),
     );
   }
 
@@ -70,15 +68,14 @@ class _DialogManagerState extends State<DialogManager> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) =>
-          OptionDialog(
-            title: request.title,
-            subtitle: request.subtitle,
-            buttonTextNo: request.buttonTextNo,
-            buttonTextYes: request.buttonTextYes,
-            onPressYes: request.onPressYes,
-            onPressNo: request.onPressNo,
-          ),
+      builder: (BuildContext context) => OptionDialog(
+        title: request.title,
+        subtitle: request.subtitle,
+        buttonTextNo: request.buttonTextNo,
+        buttonTextYes: request.buttonTextYes,
+        onPressYes: request.onPressYes,
+        onPressNo: request.onPressNo,
+      ),
     );
   }
 
@@ -86,23 +83,21 @@ class _DialogManagerState extends State<DialogManager> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) =>
-          NFCDialog(
-              title: request.title,
-              subtitle: request.subtitle,
-              onPress: request.onPress,
-              buttonText: request.buttonText),
+      builder: (BuildContext context) => NFCDialog(
+          title: request.title,
+          subtitle: request.subtitle,
+          onPress: request.onPress,
+          buttonText: request.buttonText),
     );
   }
 
   void _showSupervisorDialog(SupervisorDialogRequest request) {
     showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          SupervisorDialog(
-            supervisor: request.supervisor!,
-            onPress: request.onPress,
-          ),
+      builder: (BuildContext context) => SupervisorDialog(
+        supervisor: request.supervisor!,
+        onPress: request.onPress,
+      ),
     );
   }
 
@@ -110,10 +105,9 @@ class _DialogManagerState extends State<DialogManager> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) =>
-          LoadingDialog(
-            title: request.title,
-          ),
+      builder: (BuildContext context) => LoadingDialog(
+        title: request.title,
+      ),
     );
   }
 
@@ -121,14 +115,27 @@ class _DialogManagerState extends State<DialogManager> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) =>
-          DialogScanOPH(
-            title: request.title,
-            subtitle: request.subtitle,
-            onPress: request.onPress,
-            buttonText: request.buttonText,
-            ophCount: request.ophCount,
-            lastOPH: request.lastOPH,),
+      builder: (BuildContext context) => DialogScanOPH(
+        title: request.title,
+        subtitle: request.subtitle,
+        onPress: request.onPress,
+        buttonText: request.buttonText,
+        ophCount: request.ophCount,
+        lastOPH: request.lastOPH,
+      ),
+    );
+  }
+
+  void _showDialogPreviewPhoto(DialogPreviewPhotoRequest request) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return DialogPreviewPhoto(
+          imagePath: request.imagePath,
+          onTapClose: request.onTapClose,
+        );
+      },
     );
   }
 

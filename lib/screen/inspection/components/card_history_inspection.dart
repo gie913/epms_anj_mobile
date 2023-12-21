@@ -11,61 +11,17 @@ class CardHistoryInspection extends StatefulWidget {
   const CardHistoryInspection({
     super.key,
     this.data = const HistoryInspectionModel(),
+    required this.onPreviewPhoto,
   });
 
   final HistoryInspectionModel data;
+  final ValueSetter<String> onPreviewPhoto;
 
   @override
   State<CardHistoryInspection> createState() => _CardHistoryInspectionState();
 }
 
 class _CardHistoryInspectionState extends State<CardHistoryInspection> {
-  void showFoto(BuildContext context, String imagePath) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      useSafeArea: false,
-      builder: (context) {
-        return MediaQuery(
-          data: Style.mediaQueryText(context),
-          child: AlertDialog(
-            insetPadding: EdgeInsets.all(16),
-            content: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 1.5,
-              child: imagePath.contains('http')
-                  ? FutureBuilder(
-                      future: InspectionService.isInternetConnectionExist(),
-                      builder: (context, snapshot) {
-                        if (snapshot.data == true) {
-                          return Image.network(
-                            imagePath,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1.5,
-                            fit: BoxFit.fill,
-                          );
-                        } else {
-                          return Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1.5,
-                            color: Colors.orange,
-                          );
-                        }
-                      },
-                    )
-                  : Image.file(
-                      File(imagePath),
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.5,
-                      fit: BoxFit.fill,
-                    ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -233,7 +189,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                           padding: const EdgeInsets.only(right: 8),
                           child: InkWell(
                             onTap: () {
-                              showFoto(context, image);
+                              widget.onPreviewPhoto(image);
                             },
                             child: (image.toString().contains('http'))
                                 ? FutureBuilder(
@@ -251,7 +207,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                                                   .size
                                                   .width /
                                               6,
-                                          fit: BoxFit.fill,
+                                          fit: BoxFit.cover,
                                         );
                                       } else {
                                         return Container(
@@ -277,7 +233,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
                                         height:
                                             MediaQuery.of(context).size.width /
                                                 6,
-                                        fit: BoxFit.fill,
+                                        fit: BoxFit.cover,
                                       )
                                     : const SizedBox(),
                           ),

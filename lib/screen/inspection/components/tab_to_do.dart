@@ -67,6 +67,7 @@ class _TabToDoState extends State<TabToDo> {
                           submittedBy: data.submittedBy,
                           submittedByName: data.submittedByName,
                           trTime: data.trTime,
+                          usingGps: data.usingGps,
                         );
 
                         if (!ConvertHelper.intToBool(data.isSynchronize)) {
