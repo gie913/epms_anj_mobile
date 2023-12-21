@@ -78,73 +78,48 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
             ),
             Divider(color: Colors.white24, height: 1),
             SizedBox(height: 4),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Submitted By :',
-                  style: Style.whiteBold12.copyWith(
-                      color: Colors.white, fontWeight: FontWeight.normal),
-                ),
-                SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    widget.data.submittedByName,
-                    style: Style.whiteBold12.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.normal),
-                  ),
-                )
-              ],
+            Text(
+              'Submitted By :',
+              style: Style.whiteBold12
+                  .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
+            ),
+            Text(
+              widget.data.submittedByName,
+              style: Style.whiteBold12
+                  .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
             ),
             if (widget.data.reassignedToName.isNotEmpty)
               Column(
                 children: [
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Reassign To :',
-                        style: Style.whiteBold12.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.normal),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.data.reassignedToName,
-                          style: Style.whiteBold12.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      )
-                    ],
+                  Text(
+                    'Reassign To :',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    widget.data.reassignedToName,
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),
             if (widget.data.consultedWithName.isNotEmpty)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Consulted With :',
-                        style: Style.whiteBold12.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.normal),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.data.consultedWithName,
-                          style: Style.whiteBold12.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      )
-                    ],
+                  Text(
+                    'Consulted With :',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    widget.data.consultedWithName,
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),

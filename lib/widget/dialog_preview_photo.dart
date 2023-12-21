@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +66,7 @@ class _DialogPreviewPhotoState extends State<DialogPreviewPhoto> {
           InkWell(
             onTap: widget.onTapClose,
             child: Card(
-              color: Palette.primaryColorProd,
+              color: Colors.red,
               elevation: 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),

@@ -1,5 +1,6 @@
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/common_manager/dialog_services.dart';
+import 'package:epms/widget/dialog_attachment.dart';
 import 'package:epms/widget/dialog_preview_photo.dart';
 import 'package:epms/widget/dialog_scan_oph.dart';
 import 'package:epms/widget/loading_dialog.dart';
@@ -42,6 +43,7 @@ class _DialogManagerState extends State<DialogManager> {
       _showLoadingDialog,
       _showDialogScanOPH,
       _showDialogPreviewPhoto,
+      _showDialogAttachment,
       _popDialog,
     );
   }
@@ -134,6 +136,20 @@ class _DialogManagerState extends State<DialogManager> {
         return DialogPreviewPhoto(
           imagePath: request.imagePath,
           onTapClose: request.onTapClose,
+        );
+      },
+    );
+  }
+
+  void _showDialogAttachment(DialogAttachmentRequest request) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return DialogAttachment(
+          onTapCamera: request.onTapCamera,
+          onTapGallery: request.onTapGallery,
+          onTapCancel: request.onTapCancel,
         );
       },
     );

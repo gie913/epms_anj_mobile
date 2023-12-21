@@ -10,6 +10,7 @@ class DialogService {
   late Function(LoadingDialogRequest) _showLoadingDialogListener;
   late Function(DialogScanOPHRequest) _showDialogScanOPHListener;
   late Function(DialogPreviewPhotoRequest) _showDialogPreviewPhotoListener;
+  late Function(DialogAttachmentRequest) _showDialogAttachmentListener;
   late Function _popDialogListener;
   Completer? _dialogCompleter;
 
@@ -22,6 +23,7 @@ class DialogService {
     Function(LoadingDialogRequest) showLoadingDialogListener,
     Function(DialogScanOPHRequest) showDialogScanOPHListener,
     Function(DialogPreviewPhotoRequest) showDialogPreviewPhotoListener,
+    Function(DialogAttachmentRequest) showDialogAttachmentListener,
     Function popDialogListener,
   ) {
     _showNoOptionDialogListener = showNoOptionDialogListener;
@@ -31,6 +33,7 @@ class DialogService {
     _showLoadingDialogListener = showLoadingDialogListener;
     _showDialogScanOPHListener = showDialogScanOPHListener;
     _showDialogPreviewPhotoListener = showDialogPreviewPhotoListener;
+    _showDialogAttachmentListener = showDialogAttachmentListener;
     _popDialogListener = popDialogListener;
   }
 
@@ -127,6 +130,22 @@ class DialogService {
     _dialogCompleter = Completer();
     _showDialogPreviewPhotoListener(
       DialogPreviewPhotoRequest(imagePath: imagePath, onTapClose: onTapClose),
+    );
+    return _dialogCompleter!.future;
+  }
+
+  Future showDialogAttachment({
+    required Function() onTapCamera,
+    required Function() onTapGallery,
+    required Function() onTapCancel,
+  }) {
+    _dialogCompleter = Completer();
+    _showDialogAttachmentListener(
+      DialogAttachmentRequest(
+        onTapCamera: onTapCamera,
+        onTapGallery: onTapGallery,
+        onTapCancel: onTapCancel,
+      ),
     );
     return _dialogCompleter!.future;
   }
@@ -229,5 +248,17 @@ class DialogPreviewPhotoRequest {
   DialogPreviewPhotoRequest({
     required this.imagePath,
     required this.onTapClose,
+  });
+}
+
+class DialogAttachmentRequest {
+  Function() onTapCamera;
+  Function() onTapGallery;
+  Function() onTapCancel;
+
+  DialogAttachmentRequest({
+    required this.onTapCamera,
+    required this.onTapGallery,
+    required this.onTapCancel,
   });
 }

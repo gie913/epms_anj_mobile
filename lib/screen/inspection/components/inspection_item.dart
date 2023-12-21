@@ -133,24 +133,15 @@ class InspectionItem extends StatelessWidget {
                   //       )
                   //     ],
                   //   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'User Assign :',
-                        style: Style.whiteBold12.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.normal),
-                      ),
-                      SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          data.assignee,
-                          style: Style.whiteBold12.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      )
-                    ],
+                  Text(
+                    'User Assign :',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    data.assignee,
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
                   ),
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),

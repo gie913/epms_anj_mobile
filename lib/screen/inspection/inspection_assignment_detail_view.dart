@@ -71,6 +71,8 @@ class _InspectionAssignmentDetailViewState
 
   bool isPreviewPhoto = false;
 
+  bool isShowDialogAttachment = false;
+
   @override
   void initState() {
     descriptionController.text = widget.data.description;
@@ -175,72 +177,6 @@ class _InspectionAssignmentDetailViewState
     listActionOption = List<String>.from(data.options.map((e) => e.toString()));
     log('cek list action options : $listActionOption');
     setState(() {});
-  }
-
-  void showDialogOptionTakeFoto(
-    BuildContext context, {
-    required Function() onTapCamera,
-    required Function() onTapGalery,
-  }) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return MediaQuery(
-          data: Style.mediaQueryText(context),
-          child: AlertDialog(
-            title: Center(
-                child: Text('Ambil Foto Melalui', style: Style.textBold14)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Palette.primaryColorProd,
-                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        side: BorderSide(color: Palette.primaryColorProd)),
-                    padding: const EdgeInsets.all(16.0),
-                    textStyle:
-                        const TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onTapCamera();
-                  },
-                  child: Text("KAMERA",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(height: 12),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Palette.primaryColorProd,
-                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        side: BorderSide(color: Palette.primaryColorProd)),
-                    padding: const EdgeInsets.all(16.0),
-                    textStyle:
-                        const TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onTapGalery();
-                  },
-                  child: Text("GALERI",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   void getResponseId() {
@@ -473,9 +409,10 @@ class _InspectionAssignmentDetailViewState
             canPop: false,
             onPopInvoked: (didPop) async {
               if (didPop == false) {
-                if (isPreviewPhoto) {
+                if (isPreviewPhoto || isShowDialogAttachment) {
                   setState(() {
                     isPreviewPhoto = false;
+                    isShowDialogAttachment = false;
                   });
                   _dialogService.popDialog();
                 } else {
@@ -917,9 +854,15 @@ class _InspectionAssignmentDetailViewState
                             InkWell(
                               onTap: () {
                                 if (listInspectionPhoto.length < 5) {
-                                  showDialogOptionTakeFoto(
-                                    context,
+                                  setState(() {
+                                    isShowDialogAttachment = true;
+                                  });
+                                  _dialogService.showDialogAttachment(
                                     onTapCamera: () async {
+                                      _dialogService.popDialog();
+                                      setState(() {
+                                        isShowDialogAttachment = false;
+                                      });
                                       final result =
                                           await CameraService.getImage(
                                         context,
@@ -930,7 +873,11 @@ class _InspectionAssignmentDetailViewState
                                         setState(() {});
                                       }
                                     },
-                                    onTapGalery: () async {
+                                    onTapGallery: () async {
+                                      _dialogService.popDialog();
+                                      setState(() {
+                                        isShowDialogAttachment = false;
+                                      });
                                       final result =
                                           await CameraService.getImage(
                                         context,
@@ -940,6 +887,12 @@ class _InspectionAssignmentDetailViewState
                                         listInspectionPhoto.add(result);
                                         setState(() {});
                                       }
+                                    },
+                                    onTapCancel: () {
+                                      setState(() {
+                                        isShowDialogAttachment = false;
+                                      });
+                                      _dialogService.popDialog();
                                     },
                                   );
                                 } else {
@@ -960,7 +913,7 @@ class _InspectionAssignmentDetailViewState
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Text(
-                                      "ATTACHMENT",
+                                      "LAMPIRKAN FOTO",
                                       style: Style.whiteBold14,
                                       textAlign: TextAlign.center,
                                     ),
