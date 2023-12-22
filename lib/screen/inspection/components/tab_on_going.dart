@@ -21,7 +21,7 @@ class _TabOnGoingState extends State<TabOnGoing> {
     return Consumer<InspectionNotifier>(
       builder: (context, provider, _) {
         return Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
           child: provider.listSubordinateInspection.isNotEmpty
               ? ListView.builder(
                   itemCount: provider.listSubordinateInspection.length,

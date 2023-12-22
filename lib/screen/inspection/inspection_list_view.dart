@@ -41,7 +41,7 @@ class _InspectionListViewState extends State<InspectionListView> {
       child: Scaffold(
         appBar: AppBar(title: Text('My Inspection')),
         body: Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
           child: myInspection.isNotEmpty
               ? ListView.builder(
                   itemCount: myInspection.length,

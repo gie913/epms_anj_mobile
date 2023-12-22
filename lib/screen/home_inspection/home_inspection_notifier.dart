@@ -49,6 +49,8 @@ class HomeInspectionNotifier extends ChangeNotifier {
 
   void initData(BuildContext context) async {
     await getDataUser();
+    await DatabaseTicketInspection.deleteTicketThreeMonthAgo();
+    await DatabaseSubordinateInspection.deleteSubordinateThreeMonthAgo();
     await getDataInspection(context);
     await updateCountInspection();
   }

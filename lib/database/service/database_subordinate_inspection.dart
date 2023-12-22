@@ -1,6 +1,7 @@
 import 'package:epms/database/entity/subordinate_inspection_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../helper/database_helper.dart';
@@ -192,6 +193,18 @@ class DatabaseSubordinateInspection {
     Database db = await DatabaseHelper().database;
     await db.update(subordinateInspectionTable, data.toDatabase(),
         where: '${SubordinateInspectionEntity.code}=?', whereArgs: [data.code]);
+  }
+
+  static Future<void> deleteSubordinateThreeMonthAgo() async {
+    Database db = await DatabaseHelper().database;
+    var date = DateTime.now();
+    var newDate = new DateTime(date.year, date.month - 3, date.day);
+    String threeMonthAgoDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(newDate);
+
+    await db.rawDelete(
+        'DELETE FROM $subordinateInspectionTable WHERE ${SubordinateInspectionEntity.trTime} <= ? AND ${SubordinateInspectionEntity.status} = ? AND ${SubordinateInspectionEntity.isSynchronize} = ?',
+        ['$threeMonthAgoDate%', 'close', 1]);
   }
 
   static void deleteTable() async {

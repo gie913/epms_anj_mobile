@@ -44,7 +44,7 @@ class ItemRowInspection extends StatelessWidget {
                 )
               ],
             ),
-            Divider(height: 1.5, color: Colors.grey.shade300),
+            Divider(color: Colors.grey.shade300),
           ],
         );
       },

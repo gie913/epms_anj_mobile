@@ -23,7 +23,7 @@ class _TabToDoState extends State<TabToDo> {
     return Consumer<InspectionNotifier>(
       builder: (context, provider, _) {
         return Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
           child: provider.listTodoInspection.isNotEmpty
               ? ListView.builder(
                   itemCount: provider.listTodoInspection.length,

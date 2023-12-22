@@ -45,7 +45,7 @@ class _InspectionViewState extends State<InspectionView> {
                   tabs: [
                     Tab(
                       icon: Text(
-                        "Summary",
+                        "Inspection",
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white),
                       ),
@@ -76,12 +76,14 @@ class _InspectionViewState extends State<InspectionView> {
                   ),
                   if (tabBarIndex == 0)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                       child: InkWell(
                         onTap: () async {
                           await provider.navigationService
                               .push(Routes.INSPECTION_FORM);
                           await provider.updateMyInspectionFromLocal();
+                          await provider.updateSubordinateInspectionFromLocal();
+                          await provider.updateTodoInspectionFromLocal();
                           provider.updateTotalInspection();
                         },
                         child: Card(
@@ -106,7 +108,7 @@ class _InspectionViewState extends State<InspectionView> {
                     ),
                   if (tabBarIndex == 0)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                       child: InkWell(
                         onTap: () async {
                           await provider.navigationService.push(
@@ -137,7 +139,7 @@ class _InspectionViewState extends State<InspectionView> {
                       ),
                     ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                     child: InkWell(
                       onTap: () {
                         provider.uploadAndSynch(context);
