@@ -33,8 +33,9 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
   double longitude = 0;
   double latitude = 0;
 
-  List<MapLatLng> polyline = [];
   List<List<MapLatLng>> polylines = [];
+
+  bool isRefresh = false;
 
   @override
   void initState() {
@@ -77,14 +78,46 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
     super.initState();
   }
 
+  Future<void> updateLocation() async {
+    setState(() {
+      isRefresh = true;
+    });
+
+    var position = await LocationService.getGPSLocation();
+
+    if (position != null) {
+      longitude = position.longitude;
+      latitude = position.latitude;
+      _data[1] = MarkerModel('My Location', latitude, longitude);
+      List<MapLatLng> polyline = <MapLatLng>[
+        MapLatLng(widget.latitude, widget.longitude),
+        MapLatLng(latitude, longitude),
+      ];
+      polylines = <List<MapLatLng>>[polyline];
+      isRefresh = false;
+      setState(() {});
+      log('cek my location : longitude = $longitude, latitude = $latitude');
+    } else {
+      _data[1] = MarkerModel('My Location', latitude, longitude);
+      List<MapLatLng> polyline = <MapLatLng>[
+        MapLatLng(widget.latitude, widget.longitude),
+        MapLatLng(latitude, longitude),
+      ];
+      polylines = <List<MapLatLng>>[polyline];
+      isRefresh = false;
+      setState(() {});
+      log('cek my location : longitude = $longitude, latitude = $latitude');
+    }
+  }
+
   Future<void> getLocation() async {
     var position = await LocationService.getGPSLocation();
     if (position != null) {
       longitude = position.longitude;
       latitude = position.latitude;
+      setState(() {});
     }
     log('cek my location : longitude = $longitude, latitude = $latitude');
-    setState(() {});
 
     _zoomPanBehavior = MapZoomPanBehavior(
       focalLatLng: MapLatLng(
@@ -112,7 +145,15 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
     ];
 
     _shapeSource = MapShapeSource.asset(
-      'assets/smm.json',
+      widget.company == 'SMM'
+          ? 'assets/smm.json'
+          : widget.company == 'KAL'
+              ? 'assets/kal.json'
+              : widget.company == 'ANJAS'
+                  ? 'assets/siais.json'
+                  : widget.company == 'ANJA'
+                      ? 'assets/binanga.json'
+                      : 'assets/smm.json',
       shapeDataField: 'name',
       dataCount: _data.length,
       primaryValueMapper: (index) {
@@ -120,7 +161,7 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
       },
     );
 
-    polyline = <MapLatLng>[
+    List<MapLatLng> polyline = <MapLatLng>[
       MapLatLng(widget.latitude, widget.longitude),
       MapLatLng(latitude, longitude),
     ];
@@ -136,73 +177,98 @@ class _InspectionLocationViewState extends State<InspectionLocationView> {
           title: Text('Inspection Location'),
         ),
         body: _shapeSource != null
-            ? SfMaps(
-                layers: [
-                  MapShapeLayer(
-                    source: _shapeSource!,
-                    zoomPanBehavior: _zoomPanBehavior,
-                    initialMarkersCount: _data.length,
-                    markerBuilder: (context, index) {
-                      return MapMarker(
-                        latitude: _data[index].latitude,
-                        longitude: _data[index].longitude,
-                        child: Icon(
-                          Icons.location_on,
-                          color: _data[index].country == 'My Location'
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                      );
-                    },
-                    sublayers: [
-                      MapPolylineLayer(
-                        polylines: List<MapPolyline>.generate(
-                          polylines.length,
-                          (int index) {
-                            return MapPolyline(
-                              points: polylines[index],
-                              color: Colors.blue,
-                              strokeCap: StrokeCap.round,
-                              width: 2,
+            ? Stack(
+                children: [
+                  if (isRefresh == false)
+                    SfMaps(
+                      layers: [
+                        MapShapeLayer(
+                          source: _shapeSource!,
+                          zoomPanBehavior: _zoomPanBehavior,
+                          initialMarkersCount: _data.length,
+                          markerBuilder: (context, index) {
+                            return MapMarker(
+                              latitude: _data[index].latitude,
+                              longitude: _data[index].longitude,
+                              child: Icon(
+                                Icons.location_on,
+                                color: _data[index].country == 'My Location'
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
                             );
                           },
-                        ).toSet(),
+                          sublayers: [
+                            MapPolylineLayer(
+                              polylines: List<MapPolyline>.generate(
+                                polylines.length,
+                                (int index) {
+                                  return MapPolyline(
+                                    points: polylines[index],
+                                    color: Colors.blue,
+                                    strokeCap: StrokeCap.round,
+                                    width: 2,
+                                  );
+                                },
+                              ).toSet(),
+                            ),
+                          ],
+                        ),
+                        // MapTileLayer(
+                        //   urlTemplate:
+                        //       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        //   zoomPanBehavior: _zoomPanBehavior,
+                        //   initialMarkersCount: _dataDetail.length,
+                        //   markerBuilder: (context, index) {
+                        //     return MapMarker(
+                        //       latitude: _dataDetail[index].latLng.latitude,
+                        //       longitude: _dataDetail[index].latLng.longitude,
+                        //       child: Icon(
+                        //         Icons.location_on,
+                        //         color: _dataDetail[index].place == 'My Location'
+                        //             ? Colors.green
+                        //             : Colors.red,
+                        //       ),
+                        //     );
+                        //   },
+                        //   sublayers: [
+                        //     MapPolylineLayer(
+                        //       polylines: List<MapPolyline>.generate(
+                        //         polylines.length,
+                        //         (int index) {
+                        //           return MapPolyline(
+                        //             points: polylines[index],
+                        //             color: Colors.blue,
+                        //             strokeCap: StrokeCap.round,
+                        //             width: 2,
+                        //           );
+                        //         },
+                        //       ).toSet(),
+                        //     ),
+                        //   ],
+                        // ),
+                      ],
+                    ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 48, right: 48),
+                      child: InkWell(
+                        onTap: () {
+                          updateLocation();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.orange,
+                          ),
+                          child: Icon(Icons.my_location_rounded,
+                              color: Colors.white),
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                  // MapTileLayer(
-                  //   urlTemplate:
-                  //       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  //   zoomPanBehavior: _zoomPanBehavior,
-                  //   initialMarkersCount: _dataDetail.length,
-                  //   markerBuilder: (context, index) {
-                  //     return MapMarker(
-                  //       latitude: _dataDetail[index].latLng.latitude,
-                  //       longitude: _dataDetail[index].latLng.longitude,
-                  //       child: Icon(
-                  //         Icons.location_on,
-                  //         color: _dataDetail[index].place == 'My Location'
-                  //             ? Colors.green
-                  //             : Colors.red,
-                  //       ),
-                  //     );
-                  //   },
-                  //   sublayers: [
-                  //     MapPolylineLayer(
-                  //       polylines: List<MapPolyline>.generate(
-                  //         polylines.length,
-                  //         (int index) {
-                  //           return MapPolyline(
-                  //             points: polylines[index],
-                  //             color: Colors.blue,
-                  //             strokeCap: StrokeCap.round,
-                  //             width: 2,
-                  //           );
-                  //         },
-                  //       ).toSet(),
-                  //     ),
-                  //   ],
-                  // ),
                 ],
               )
             : const SizedBox(),

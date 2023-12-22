@@ -195,6 +195,8 @@ class DatabaseTodoInspection {
     var data = List<TicketInspectionModel>.from(mapList.map((e) {
       return TicketInspectionModel.fromDatabase(e);
     }));
+    data.sort((a, b) =>
+        DateTime.parse(b.submittedAt).compareTo(DateTime.parse(a.submittedAt)));
     return data;
   }
 

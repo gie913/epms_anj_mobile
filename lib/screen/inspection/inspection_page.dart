@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class InspectionPage extends StatefulWidget {
-  const InspectionPage({super.key});
+  const InspectionPage({super.key, this.arguments = ''});
+
+  final String arguments;
 
   @override
   State<InspectionPage> createState() => _InspectionPageState();
@@ -15,7 +17,7 @@ class _InspectionPageState extends State<InspectionPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => InspectionNotifier(),
-      child: InspectionView(),
+      child: InspectionView(arguments: widget.arguments),
     );
   }
 }

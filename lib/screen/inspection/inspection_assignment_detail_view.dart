@@ -600,7 +600,11 @@ class _InspectionAssignmentDetailViewState
                         validator: (value) => null,
                         readOnly: true,
                       ),
-                      if (ConvertHelper.intToBool(widget.data.usingGps))
+                      if (ConvertHelper.intToBool(widget.data.usingGps) &&
+                          (widget.data.mCompanyAlias == 'SMM' ||
+                              widget.data.mCompanyAlias == 'ANJA' ||
+                              widget.data.mCompanyAlias == 'KAL' ||
+                              widget.data.mCompanyAlias == 'ANJAS'))
                         InkWell(
                           onTap: () {
                             _navigationService.push(
@@ -608,7 +612,7 @@ class _InspectionAssignmentDetailViewState
                               arguments: {
                                 'longitude': widget.data.gpsLng,
                                 'latitude': widget.data.gpsLat,
-                                'company': widget.data.mCompanyName,
+                                'company': widget.data.mCompanyAlias,
                               },
                             );
                           },

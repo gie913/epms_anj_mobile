@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class InspectionView extends StatefulWidget {
-  const InspectionView({super.key});
+  const InspectionView({super.key, this.arguments = ''});
+
+  final String arguments;
 
   @override
   State<InspectionView> createState() => _InspectionViewState();
@@ -20,7 +22,12 @@ class _InspectionViewState extends State<InspectionView> {
 
   @override
   void initState() {
-    context.read<InspectionNotifier>().initData(context);
+    if (widget.arguments.isEmpty) {
+      context.read<InspectionNotifier>().initData(context);
+    } else {
+      context.read<InspectionNotifier>().getDataInspection(context);
+    }
+
     super.initState();
   }
 

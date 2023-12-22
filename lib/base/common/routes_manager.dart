@@ -253,8 +253,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
       );
     case Routes.INSPECTION:
+      final arguments =
+          settings.arguments != null ? settings.arguments as String : '';
       return MaterialPageRoute(
-        builder: (context) => InspectionPage(),
+        builder: (context) => InspectionPage(arguments: arguments),
       );
     case Routes.INSPECTION_FORM:
       return MaterialPageRoute(
