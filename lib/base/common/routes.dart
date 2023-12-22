@@ -48,6 +48,7 @@ class Routes {
 
   static const INSPECTION = '/inspection';
   static const INSPECTION_FORM = '/inspection-form';
+  static const INSPECTION_LIST = '/inspection-list';
   static const INSPECTION_ASSIGNMENT_DETAIL = '/inspection-assignment-detail';
   static const INSPECTION_DETAIL = '/inspection-detail';
   static const INSPECTION_APPROVAL = '/inspection-approval';

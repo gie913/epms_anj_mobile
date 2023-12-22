@@ -10,6 +10,7 @@ import 'package:epms/screen/inspection/inspection_approval_view.dart';
 import 'package:epms/screen/inspection/inspection_assignment_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_detail_view.dart';
 import 'package:epms/screen/inspection/inspection_form_view.dart';
+import 'package:epms/screen/inspection/inspection_list_view.dart';
 import 'package:epms/screen/inspection/inspection_location_view.dart';
 import 'package:epms/screen/inspection/inspection_page.dart';
 import 'package:epms/screen/inspection/inspection_user_view.dart';
@@ -258,6 +259,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case Routes.INSPECTION_FORM:
       return MaterialPageRoute(
         builder: (context) => InspectionFormView(),
+      );
+    case Routes.INSPECTION_LIST:
+      final arguments = settings.arguments != null
+          ? settings.arguments as List<TicketInspectionModel>
+          : const <TicketInspectionModel>[];
+      return MaterialPageRoute(
+        builder: (context) => InspectionListView(listMyInspection: arguments),
       );
     case Routes.INSPECTION_ASSIGNMENT_DETAIL:
       final arguments = settings.arguments != null

@@ -45,7 +45,7 @@ class _InspectionViewState extends State<InspectionView> {
                   tabs: [
                     Tab(
                       icon: Text(
-                        "My Inspection",
+                        "Summary",
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white),
                       ),
@@ -82,6 +82,7 @@ class _InspectionViewState extends State<InspectionView> {
                           await provider.navigationService
                               .push(Routes.INSPECTION_FORM);
                           await provider.updateMyInspectionFromLocal();
+                          provider.updateTotalInspection();
                         },
                         child: Card(
                           color: Palette.primaryColorProd,
@@ -103,8 +104,40 @@ class _InspectionViewState extends State<InspectionView> {
                         ),
                       ),
                     ),
+                  if (tabBarIndex == 0)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      child: InkWell(
+                        onTap: () async {
+                          await provider.navigationService.push(
+                            Routes.INSPECTION_LIST,
+                            arguments: provider.listMyInspection,
+                          );
+                          await provider.updateMyInspectionFromLocal();
+                          provider.updateTotalInspection();
+                        },
+                        child: Card(
+                          color: Palette.primaryColorProd,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                "MY INSPECTION",
+                                style: Style.whiteBold14,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: InkWell(
                       onTap: () {
                         provider.uploadAndSynch(context);

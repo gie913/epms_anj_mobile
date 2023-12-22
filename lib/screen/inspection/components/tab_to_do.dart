@@ -98,6 +98,7 @@ class _TabToDoState extends State<TabToDo> {
                             await provider.updateMyInspectionFromLocal();
                             await provider
                                 .updateSubordinateInspectionFromLocal();
+                            provider.updateTotalInspection();
                           } else if (data.status == 'reassign' ||
                               data.status == 'complete' ||
                               data.status == 'need_consultation' ||
@@ -116,6 +117,7 @@ class _TabToDoState extends State<TabToDo> {
                             await provider.updateMyInspectionFromLocal();
                             await provider
                                 .updateSubordinateInspectionFromLocal();
+                            provider.updateTotalInspection();
                           }
                         }
                       },

@@ -29,10 +29,26 @@ class InspectionNotifier extends ChangeNotifier {
   List<TicketInspectionModel> get listSubordinateInspection =>
       _listSubordinateInspection;
 
+  int _totalCreateInspection = 0;
+  int get totalCreateInspection => _totalCreateInspection;
+
+  int _totalInspectionNotClose = 0;
+  int get totalInspectionNotClose => _totalInspectionNotClose;
+
+  int _totalInspectionToDo = 0;
+  int get totalInspectionToDo => _totalInspectionToDo;
+
+  int _totalInspectionClose = 0;
+  int get totalInspectionClose => _totalInspectionClose;
+
+  int _totalInspectionNeedUpload = 0;
+  int get totalInspectionNeedUpload => _totalInspectionNeedUpload;
+
   Future<void> initData(BuildContext context) async {
     await updateMyInspectionFromLocal();
     await updateTodoInspectionFromLocal();
     await updateSubordinateInspectionFromLocal();
+    updateTotalInspection();
     // await getDataInspection(context);
   }
 
@@ -54,6 +70,33 @@ class InspectionNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateTotalInspection() {
+    _totalCreateInspection = _listMyInspection.length;
+    var myInspectionNotClose =
+        _listMyInspection.where((element) => element.status != 'close').length;
+    var mySubordinateNotClose = _listSubordinateInspection
+        .where((element) => element.status != 'close')
+        .length;
+    _totalInspectionNotClose = myInspectionNotClose + mySubordinateNotClose;
+    _totalInspectionToDo = _listTodoInspection
+        .where((element) => element.isSynchronize == 1)
+        .length;
+    var myInspectionClose =
+        _listMyInspection.where((element) => element.status == 'close').length;
+    var mySubordinateClose = _listSubordinateInspection
+        .where((element) => element.status == 'close')
+        .length;
+    _totalInspectionClose = myInspectionClose + mySubordinateClose;
+    var myInspectionNeedUpload =
+        _listMyInspection.where((element) => element.isSynchronize == 0).length;
+    var myToDoInspectionNeedUpload = _listTodoInspection
+        .where((element) => element.isSynchronize == 0)
+        .length;
+    _totalInspectionNeedUpload =
+        myInspectionNeedUpload + myToDoInspectionNeedUpload;
+    notifyListeners();
+  }
+
   Future<void> getDataInspection(BuildContext context) async {
     final isInternetExist = await InspectionService.isInternetConnectionExist();
     if (isInternetExist) {
@@ -72,6 +115,7 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  updateTotalInspection();
                   FlushBarManager.showFlushBarSuccess(
                     context,
                     "Berhasil Synchronize",
@@ -99,6 +143,7 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  updateTotalInspection();
                   FlushBarManager.showFlushBarSuccess(
                     context,
                     "Berhasil Synchronize",
@@ -133,6 +178,7 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  updateTotalInspection();
                   FlushBarManager.showFlushBarSuccess(
                     context,
                     "Berhasil Synchronize",
@@ -160,6 +206,7 @@ class InspectionNotifier extends ChangeNotifier {
                 (context, data) async {
                   await DatabaseSubordinateInspection.addAllData(data);
                   await updateSubordinateInspectionFromLocal();
+                  updateTotalInspection();
                   FlushBarManager.showFlushBarSuccess(
                     context,
                     "Berhasil Synchronize",
@@ -188,6 +235,7 @@ class InspectionNotifier extends ChangeNotifier {
       await updateMyInspectionFromLocal();
       await updateTodoInspectionFromLocal();
       await updateSubordinateInspectionFromLocal();
+      updateTotalInspection();
       log('list My Inspection : $_listMyInspection');
       log('list Todo Inspection : $_listTodoInspection');
       log('list Subordinate Inspection : $_listSubordinateInspection');

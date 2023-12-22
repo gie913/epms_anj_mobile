@@ -90,6 +90,7 @@ class _CardHistoryInspectionState extends State<CardHistoryInspection> {
             ),
             if (widget.data.reassignedToName.isNotEmpty)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),

@@ -432,7 +432,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
         attachments: widget.data.attachments,
         responses: listHistoryInspection,
       );
-      await DatabaseTodoInspection.updateData(dataInspection);
+
       final isInternetExist =
           await InspectionService.isInternetConnectionExist();
       if (isInternetExist) {
@@ -442,6 +442,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
           responseInspection: dataInspection.responses.last,
         );
       } else {
+        await DatabaseTodoInspection.updateData(dataInspection);
         _navigationService.pop();
       }
     }
