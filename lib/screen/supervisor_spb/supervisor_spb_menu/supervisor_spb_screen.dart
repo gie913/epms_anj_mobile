@@ -332,7 +332,7 @@ class _SupervisorSPBScreenState extends State<SupervisorSPBScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: InkWell(
-                                    child: Text("Synch Ulang"),
+                                    child: Text("Sync Ulang"),
                                     onTap: () {
                                       SupervisorSPBNotifier().reSynch();
                                     },

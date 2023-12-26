@@ -321,7 +321,7 @@ class _SupervisorFormScreenState extends State<SupervisorFormScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: InkWell(
-                                  child: Text("Synch Ulang"),
+                                  child: Text("Sync Ulang"),
                                   onTap: () {
                                     KeraniPanenNotifier().reSynch();
                                   },

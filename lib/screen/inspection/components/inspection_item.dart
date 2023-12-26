@@ -171,7 +171,7 @@ class InspectionItem extends StatelessWidget {
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Text(
-                        'Need Synch',
+                        'Need Sync',
                         style: Style.whiteBold12.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,

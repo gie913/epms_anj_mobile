@@ -122,21 +122,21 @@ class SynchNotifier extends ChangeNotifier {
     await InspectionRepository().getMyInspection(
       context,
       (context, data) async {
-        _dataText = "Synch data my inspection";
+        _dataText = "Sync data my inspection";
         notifyListeners();
         await DatabaseTicketInspection.addAllData(data);
 
         await InspectionRepository().getToDoInspection(
           context,
           (context, data) async {
-            _dataText = "Synch data todo inspection";
+            _dataText = "Sync data todo inspection";
             notifyListeners();
             await DatabaseTodoInspection.addAllData(data);
 
             await InspectionRepository().getMySubordinate(
               context,
               (context, data) async {
-                _dataText = "Synch data subordinate inspection";
+                _dataText = "Sync data subordinate inspection";
                 notifyListeners();
                 await DatabaseSubordinateInspection.addAllData(data);
 
@@ -164,21 +164,21 @@ class SynchNotifier extends ChangeNotifier {
     await InspectionRepository().getMyInspection(
       context,
       (context, data) async {
-        _dataText = "Synch data my inspection";
+        _dataText = "Sync data my inspection";
         notifyListeners();
         await DatabaseTicketInspection.addAllData(data);
 
         await InspectionRepository().getToDoInspection(
           context,
           (context, data) async {
-            _dataText = "Synch data todo inspection";
+            _dataText = "Sync data todo inspection";
             notifyListeners();
             await DatabaseTodoInspection.addAllData(data);
 
             await InspectionRepository().getMySubordinate(
               context,
               (context, data) async {
-                _dataText = "Synch data subordinate inspection";
+                _dataText = "Sync data subordinate inspection";
                 notifyListeners();
                 await DatabaseSubordinateInspection.addAllData(data);
 
@@ -210,7 +210,7 @@ class SynchNotifier extends ChangeNotifier {
   onErrorSynch(BuildContext context, String message) {
     print(message);
     _dialogService.showOptionDialog(
-        title: "Gagal Synch",
+        title: "Gagal Sync",
         subtitle: "$message",
         buttonTextYes: "Ulang",
         buttonTextNo: "Log Out",
@@ -221,7 +221,7 @@ class SynchNotifier extends ChangeNotifier {
   onErrorSynchEpmsInspection(BuildContext context, String message) {
     print(message);
     _dialogService.showOptionDialog(
-      title: "Gagal Synch",
+      title: "Gagal Sync",
       subtitle: "$message",
       buttonTextYes: "Ulang",
       buttonTextNo: "Log Out",
@@ -240,33 +240,33 @@ class SynchNotifier extends ChangeNotifier {
   saveDatabaseSynchInspection(
       BuildContext context, SynchInspectionData data) async {
     try {
-      _dataText = "Synch data user inspection";
+      _dataText = "Sync data user inspection";
       notifyListeners();
       await DatabaseUserInspection.insetData(data.user);
 
-      _dataText = "Synch data team inspection";
+      _dataText = "Sync data team inspection";
       notifyListeners();
       await DatabaseTeamInspection.insetData(data.team);
 
-      _dataText = "Synch data member inspection";
+      _dataText = "Sync data member inspection";
       notifyListeners();
       await DatabaseMemberInspection.insetData(data.team);
 
-      _dataText = "Synch data action inspection";
+      _dataText = "Sync data action inspection";
       notifyListeners();
       await DatabaseActionInspection.insetData(data.action);
 
-      _dataText = "Synch data company inspection";
+      _dataText = "Sync data company inspection";
       notifyListeners();
       await DatabaseCompanyInspection.insetData(data.company);
 
-      _dataText = "Synch data division inspection";
+      _dataText = "Sync data division inspection";
       notifyListeners();
       await DatabaseDivisionInspection.insetData(data.division);
     } catch (e) {
       print(e);
       _dialogService.showOptionDialog(
-        title: "Gagal Synch",
+        title: "Gagal Sync",
         subtitle: "$e",
         buttonTextYes: "Ulang",
         buttonTextNo: "Log Out",
@@ -299,86 +299,86 @@ class SynchNotifier extends ChangeNotifier {
       DatabaseMVendorSchema()
           .insertMVendorSchema(globals.globalRevamp.mVendorSchema ?? [])
           .then((value) {
-        _dataText = "Synch data Estate";
+        _dataText = "Sync data Estate";
         notifyListeners();
         DatabaseMEstateSchema()
             .insertMEstateSchema(globals.globalRevamp.mEstateSchema ?? [])
             .then((value) {
-          _dataText = "Synch data Pekerja";
+          _dataText = "Sync data Pekerja";
           notifyListeners();
           DatabaseMEmployeeSchema()
               .insertMEmployeeSchema(globals.globalRevamp.mEmployeeSchema ?? [])
               .then((value) {
-            _dataText = "Synch data Activity";
+            _dataText = "Sync data Activity";
             notifyListeners();
             DatabaseMActivitySchema()
                 .insertMActivitySchema(
                     globals.globalRevamp.mActivitySchema ?? [])
                 .then((value) {
-              _dataText = "Synch data Cost Control";
+              _dataText = "Sync data Cost Control";
               notifyListeners();
               DatabaseMCostControlSchema()
                   .insertMCostControlSchema(
                       globals.globalRevamp.mCostControlSchema ?? [])
                   .then((value) {
-                _dataText = "Synch data Customer";
+                _dataText = "Sync data Customer";
                 notifyListeners();
                 DatabaseMCustomerCodeSchema()
                     .insertMCustomerCodeSchema(
                         globals.globalRevamp.mCustomerCodeSchema ?? [])
                     .then((value) {
-                  _dataText = "Synch data Divisi";
+                  _dataText = "Sync data Divisi";
                   notifyListeners();
                   DatabaseMDivisionSchema()
                       .insertMDivisionSchema(
                           globals.globalRevamp.mDivisionSchema ?? [])
                       .then((value) {
-                    _dataText = "Synch data Material";
+                    _dataText = "Sync data Material";
                     notifyListeners();
                     DatabaseMMaterialSchema()
                         .insertMMaterialSchema(
                             globals.globalRevamp.mMaterialSchema ?? [])
                         .then((value) {
-                      _dataText = "Synch data Blok";
+                      _dataText = "Sync data Blok";
                       notifyListeners();
                       DatabaseMBlockSchema()
                           .insertMBlockSchema(
                               globals.globalRevamp.mBlockSchema ?? [])
                           .then((value) {
-                        _dataText = "Synch data Kartu OPH";
+                        _dataText = "Sync data Kartu OPH";
                         notifyListeners();
                         DatabaseMCOPHSchema()
                             .insertMCOPHSchema(
                                 globals.globalRevamp.mCOPHCardSchema ?? [])
                             .then((value) {
-                          _dataText = "Synch data TPH";
+                          _dataText = "Sync data TPH";
                           notifyListeners();
                           DatabaseMTPHSchema()
                               .insertMTPHSchema(
                                   globals.globalRevamp.mTPHSchema ?? [])
                               .then((value) {
-                            _dataText = "Synch data Penugasan";
+                            _dataText = "Sync data Penugasan";
                             notifyListeners();
                             DatabaseTUserAssignment()
                                 .insertTUserAssignment(globals
                                         .globalRevamp.tUserAssignmentSchema ??
                                     [])
                                 .then((value) {
-                              _dataText = "Synch data Kartu SPB";
+                              _dataText = "Sync data Kartu SPB";
                               notifyListeners();
                               DatabaseMCSPBCardSchema()
                                   .insertMCSPBCardSchema(
                                       globals.globalRevamp.mCSPBCardSchema ??
                                           [])
                                   .then((value) {
-                                _dataText = "Synch data Absensi";
+                                _dataText = "Sync data Absensi";
                                 notifyListeners();
                                 DatabaseMAttendance()
                                     .insertAttendance(globals
                                             .globalRevamp.mAttendanceSchema ??
                                         [])
                                     .then((value) {
-                                  _dataText = "Synch data Tujuan";
+                                  _dataText = "Sync data Tujuan";
                                   notifyListeners();
                                   DatabaseMDestinationSchema()
                                       .insertMDestinationSchema(globals
@@ -386,14 +386,14 @@ class SynchNotifier extends ChangeNotifier {
                                               .mDestinationSchema ??
                                           [])
                                       .then((value) {
-                                    _dataText = "Synch data Kehadiran";
+                                    _dataText = "Sync data Kehadiran";
                                     notifyListeners();
                                     DatabaseAttendance()
                                         .insertAttendance(globals.globalRevamp
                                                 .tAttendanceSchema ??
                                             [])
                                         .then((value) {
-                                      _dataText = "Synch data Kendaraan";
+                                      _dataText = "Sync data Kendaraan";
                                       notifyListeners();
                                       DatabaseMVRASchema()
                                           .insertMVRASchema(
@@ -402,7 +402,7 @@ class SynchNotifier extends ChangeNotifier {
                                           .then((value) {
                                         if (synchResponse.keraniPanen != null) {
                                           _dataText =
-                                              "Synch data Laporan Panen Kemarin";
+                                              "Sync data Laporan Panen Kemarin";
                                           notifyListeners();
                                           DatabaseLaporanPanenKemarin()
                                               .insertLaporanPanenKemarin(
@@ -410,14 +410,13 @@ class SynchNotifier extends ChangeNotifier {
                                                           ?.laporanPanenKemarin ??
                                                       []);
                                           _dataText =
-                                              "Synch data Estimasi Berat";
+                                              "Sync data Estimasi Berat";
                                           notifyListeners();
                                           DatabaseTABWSchema().insertTABWSchema(
                                               synchResponse.keraniPanen!
                                                       .tABWSchema ??
                                                   []);
-                                          _dataText =
-                                              "Synch data Rencana Panen";
+                                          _dataText = "Sync data Rencana Panen";
                                           notifyListeners();
                                           DatabaseTHarvestingPlan()
                                               .insertTHarvestingPlan(synchResponse
@@ -425,7 +424,7 @@ class SynchNotifier extends ChangeNotifier {
                                                       ?.tHarvestingPlanSchema ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan Restan";
+                                              "Sync data Laporan Restan";
                                           notifyListeners();
                                           DatabaseLaporanRestan()
                                               .insertLaporanRestan(synchResponse
@@ -435,7 +434,7 @@ class SynchNotifier extends ChangeNotifier {
                                         } else if (synchResponse.keraniKirim !=
                                             null) {
                                           _dataText =
-                                              "Synch data Laporan Restan";
+                                              "Sync data Laporan Restan";
                                           notifyListeners();
                                           DatabaseLaporanRestan()
                                               .insertLaporanRestan(synchResponse
@@ -443,7 +442,7 @@ class SynchNotifier extends ChangeNotifier {
                                                       ?.laporanRestan ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan SPB Kemarin";
+                                              "Sync data Laporan SPB Kemarin";
                                           notifyListeners();
                                           DatabaseLaporanSPBKemarin()
                                               .insertLaporanSPBKemarin(
@@ -453,7 +452,7 @@ class SynchNotifier extends ChangeNotifier {
                                         } else if (synchResponse.kerani !=
                                             null) {
                                           _dataText =
-                                              "Synch data Laporan Panen Kemarin";
+                                              "Sync data Laporan Panen Kemarin";
                                           notifyListeners();
                                           DatabaseLaporanPanenKemarin()
                                               .insertLaporanPanenKemarin(
@@ -461,14 +460,13 @@ class SynchNotifier extends ChangeNotifier {
                                                           ?.laporanPanenKemarin ??
                                                       []);
                                           _dataText =
-                                              "Synch data Estimasi Berat";
+                                              "Sync data Estimasi Berat";
                                           notifyListeners();
                                           DatabaseTABWSchema().insertTABWSchema(
                                               synchResponse
                                                       .kerani!.tAbwSchema ??
                                                   []);
-                                          _dataText =
-                                              "Synch data Rencana Panen";
+                                          _dataText = "Sync data Rencana Panen";
                                           notifyListeners();
                                           DatabaseTHarvestingPlan()
                                               .insertTHarvestingPlan(synchResponse
@@ -476,14 +474,14 @@ class SynchNotifier extends ChangeNotifier {
                                                       ?.tHarvestingPlanSchema ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan Restan";
+                                              "Sync data Laporan Restan";
                                           notifyListeners();
                                           DatabaseLaporanRestan()
                                               .insertLaporanRestan(synchResponse
                                                       .kerani?.laporanRestan ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan SPB Kemarin";
+                                              "Sync data Laporan SPB Kemarin";
                                           notifyListeners();
                                           DatabaseLaporanSPBKemarin()
                                               .insertLaporanSPBKemarin(
@@ -492,24 +490,21 @@ class SynchNotifier extends ChangeNotifier {
                                                       []);
                                         } else if (synchResponse.supervisi !=
                                             null) {
-                                          _dataText =
-                                              "Synch data Pekerja Ancak";
+                                          _dataText = "Sync data Pekerja Ancak";
                                           notifyListeners();
                                           DatabaseMAncakEmployee()
                                               .insertMAncakEmployeeSchema(
                                                   synchResponse.supervisi
                                                           ?.mAncakEmployee ??
                                                       []);
-                                          _dataText =
-                                              "Synch data Rencana Panen";
+                                          _dataText = "Sync data Rencana Panen";
                                           notifyListeners();
                                           DatabaseTHarvestingPlan()
                                               .insertTHarvestingPlan(synchResponse
                                                       .supervisi
                                                       ?.tHarvestingPlanSchema ??
                                                   []);
-                                          _dataText =
-                                              "Synch data Rencana Kerja";
+                                          _dataText = "Sync data Rencana Kerja";
                                           notifyListeners();
                                           DatabaseTWorkplanSchema()
                                               .insertTWorkPlan(synchResponse
@@ -517,7 +512,7 @@ class SynchNotifier extends ChangeNotifier {
                                                       ?.tWorkplanSchema ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan Restan";
+                                              "Sync data Laporan Restan";
                                           notifyListeners();
                                           DatabaseLaporanRestan()
                                               .insertLaporanRestan(synchResponse
@@ -525,7 +520,7 @@ class SynchNotifier extends ChangeNotifier {
                                                       ?.laporanRestan ??
                                                   []);
                                           _dataText =
-                                              "Synch data Laporan Panen Kemarin";
+                                              "Sync data Laporan Panen Kemarin";
                                           notifyListeners();
                                           DatabaseLaporanPanenKemarin()
                                               .insertLaporanPanenKemarin(
@@ -533,7 +528,7 @@ class SynchNotifier extends ChangeNotifier {
                                                           ?.laporanPanenKemarin ??
                                                       []);
                                           _dataText =
-                                              "Synch data Supervisi Auth";
+                                              "Sync data Supervisi Auth";
                                           notifyListeners();
                                           DatabaseTAuth.insertTAuth(
                                               synchResponse.supervisi!.auth ??
@@ -542,7 +537,7 @@ class SynchNotifier extends ChangeNotifier {
                                                 .supervisi3rdParty !=
                                             null) {
                                           _dataText =
-                                              "Synch data Grading TBS Luar";
+                                              "Sync data Grading TBS Luar";
                                           notifyListeners();
                                           DatabaseTBSLuarOneMonth()
                                               .insertTBSLuarOneMonth(
@@ -572,7 +567,7 @@ class SynchNotifier extends ChangeNotifier {
     } catch (e) {
       print(e);
       _dialogService.showOptionDialog(
-          title: "Gagal Synch",
+          title: "Gagal Sync",
           subtitle: "$e",
           buttonTextYes: "Ulang",
           buttonTextNo: "Log Out",
@@ -687,7 +682,7 @@ class SynchNotifier extends ChangeNotifier {
   onErrorSynchBackground(BuildContext context, String message) {
     _dialogService.popDialog();
     _dialogService.showOptionDialog(
-        title: "Gagal Synch",
+        title: "Gagal Sync",
         subtitle: "Gagal pada saat sinkronisasi $message",
         buttonTextYes: "Ulang",
         buttonTextNo: "Log Out",
@@ -703,7 +698,7 @@ class SynchNotifier extends ChangeNotifier {
     // DatabaseLaporanRestan().deleteLaporanRestan();
     try {
       if (synchResponse.keraniPanen != null) {
-        _dataText = "Synch data Laporan Panen Kemarin";
+        _dataText = "Sync data Laporan Panen Kemarin";
         await DatabaseLaporanPanenKemarin().insertLaporanPanenKemarin(
             synchResponse.keraniPanen?.laporanPanenKemarin ?? []);
         notifyListeners();
@@ -724,7 +719,7 @@ class SynchNotifier extends ChangeNotifier {
     } catch (e) {
       print(e);
       _dialogService.showOptionDialog(
-          title: "Gagal Synch",
+          title: "Gagal Sync",
           subtitle: "Gagal pada saat sinkronisasi $e",
           buttonTextYes: "Ulang",
           buttonTextNo: "Log Out",

@@ -251,7 +251,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
   reSynch() {
     _dialogService.showOptionDialog(
         title: "Sinkronisasi Ulang",
-        subtitle: "Anda yakin ingin synch ulang?",
+        subtitle: "Anda yakin ingin sync ulang?",
         buttonTextYes: "Ya",
         buttonTextNo: "Tidak",
         onPressYes: onPressYes,

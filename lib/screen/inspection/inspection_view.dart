@@ -162,7 +162,7 @@ class _InspectionViewState extends State<InspectionView> {
                           child: Padding(
                             padding: EdgeInsets.all(16),
                             child: Text(
-                              "UPLOAD & SYNCH",
+                              "UPLOAD & SYNC",
                               style: Style.whiteBold14,
                               textAlign: TextAlign.center,
                             ),
