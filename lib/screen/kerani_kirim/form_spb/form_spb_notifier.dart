@@ -546,6 +546,17 @@ class FormSPBNotifier extends ChangeNotifier {
     _totalBunches = _totalBunches - listSPBDetail[index].ophBunchesDelivered!;
     _totalLooseFruits =
         _totalLooseFruits - listSPBDetail[index].ophLooseFruitDelivered!;
+    if (_mvraSchema != null) {
+      _totalWeightEstimation =
+          _totalWeightEstimation - _listOPHScanned[index].ophEstimateTonnage!;
+      if (_totalWeightEstimation == 0.0) {
+        _totalCapacityTruck = _mvraSchema!.vraMaxCap;
+      } else {
+        _totalCapacityTruck =
+            (_totalCapacityTruck + _listOPHScanned[index].ophEstimateTonnage!);
+      }
+    }
+
     _listSPBDetail.removeAt(index);
     _listOPHScanned.removeAt(index);
     _lastOPH = _listSPBDetail.isNotEmpty ? _listSPBDetail.last.ophCardId! : "";
@@ -561,17 +572,6 @@ class FormSPBNotifier extends ChangeNotifier {
         ? await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(
             getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length))
         : MEstateSchema();
-    if (_mvraSchema != null) {
-      _totalWeightEstimation =
-          _totalWeightEstimation - _listOPHScanned[index].ophEstimateTonnage!;
-      if (_totalWeightEstimation == 0.0) {
-        _totalCapacityTruck = _mvraSchema!.vraMaxCap;
-      } else {
-        _totalCapacityTruck =
-            (_totalCapacityTruck + _listOPHScanned[index].ophEstimateTonnage!);
-      }
-      _listOPHScanned.removeAt(index);
-    }
     notifyListeners();
   }
 

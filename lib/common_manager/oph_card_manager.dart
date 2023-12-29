@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/model/oph.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ class OPHCardManager {
 
   writeOPHCard(BuildContext context, OPH oph, onSuccess, onError) {
     String ophTag = ValueService.ophCardTag(oph);
+    log('cek ophTag : $ophTag');
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       var ndef = Ndef.from(tag);
       if (ndef == null || !ndef.isWritable) {
@@ -39,6 +42,7 @@ class OPHCardManager {
       try {
         ValueService.tagReader(tag).then((value) {
           String decryptData = EncryptionManager.decryptData(value);
+          log('cek ophTag read : $decryptData');
           if (decryptData.characters.first == "O") {
             final split = decryptData.split(',');
             final Map<int, String> values = {
