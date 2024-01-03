@@ -27,9 +27,14 @@ class DatabaseDivisionInspection {
     await batch.commit();
   }
 
-  static Future<List<DivisionInspectionModel>> selectData() async {
+  static Future<List<DivisionInspectionModel>> selectDataByCompanyId(
+      String companyId) async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(divisionInspectionTable);
+    var mapList = await db.query(
+      divisionInspectionTable,
+      where: '${DivisionInspectionEntity.mCompanyId}=?',
+      whereArgs: [companyId],
+    );
     List<DivisionInspectionModel> data =
         List<DivisionInspectionModel>.from(mapList.map((e) {
       return DivisionInspectionModel.fromJson(e);

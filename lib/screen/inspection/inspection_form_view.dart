@@ -190,7 +190,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     await getUserInspection();
     await getCategory();
     await getCompany();
-    await getDivision();
     await getLocation();
   }
 
@@ -251,7 +250,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   }
 
   Future<void> getDivision() async {
-    final data = await DatabaseDivisionInspection.selectData();
+    final data = await DatabaseDivisionInspection.selectDataByCompanyId(
+      selectedCompany!.id,
+    );
     listDivision = data;
     log('cek list dision : $listDivision');
     setState(() {});
@@ -588,6 +589,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                               onChanged: (value) {
                                 if (value != null) {
                                   selectedCompany = value;
+                                  selectedDivision = null;
+                                  getDivision();
                                   initialSelectedUser();
                                   log('selectedCompany : $selectedCompany');
                                   setState(() {});
@@ -597,7 +600,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           )
                         ],
                       ),
-                      if (selectedCategory?.name == 'Estate')
+                      if (selectedCategory?.name == 'Estate' &&
+                          selectedCompany != null &&
+                          listDivision.isNotEmpty)
                         Row(
                           children: [
                             Expanded(child: Text('Divisi :')),
@@ -640,70 +645,151 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                               ),
                             )
                           ],
-                        ),
-                      Row(
-                        children: [
-                          Expanded(child: Text('User Assign :')),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () async {
-                                final data = await _navigationService
-                                    .push(Routes.INSPECTION_USER);
-                                selectedUserInspection = data;
-                                setState(() {});
-                                log('selected user inspection : $selectedUserInspection');
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: themeNotifier.status == true ||
-                                                  MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                              ? Colors.white
-                                              : Colors.grey.shade400,
-                                          width: 0.5)),
-                                ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: selectedUserInspection != null
-                                            ? Text(selectedUserInspection!.name)
-                                            : Text(
-                                                'Pilih User',
-                                                style: TextStyle(
-                                                    color: themeNotifier
-                                                                    .status ==
-                                                                true ||
-                                                            MediaQuery.of(
-                                                                        context)
-                                                                    .platformBrightness ==
-                                                                Brightness.dark
-                                                        ? Colors.grey.shade500
-                                                        : Colors.black
-                                                            .withOpacity(0.35)),
-                                              ),
-                                      ),
-                                      Icon(Icons.arrow_drop_down,
-                                          color: themeNotifier.status == true ||
-                                                  MediaQuery.of(context)
-                                                          .platformBrightness ==
-                                                      Brightness.dark
-                                              ? Colors.grey.shade400
-                                              : Colors.grey.shade700)
-                                    ],
+                        )
+                      else if (selectedCategory?.name == 'Estate' &&
+                          selectedCompany != null)
+                        Text(
+                            'Company ${selectedCompany?.alias} Tidak Mempunyai Divisi'),
+                      if (selectedCategory?.name != 'Estate' &&
+                          selectedCompany != null)
+                        Row(
+                          children: [
+                            Expanded(child: Text('User Assign :')),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  final data = await _navigationService
+                                      .push(Routes.INSPECTION_USER);
+                                  selectedUserInspection = data;
+                                  setState(() {});
+                                  log('selected user inspection : $selectedUserInspection');
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: themeNotifier.status ==
+                                                        true ||
+                                                    MediaQuery.of(context)
+                                                            .platformBrightness ==
+                                                        Brightness.dark
+                                                ? Colors.white
+                                                : Colors.grey.shade400,
+                                            width: 0.5)),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: selectedUserInspection != null
+                                              ? Text(
+                                                  selectedUserInspection!.name)
+                                              : Text(
+                                                  'Pilih User',
+                                                  style: TextStyle(
+                                                      color: themeNotifier
+                                                                      .status ==
+                                                                  true ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .platformBrightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                          ? Colors.grey.shade500
+                                                          : Colors.black
+                                                              .withOpacity(
+                                                                  0.35)),
+                                                ),
+                                        ),
+                                        Icon(Icons.arrow_drop_down,
+                                            color: themeNotifier.status ==
+                                                        true ||
+                                                    MediaQuery.of(context)
+                                                            .platformBrightness ==
+                                                        Brightness.dark
+                                                ? Colors.grey.shade400
+                                                : Colors.grey.shade700)
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        )
+                      else if (selectedCompany != null &&
+                          selectedDivision != null)
+                        Row(
+                          children: [
+                            Expanded(child: Text('User Assign :')),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  final data = await _navigationService
+                                      .push(Routes.INSPECTION_USER);
+                                  selectedUserInspection = data;
+                                  setState(() {});
+                                  log('selected user inspection : $selectedUserInspection');
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: themeNotifier.status ==
+                                                        true ||
+                                                    MediaQuery.of(context)
+                                                            .platformBrightness ==
+                                                        Brightness.dark
+                                                ? Colors.white
+                                                : Colors.grey.shade400,
+                                            width: 0.5)),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: selectedUserInspection != null
+                                              ? Text(
+                                                  selectedUserInspection!.name)
+                                              : Text(
+                                                  'Pilih User',
+                                                  style: TextStyle(
+                                                      color: themeNotifier
+                                                                      .status ==
+                                                                  true ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .platformBrightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                          ? Colors.grey.shade500
+                                                          : Colors.black
+                                                              .withOpacity(
+                                                                  0.35)),
+                                                ),
+                                        ),
+                                        Icon(Icons.arrow_drop_down,
+                                            color: themeNotifier.status ==
+                                                        true ||
+                                                    MediaQuery.of(context)
+                                                            .platformBrightness ==
+                                                        Brightness.dark
+                                                ? Colors.grey.shade400
+                                                : Colors.grey.shade700)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       SizedBox(height: 8),
                       Text('Deskripsi :'),
                       SizedBox(height: 6),
