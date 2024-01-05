@@ -13,11 +13,9 @@ class DatabaseMemberInspection {
        ${MemberInspectionEntity.id} TEXT,
        ${MemberInspectionEntity.mTeamId} TEXT,
        ${MemberInspectionEntity.mUserId} TEXT,
-       ${MemberInspectionEntity.isActive} INTEGER,
-       ${MemberInspectionEntity.createdAt} TEXT,
-       ${MemberInspectionEntity.createdBy} TEXT,
-       ${MemberInspectionEntity.updatedAt} TEXT,
-       ${MemberInspectionEntity.updatedBy} TEXT)
+       ${MemberInspectionEntity.mCompanyId} TEXT,
+       ${MemberInspectionEntity.mDivisionId} TEXT,
+       ${MemberInspectionEntity.mEstateId} TEXT)
     ''');
   }
 

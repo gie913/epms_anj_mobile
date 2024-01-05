@@ -19,7 +19,6 @@ import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
-import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/history_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
@@ -61,7 +60,6 @@ class _InspectionAssignmentDetailViewState
 
   List<HistoryInspectionModel> listHistoryInspection = [];
 
-  List<UserInspectionModel> listUserInspection = const [];
   UserInspectionModel? selectedUserInspection;
 
   List<String> listActionOption = const [];
@@ -78,7 +76,6 @@ class _InspectionAssignmentDetailViewState
     descriptionController.text = widget.data.description;
     listHistoryInspection = widget.data.responses;
     getResponseId();
-    getUserInspection();
     getOptionAction();
     getUser();
     getLocation();
@@ -161,13 +158,6 @@ class _InspectionAssignmentDetailViewState
       gpsLocation = "${position.longitude}, ${position.latitude}";
     }
     log('cek inspection location : $gpsLocation');
-    setState(() {});
-  }
-
-  Future<void> getUserInspection() async {
-    final data = await DatabaseUserInspection.selectData();
-    listUserInspection = data;
-    log('cek list user inspection : $listUserInspection');
     setState(() {});
   }
 

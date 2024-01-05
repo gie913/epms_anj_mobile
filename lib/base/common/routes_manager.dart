@@ -291,8 +291,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => InspectionApprovalView(data: arguments),
       );
     case Routes.INSPECTION_USER:
+      final arguments =
+          settings.arguments != null ? settings.arguments as String : '';
       return MaterialPageRoute(
-        builder: (context) => InspectionUserView(),
+        builder: (context) => InspectionUserView(companyId: arguments),
       );
     case Routes.INSPECTION_LOCATION:
       final arguments =

@@ -12,7 +12,8 @@ class DatabaseUserInspection {
        ${UserInspectionEntity.id} TEXT,
        ${UserInspectionEntity.name} TEXT,
        ${UserInspectionEntity.employeeCode} TEXT,
-       ${UserInspectionEntity.employeeNumber} TEXT)
+       ${UserInspectionEntity.employeeNumber} TEXT,
+       ${UserInspectionEntity.mCompanyId} TEXT)
     ''');
   }
 
@@ -26,13 +27,26 @@ class DatabaseUserInspection {
     await batch.commit();
   }
 
-  static Future<List<UserInspectionModel>> selectData() async {
+  static Future<List<UserInspectionModel>> selectData(String companyId) async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(userInspectionTable);
-    var data = List<UserInspectionModel>.from(mapList.map((e) {
-      return UserInspectionModel.fromJson(e);
-    }));
-    return data;
+
+    if (companyId.isNotEmpty) {
+      var mapList = await db.query(
+        userInspectionTable,
+        where: '${UserInspectionEntity.mCompanyId}=?',
+        whereArgs: [companyId],
+      );
+      var data = List<UserInspectionModel>.from(mapList.map((e) {
+        return UserInspectionModel.fromJson(e);
+      }));
+      return data;
+    } else {
+      var mapList = await db.query(userInspectionTable);
+      var data = List<UserInspectionModel>.from(mapList.map((e) {
+        return UserInspectionModel.fromJson(e);
+      }));
+      return data;
+    }
   }
 
   static void deleteTable() async {
