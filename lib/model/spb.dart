@@ -143,4 +143,9 @@ class SPB {
     data['spb_is_closed'] = this.spbIsClosed;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'SPB(spb_id: $spbId, spb_estate_code: $spbEstateCode, spb_division_code: $spbDivisionCode)';
+  }
 }

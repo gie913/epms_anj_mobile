@@ -12,8 +12,8 @@ class SPBCardManager {
   ValueNotifier<dynamic> resultNFC = ValueNotifier(null);
 
   writeSPBCard(BuildContext context, SPB spb, List<SPBDetail> listSPBDetail,
-      onSuccess, onError) {
-    String spbTag = ValueService.spbCardTag(spb, listSPBDetail);
+      onSuccess, onError) async {
+    String spbTag = await ValueService.spbCardTag(spb, listSPBDetail);
     log('cek spbTag : $spbTag');
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       var ndef = Ndef.from(tag);

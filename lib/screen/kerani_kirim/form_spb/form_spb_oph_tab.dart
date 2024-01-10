@@ -1,5 +1,7 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/base/ui/theme_notifier.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/screen/kerani_kirim/form_spb/form_spb_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -63,59 +65,176 @@ class _FormSPBOPHTabState extends State<FormSPBOPHTab> {
                         child: ListView.builder(
                             itemCount: formSPB.listSPBDetail.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "${formSPB.listSPBDetail[index].ophId}",
-                                                    style: Style.textBold18,
+                              return Consumer<ThemeNotifier>(
+                                builder: (context, themeNotifier, _) {
+                                  return Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "${formSPB.listSPBDetail[index].ophId}",
+                                                        style: Style.textBold18
+                                                            .copyWith(
+                                                          color: ValueService.plasmaValidator(formSPB
+                                                                      .listSPBDetail[
+                                                                          index]
+                                                                      .ophEstateCode!) ==
+                                                                  1
+                                                              ? themeNotifier.status ==
+                                                                          true ||
+                                                                      MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                  ? Colors.white
+                                                                  : Colors.black
+                                                              : Colors
+                                                                  .orangeAccent,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 16),
+                                                      Text(
+                                                        "Janjang terkirim : ${formSPB.listSPBDetail[index].ophBunchesDelivered}",
+                                                        style: TextStyle(
+                                                          color: ValueService.plasmaValidator(formSPB
+                                                                      .listSPBDetail[
+                                                                          index]
+                                                                      .ophEstateCode!) ==
+                                                                  1
+                                                              ? themeNotifier.status ==
+                                                                          true ||
+                                                                      MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                  ? Colors.white
+                                                                  : Colors.black
+                                                              : Colors
+                                                                  .orangeAccent,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Brondolan (kg) : ${formSPB.listSPBDetail[index].ophLooseFruitDelivered}",
+                                                        style: TextStyle(
+                                                          color: ValueService.plasmaValidator(formSPB
+                                                                      .listSPBDetail[
+                                                                          index]
+                                                                      .ophEstateCode!) ==
+                                                                  1
+                                                              ? themeNotifier.status ==
+                                                                          true ||
+                                                                      MediaQuery.of(context)
+                                                                              .platformBrightness ==
+                                                                          Brightness
+                                                                              .dark
+                                                                  ? Colors.white
+                                                                  : Colors.black
+                                                              : Colors
+                                                                  .orangeAccent,
+                                                        ),
+                                                      )
+                                                    ]),
+                                                InkWell(
+                                                  onTap: () {
+                                                    formSPB.onDeleteOPH(index);
+                                                  },
+                                                  child: Card(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              12.0),
+                                                      child: Icon(Icons.delete,
+                                                          color: Colors.red),
+                                                    ),
                                                   ),
-                                                  SizedBox(height: 16),
-                                                  Text(
-                                                      "Janjang terkirim : ${formSPB.listSPBDetail[index].ophBunchesDelivered}"),
-                                                  Text(
-                                                      "Brondolan (kg) : ${formSPB.listSPBDetail[index].ophLooseFruitDelivered}")
-                                                ]),
-                                            InkWell(
-                                              onTap: () {
-                                                formSPB.onDeleteOPH(index);
-                                              },
-                                              child: Card(
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      12.0),
-                                                  child: Icon(Icons.delete,
-                                                      color: Colors.red),
+                                                ),
+                                              ]),
+                                          Divider(),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Blok: ${formSPB.listSPBDetail[index].ophBlockCode}",
+                                                style: TextStyle(
+                                                  color: ValueService.plasmaValidator(
+                                                              formSPB
+                                                                  .listSPBDetail[
+                                                                      index]
+                                                                  .ophEstateCode!) ==
+                                                          1
+                                                      ? themeNotifier.status ==
+                                                                  true ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .platformBrightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                          ? Colors.white
+                                                          : Colors.black
+                                                      : Colors.orangeAccent,
                                                 ),
                                               ),
-                                            ),
-                                          ]),
-                                      Divider(),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                              "Blok: ${formSPB.listSPBDetail[index].ophBlockCode}"),
-                                          Text(
-                                              "TPH: ${formSPB.listSPBDetail[index].ophTphCode}"),
-                                          Text(
-                                              "Kartu: ${formSPB.listSPBDetail[index].ophCardId}")
+                                              Text(
+                                                "TPH: ${formSPB.listSPBDetail[index].ophTphCode}",
+                                                style: TextStyle(
+                                                  color: ValueService.plasmaValidator(
+                                                              formSPB
+                                                                  .listSPBDetail[
+                                                                      index]
+                                                                  .ophEstateCode!) ==
+                                                          1
+                                                      ? themeNotifier.status ==
+                                                                  true ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .platformBrightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                          ? Colors.white
+                                                          : Colors.black
+                                                      : Colors.orangeAccent,
+                                                ),
+                                              ),
+                                              Text(
+                                                "Kartu: ${formSPB.listSPBDetail[index].ophCardId}",
+                                                style: TextStyle(
+                                                  color: ValueService.plasmaValidator(
+                                                              formSPB
+                                                                  .listSPBDetail[
+                                                                      index]
+                                                                  .ophEstateCode!) ==
+                                                          1
+                                                      ? themeNotifier.status ==
+                                                                  true ||
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .platformBrightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                          ? Colors.white
+                                                          : Colors.black
+                                                      : Colors.orangeAccent,
+                                                ),
+                                              )
+                                            ],
+                                          )
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
                             }),
                       ),

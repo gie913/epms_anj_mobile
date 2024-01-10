@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -12,6 +13,7 @@ import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/service/database_m_config.dart';
 import 'package:epms/database/service/database_spb.dart';
@@ -41,25 +43,159 @@ class KeraniKirimNotifier extends ChangeNotifier {
 
   DialogService get dialogService => _dialogService;
 
-  doUpload() async {
+  Future<void> doUpload() async {
     _dialogService.popDialog();
     List<SPB> _listSPB = await DatabaseSPB().selectSPB();
     List<SPBDetail> _listSPBDetail =
         await DatabaseSPBDetail().selectSPBDetail();
     List<SPBLoader> _listSPBLoader =
         await DatabaseSPBLoader().selectSPBLoader();
+
     if (_listSPB.isNotEmpty) {
       List<String> mapListSPB = [];
       List<String> mapListSPBDetail = [];
       List<String> mapListSPBLoader = [];
 
-      for (int i = 0; i < _listSPB.length; i++) {
-        String jsonString = jsonEncode(_listSPB[i]);
-        mapListSPB.add("\"$i\":$jsonString");
-      }
+      // typeTBS = 1 Inti, 2 Plasma, 3 Campuran
+      int typeTBS = ValueService.checkTypeTBS(_listSPBDetail);
+      List<String> mapListSPBInti = [];
+      List<String> mapListSPBPlasma = [];
+      List<String> mapListSPBDetailInti = [];
+      List<String> mapListSPBDetailPlasma = [];
+
+      List<SPBDetail> listSPBDetailInti = [];
+      List<SPBDetail> listSPBDetailPlasma = [];
+
+      String mostEstateCodeInti = '';
+      String mostEstateCodePlasma = '';
+
+      String mostDivisionCodeInti = '';
+      String mostDivisionCodePlasma = '';
+
       for (int i = 0; i < _listSPBDetail.length; i++) {
+        if (typeTBS == 3) {
+          if (ValueService.plasmaValidator(_listSPBDetail[i].ophEstateCode!) ==
+              1) {
+            SPBDetail spbDetailTemp = _listSPBDetail[i];
+            spbDetailTemp.spbId = '${spbDetailTemp.spbId}_2';
+            listSPBDetailInti.add(spbDetailTemp);
+            String jsonString = jsonEncode(spbDetailTemp);
+            mapListSPBDetailInti
+                .add("\"${mapListSPBDetailInti.length}\":$jsonString");
+          } else {
+            listSPBDetailPlasma.add(_listSPBDetail[i]);
+            String jsonString = jsonEncode(_listSPBDetail[i]);
+            mapListSPBDetailPlasma
+                .add("\"${mapListSPBDetailPlasma.length}\":$jsonString");
+          }
+        }
+
         String jsonString = jsonEncode(_listSPBDetail[i]);
         mapListSPBDetail.add("\"$i\":$jsonString");
+      }
+
+      // Check Most Estate & Division Inti
+      int maxCountEstateInti = 0;
+      for (int i = 0; i < listSPBDetailInti.length; i++) {
+        int countEstateInti = 0;
+        for (int j = 0; j < listSPBDetailInti.length; j++) {
+          if (listSPBDetailInti[i].ophEstateCode ==
+              listSPBDetailInti[j].ophEstateCode) {
+            countEstateInti++;
+          }
+        }
+
+        if (countEstateInti > maxCountEstateInti) {
+          maxCountEstateInti = countEstateInti;
+          mostEstateCodeInti = listSPBDetailInti[i].ophEstateCode!;
+        }
+      }
+
+      List<SPBDetail> listSPBDetailMostEstateInti = [];
+      for (int i = 0; i < listSPBDetailInti.length; i++) {
+        if (listSPBDetailInti[i].ophEstateCode! == mostEstateCodeInti) {
+          listSPBDetailMostEstateInti.add(listSPBDetailInti[i]);
+        }
+      }
+
+      int maxCountDivisionInti = 0;
+      for (int i = 0; i < listSPBDetailMostEstateInti.length; i++) {
+        int countDivisionInti = 0;
+        for (int j = 0; j < listSPBDetailMostEstateInti.length; j++) {
+          if (listSPBDetailMostEstateInti[i].ophDivisionCode ==
+              listSPBDetailMostEstateInti[j].ophDivisionCode) {
+            countDivisionInti++;
+          }
+        }
+
+        if (countDivisionInti > maxCountDivisionInti) {
+          maxCountDivisionInti = countDivisionInti;
+          mostDivisionCodeInti =
+              listSPBDetailMostEstateInti[i].ophDivisionCode!;
+        }
+      }
+
+      // Check Most Estate & Division Plasma
+      int maxCountEstatePlasma = 0;
+      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+        int countEstatePlasma = 0;
+        for (int j = 0; j < listSPBDetailPlasma.length; j++) {
+          if (listSPBDetailPlasma[i].ophEstateCode ==
+              listSPBDetailPlasma[j].ophEstateCode) {
+            countEstatePlasma++;
+          }
+        }
+
+        if (countEstatePlasma > maxCountEstatePlasma) {
+          maxCountEstatePlasma = countEstatePlasma;
+          mostEstateCodePlasma = listSPBDetailPlasma[i].ophEstateCode!;
+        }
+      }
+
+      List<SPBDetail> listSPBDetailMostEstatePlasma = [];
+      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+        if (listSPBDetailPlasma[i].ophEstateCode! == mostEstateCodePlasma) {
+          listSPBDetailMostEstatePlasma.add(listSPBDetailPlasma[i]);
+        }
+      }
+
+      int maxCountDivisionPlasma = 0;
+      for (int i = 0; i < listSPBDetailMostEstatePlasma.length; i++) {
+        int countDivisionPlasma = 0;
+        for (int j = 0; j < listSPBDetailMostEstatePlasma.length; j++) {
+          if (listSPBDetailMostEstatePlasma[i].ophDivisionCode ==
+              listSPBDetailMostEstatePlasma[j].ophDivisionCode) {
+            countDivisionPlasma++;
+          }
+        }
+
+        if (countDivisionPlasma > maxCountDivisionPlasma) {
+          maxCountDivisionPlasma = countDivisionPlasma;
+          mostDivisionCodePlasma =
+              listSPBDetailMostEstatePlasma[i].ophDivisionCode!;
+        }
+      }
+
+      for (int i = 0; i < _listSPB.length; i++) {
+        if (typeTBS == 3) {
+          SPB spbPlasmaTemp = _listSPB[i];
+          spbPlasmaTemp.spbEstateCode = mostEstateCodePlasma;
+          spbPlasmaTemp.spbDivisionCode = mostDivisionCodePlasma;
+          String jsonStringPlasma = jsonEncode(spbPlasmaTemp);
+          mapListSPBPlasma.add("\"0\":$jsonStringPlasma");
+          log('spbPlasmaTemp : $spbPlasmaTemp');
+
+          SPB spbIntiTemp = _listSPB[i];
+          spbIntiTemp.spbId = '${spbIntiTemp.spbId}_2';
+          spbIntiTemp.spbEstateCode = mostEstateCodeInti;
+          spbIntiTemp.spbDivisionCode = mostDivisionCodeInti;
+          String jsonString = jsonEncode(spbIntiTemp);
+          mapListSPBInti.add("\"0\":$jsonString");
+          log('spbIntiTemp : $spbIntiTemp');
+        }
+
+        String jsonString = jsonEncode(_listSPB[i]);
+        mapListSPB.add("\"$i\":$jsonString");
       }
 
       for (int i = 0; i < _listSPBLoader.length; i++) {
@@ -67,22 +203,97 @@ class KeraniKirimNotifier extends ChangeNotifier {
         mapListSPBLoader.add("\"$i\":$jsonString");
       }
 
-      var stringListSPB = mapListSPB.join(",");
-      var stringListSPBDetail = mapListSPBDetail.join(",");
-      var stringListSPBLoader = mapListSPBLoader.join(",");
+      log('mapListSPBInti : $mapListSPBInti');
+      // log('mapListSPBDetailInti : $mapListSPBDetailInti');
 
-      String listSPB = "{$stringListSPB}";
-      String listSPBDetail = "{$stringListSPBDetail}";
-      String listSPBLoader = "{$stringListSPBLoader}";
+      log('mapListSPBPlasma : $mapListSPBPlasma');
+      // log('mapListSPBDetailPlasma : $mapListSPBDetailPlasma');
 
       _dialogService.showLoadingDialog(title: "Mengupload SPB");
-      UploadSPBRepository().doPostUploadSPB(
+
+      if (typeTBS == 3) {
+        var stringListSPBLoader = mapListSPBLoader.join(",");
+        String listSPBLoader = "{$stringListSPBLoader}";
+
+        var stringListSPBInti = mapListSPBInti.join(",");
+        var stringListSPBDetailInti = mapListSPBDetailInti.join(",");
+        String listSPBInti = "{$stringListSPBInti}";
+        String listSPBDetailInti = "{$stringListSPBDetailInti}";
+
+        var stringListSPBPlasma = mapListSPBPlasma.join(",");
+        var stringListSPBDetailPlasma = mapListSPBDetailPlasma.join(",");
+        String listSPBPlasma = "{$stringListSPBPlasma}";
+        String listSPBDetailPlasma = "{$stringListSPBDetailPlasma}";
+
+        UploadSPBRepository().doPostUploadSPB(
+          _navigationService.navigatorKey.currentContext!,
+          listSPBPlasma,
+          listSPBDetailPlasma,
+          listSPBLoader,
+          (BuildContext context, response) async {
+            List<SPB> listSPB = await DatabaseSPB().selectSPB();
+            for (int i = 0; i < listSPB.length; i++) {
+              if (listSPB[i].spbPhoto != null) {
+                UploadImageOPHRepository().doUploadPhoto(
+                    context,
+                    listSPB[i].spbPhoto!,
+                    listSPB[i].spbId!,
+                    "spb",
+                    onSuccessUploadImage,
+                    onErrorUploadImage);
+              }
+            }
+            FlushBarManager.showFlushBarSuccess(
+                context, "Upload SPB", "Berhasil mengupload data");
+
+            UploadSPBRepository().doPostUploadSPB(
+              _navigationService.navigatorKey.currentContext!,
+              listSPBInti,
+              listSPBDetailInti,
+              listSPBLoader,
+              (BuildContext context, response) async {
+                List<SPB> listSPB = await DatabaseSPB().selectSPB();
+                for (int i = 0; i < listSPB.length; i++) {
+                  if (listSPB[i].spbPhoto != null) {
+                    UploadImageOPHRepository().doUploadPhoto(
+                        context,
+                        listSPB[i].spbPhoto!,
+                        '${listSPB[i].spbId!}_2',
+                        "spb",
+                        onSuccessUploadImage,
+                        onErrorUploadImage);
+                  }
+                }
+                DatabaseSPB().deleteSPB();
+                DatabaseSPBDetail().deleteSPBDetail();
+                DatabaseSPBLoader().deleteSPBLoader();
+                _dialogService.popDialog();
+                FlushBarManager.showFlushBarSuccess(
+                    context, "Upload SPB", "Berhasil mengupload data");
+              },
+              onErrorUploadSPB,
+            );
+          },
+          onErrorUploadSPB,
+        );
+      } else {
+        var stringListSPB = mapListSPB.join(",");
+        var stringListSPBDetail = mapListSPBDetail.join(",");
+        var stringListSPBLoader = mapListSPBLoader.join(",");
+
+        String listSPB = "{$stringListSPB}";
+        String listSPBDetail = "{$stringListSPBDetail}";
+        String listSPBLoader = "{$stringListSPBLoader}";
+
+        UploadSPBRepository().doPostUploadSPB(
           _navigationService.navigatorKey.currentContext!,
           listSPB,
           listSPBDetail,
           listSPBLoader,
           onSuccessUploadSPB,
-          onErrorUploadSPB);
+          onErrorUploadSPB,
+        );
+      }
     } else {
       FlushBarManager.showFlushBarWarning(
           _navigationService.navigatorKey.currentContext!,
@@ -97,6 +308,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
 
   onErrorUploadSPB(BuildContext context, String response) {
     _dialogService.popDialog();
+    log('Error upload SPB : $response');
     FlushBarManager.showFlushBarError(
         context, "Upload SPB", "Gagal mengupload data");
   }

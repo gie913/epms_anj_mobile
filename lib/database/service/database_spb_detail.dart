@@ -14,6 +14,8 @@ class DatabaseSPBDetail {
        ${SPBDetailEntity.ophId} TEXT,
        ${SPBDetailEntity.ophBunchesDelivered} INT,
        ${SPBDetailEntity.ophLooseFruitDelivered} INT,
+       ${SPBDetailEntity.ophEstateCode} TEXT,
+       ${SPBDetailEntity.ophDivisionCode} TEXT,
        ${SPBDetailEntity.ophBlockCode} TEXT,
        ${SPBDetailEntity.ophTphCode} TEXT,
        ${SPBDetailEntity.ophCardId} TEXT)
@@ -22,13 +24,13 @@ class DatabaseSPBDetail {
 
   Future<int> insertSPBDetail(SPBDetail object) async {
     Database db = await DatabaseHelper().database;
-    int saved = await db.insert(tSPBDetailSchemaListTable, object.toJson());
+    int saved = await db.insert(tSPBDetailSchemaListTable, object.toDatabase());
     return saved;
   }
 
   Future<int> updateSPBDetailByID(SPBDetail object) async {
     Database db = await DatabaseHelper().database;
-    int count = await db.update(tSPBDetailSchemaListTable, object.toJson(),
+    int count = await db.update(tSPBDetailSchemaListTable, object.toDatabase(),
         where: '${SPBDetailEntity.spbId}=? AND ${SPBDetailEntity.ophId}=?',
         whereArgs: [object.spbId, object.ophId]);
     return count;
