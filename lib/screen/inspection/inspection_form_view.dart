@@ -67,7 +67,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
 
   bool isLoading = false;
 
-  bool usingGps = false;
+  bool usingGps = true;
 
   bool isPreviewPhoto = false;
 
