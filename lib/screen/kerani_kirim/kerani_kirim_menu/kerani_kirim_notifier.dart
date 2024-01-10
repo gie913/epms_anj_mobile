@@ -93,6 +93,9 @@ class KeraniKirimNotifier extends ChangeNotifier {
         String jsonString = jsonEncode(_listSPBDetail[i]);
         mapListSPBDetail.add("\"$i\":$jsonString");
       }
+      log('cek mapListSPBDetail : $mapListSPBDetail');
+      log('cek mapListSPBDetailInti : $mapListSPBDetailInti');
+      log('cek listSPBDetailPlasma : $listSPBDetailPlasma');
 
       // Check Most Estate & Division Inti
       int maxCountEstateInti = 0;
@@ -225,6 +228,12 @@ class KeraniKirimNotifier extends ChangeNotifier {
         String listSPBPlasma = "{$stringListSPBPlasma}";
         String listSPBDetailPlasma = "{$stringListSPBDetailPlasma}";
 
+        log('cek stringListSPBInti : $stringListSPBInti');
+        log('cek listSPBInti : $listSPBInti');
+
+        log('cek stringListSPBPlasma : $stringListSPBPlasma');
+        log('cek listSPBPlasma : $listSPBPlasma');
+
         UploadSPBRepository().doPostUploadSPB(
           _navigationService.navigatorKey.currentContext!,
           listSPBPlasma,
@@ -284,6 +293,9 @@ class KeraniKirimNotifier extends ChangeNotifier {
         String listSPB = "{$stringListSPB}";
         String listSPBDetail = "{$stringListSPBDetail}";
         String listSPBLoader = "{$stringListSPBLoader}";
+
+        log('cek stringListSPB : $stringListSPB');
+        log('cek listSPB : $listSPB');
 
         UploadSPBRepository().doPostUploadSPB(
           _navigationService.navigatorKey.currentContext!,

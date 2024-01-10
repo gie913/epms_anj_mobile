@@ -54,7 +54,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   double latitude = 0;
   String gpsLocation = '';
 
-  List<UserInspectionModel> listUserInspection = const [];
   UserInspectionModel? selectedUserInspection;
 
   List<TeamInspectionModel> listCategory = const [];
@@ -187,7 +186,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     getInspectionId();
     getInspectionDateTime();
     await getUser();
-    await getUserInspection();
     await getCategory();
     await getCompany();
     await getLocation();
@@ -228,13 +226,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     setState(() {});
   }
 
-  Future<void> getUserInspection() async {
-    final data = await DatabaseUserInspection.selectData();
-    listUserInspection = data;
-    log('cek list user inspection : $listUserInspection');
-    setState(() {});
-  }
-
   Future<void> getCategory() async {
     final data = await DatabaseTeamInspection.selectData();
     listCategory = data;
@@ -254,15 +245,16 @@ class _InspectionFormViewState extends State<InspectionFormView> {
       selectedCompany!.id,
     );
     listDivision = data;
-    log('cek list dision : $listDivision');
+    log('cek list division : $listDivision');
     setState(() {});
   }
 
-  void initialSelectedUser() {
-    if (selectedCategory?.name != 'Estate') {
-      selectedUserInspection = listUserInspection.first;
-      setState(() {});
-    }
+  Future<void> getDefaultUserInspection() async {
+    final companyId = selectedCompany != null ? selectedCompany!.id : '';
+    final listUserInspection =
+        await DatabaseUserInspection.selectData(companyId);
+    selectedUserInspection = listUserInspection.first;
+    setState(() {});
   }
 
   Future<void> getDataInspection(BuildContext context) async {
@@ -591,7 +583,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                   selectedCompany = value;
                                   selectedDivision = null;
                                   getDivision();
-                                  initialSelectedUser();
+                                  // initialSelectedUser();
+                                  getDefaultUserInspection();
                                   log('selectedCompany : $selectedCompany');
                                   setState(() {});
                                 }
@@ -636,8 +629,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 onChanged: (value) {
                                   if (value != null) {
                                     selectedDivision = value;
-                                    selectedUserInspection =
-                                        listUserInspection.first;
                                     log('selected divisi : $selectedDivision');
                                     setState(() {});
                                   }
@@ -650,146 +641,310 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           selectedCompany != null)
                         Text(
                             'Company ${selectedCompany?.alias} Tidak Mempunyai Divisi'),
-                      if (selectedCategory?.name != 'Estate' &&
-                          selectedCompany != null)
-                        Row(
-                          children: [
-                            Expanded(child: Text('User Assign :')),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final data = await _navigationService
-                                      .push(Routes.INSPECTION_USER);
-                                  selectedUserInspection = data;
-                                  setState(() {});
-                                  log('selected user inspection : $selectedUserInspection');
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            color: themeNotifier.status ==
-                                                        true ||
-                                                    MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                ? Colors.white
-                                                : Colors.grey.shade400,
-                                            width: 0.5)),
-                                  ),
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: selectedUserInspection != null
-                                              ? Text(
-                                                  selectedUserInspection!.name)
-                                              : Text(
-                                                  'Pilih User',
-                                                  style: TextStyle(
-                                                      color: themeNotifier
-                                                                      .status ==
-                                                                  true ||
-                                                              MediaQuery.of(
-                                                                          context)
-                                                                      .platformBrightness ==
-                                                                  Brightness
-                                                                      .dark
-                                                          ? Colors.grey.shade500
-                                                          : Colors.black
-                                                              .withOpacity(
-                                                                  0.35)),
-                                                ),
+
+                      // User Assign
+                      if (selectedCompany != null)
+                        if (selectedCategory?.name == 'Estate')
+                          if (selectedDivision != null)
+                            Row(
+                              children: [
+                                Expanded(child: Text('User Assign :')),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final data =
+                                          await _navigationService.push(
+                                        Routes.INSPECTION_USER,
+                                        arguments: selectedCompany?.id,
+                                      );
+                                      if (data != null) {
+                                        selectedUserInspection = data;
+                                        setState(() {});
+                                        log('selected user inspection : $selectedUserInspection');
+                                      }
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                                color: themeNotifier.status ==
+                                                            true ||
+                                                        MediaQuery.of(context)
+                                                                .platformBrightness ==
+                                                            Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.grey.shade400,
+                                                width: 0.5)),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: selectedUserInspection !=
+                                                      null
+                                                  ? Text(selectedUserInspection!
+                                                      .name)
+                                                  : Text(
+                                                      'Pilih User',
+                                                      style: TextStyle(
+                                                          color: themeNotifier.status ==
+                                                                      true ||
+                                                                  MediaQuery.of(
+                                                                              context)
+                                                                          .platformBrightness ==
+                                                                      Brightness
+                                                                          .dark
+                                                              ? Colors
+                                                                  .grey.shade500
+                                                              : Colors.black
+                                                                  .withOpacity(
+                                                                      0.35)),
+                                                    ),
+                                            ),
+                                            Icon(Icons.arrow_drop_down,
+                                                color: themeNotifier.status ==
+                                                            true ||
+                                                        MediaQuery.of(context)
+                                                                .platformBrightness ==
+                                                            Brightness.dark
+                                                    ? Colors.grey.shade400
+                                                    : Colors.grey.shade700)
+                                          ],
                                         ),
-                                        Icon(Icons.arrow_drop_down,
-                                            color: themeNotifier.status ==
-                                                        true ||
-                                                    MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                ? Colors.grey.shade400
-                                                : Colors.grey.shade700)
-                                      ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            const SizedBox()
+                        else
+                          Row(
+                            children: [
+                              Expanded(child: Text('User Assign :')),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () async {
+                                    final data = await _navigationService.push(
+                                      Routes.INSPECTION_USER,
+                                      arguments: selectedCompany?.id,
+                                    );
+                                    if (data != null) {
+                                      selectedUserInspection = data;
+                                      setState(() {});
+                                      log('selected user inspection : $selectedUserInspection');
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: themeNotifier.status ==
+                                                          true ||
+                                                      MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                  ? Colors.white
+                                                  : Colors.grey.shade400,
+                                              width: 0.5)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child:
+                                                selectedUserInspection != null
+                                                    ? Text(
+                                                        selectedUserInspection!
+                                                            .name)
+                                                    : Text(
+                                                        'Pilih User',
+                                                        style: TextStyle(
+                                                            color: themeNotifier
+                                                                            .status ==
+                                                                        true ||
+                                                                    MediaQuery.of(context)
+                                                                            .platformBrightness ==
+                                                                        Brightness
+                                                                            .dark
+                                                                ? Colors.grey
+                                                                    .shade500
+                                                                : Colors.black
+                                                                    .withOpacity(
+                                                                        0.35)),
+                                                      ),
+                                          ),
+                                          Icon(Icons.arrow_drop_down,
+                                              color: themeNotifier.status ==
+                                                          true ||
+                                                      MediaQuery.of(context)
+                                                              .platformBrightness ==
+                                                          Brightness.dark
+                                                  ? Colors.grey.shade400
+                                                  : Colors.grey.shade700)
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        )
-                      else if (selectedCompany != null &&
-                          selectedDivision != null)
-                        Row(
-                          children: [
-                            Expanded(child: Text('User Assign :')),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final data = await _navigationService
-                                      .push(Routes.INSPECTION_USER);
-                                  selectedUserInspection = data;
-                                  setState(() {});
-                                  log('selected user inspection : $selectedUserInspection');
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            color: themeNotifier.status ==
-                                                        true ||
-                                                    MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                ? Colors.white
-                                                : Colors.grey.shade400,
-                                            width: 0.5)),
-                                  ),
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: selectedUserInspection != null
-                                              ? Text(
-                                                  selectedUserInspection!.name)
-                                              : Text(
-                                                  'Pilih User',
-                                                  style: TextStyle(
-                                                      color: themeNotifier
-                                                                      .status ==
-                                                                  true ||
-                                                              MediaQuery.of(
-                                                                          context)
-                                                                      .platformBrightness ==
-                                                                  Brightness
-                                                                      .dark
-                                                          ? Colors.grey.shade500
-                                                          : Colors.black
-                                                              .withOpacity(
-                                                                  0.35)),
-                                                ),
-                                        ),
-                                        Icon(Icons.arrow_drop_down,
-                                            color: themeNotifier.status ==
-                                                        true ||
-                                                    MediaQuery.of(context)
-                                                            .platformBrightness ==
-                                                        Brightness.dark
-                                                ? Colors.grey.shade400
-                                                : Colors.grey.shade700)
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          )
+                      else
+                        const SizedBox(),
+
+                      // User Assign Old
+                      // if (selectedCategory?.name != 'Estate' &&
+                      //     selectedCompany != null)
+                      //   Row(
+                      //     children: [
+                      //       Expanded(child: Text('User Assign :')),
+                      //       SizedBox(width: 12),
+                      //       Expanded(
+                      //         child: InkWell(
+                      //           onTap: () async {
+                      //             final data = await _navigationService.push(
+                      //               Routes.INSPECTION_USER,
+                      //               arguments: selectedCompany?.id,
+                      //             );
+                      //             if (data != null) {
+                      //               selectedUserInspection = data;
+                      //               setState(() {});
+                      //               log('selected user inspection : $selectedUserInspection');
+                      //             }
+                      //           },
+                      //           child: Container(
+                      //             decoration: BoxDecoration(
+                      //               border: Border(
+                      //                   bottom: BorderSide(
+                      //                       color: themeNotifier.status ==
+                      //                                   true ||
+                      //                               MediaQuery.of(context)
+                      //                                       .platformBrightness ==
+                      //                                   Brightness.dark
+                      //                           ? Colors.white
+                      //                           : Colors.grey.shade400,
+                      //                       width: 0.5)),
+                      //             ),
+                      //             child: Padding(
+                      //               padding:
+                      //                   const EdgeInsets.symmetric(vertical: 4),
+                      //               child: Row(
+                      //                 children: [
+                      //                   Expanded(
+                      //                     child: selectedUserInspection != null
+                      //                         ? Text(
+                      //                             selectedUserInspection!.name)
+                      //                         : Text(
+                      //                             'Pilih User',
+                      //                             style: TextStyle(
+                      //                                 color: themeNotifier
+                      //                                                 .status ==
+                      //                                             true ||
+                      //                                         MediaQuery.of(
+                      //                                                     context)
+                      //                                                 .platformBrightness ==
+                      //                                             Brightness
+                      //                                                 .dark
+                      //                                     ? Colors.grey.shade500
+                      //                                     : Colors.black
+                      //                                         .withOpacity(
+                      //                                             0.35)),
+                      //                           ),
+                      //                   ),
+                      //                   Icon(Icons.arrow_drop_down,
+                      //                       color: themeNotifier.status ==
+                      //                                   true ||
+                      //                               MediaQuery.of(context)
+                      //                                       .platformBrightness ==
+                      //                                   Brightness.dark
+                      //                           ? Colors.grey.shade400
+                      //                           : Colors.grey.shade700)
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   )
+                      // else if (selectedCompany != null &&
+                      //     selectedDivision != null)
+                      //   Row(
+                      //     children: [
+                      //       Expanded(child: Text('User Assign :')),
+                      //       SizedBox(width: 12),
+                      //       Expanded(
+                      //         child: InkWell(
+                      //           onTap: () async {
+                      //             final data = await _navigationService
+                      //                 .push(Routes.INSPECTION_USER);
+                      //             selectedUserInspection = data;
+                      //             setState(() {});
+                      //             log('selected user inspection : $selectedUserInspection');
+                      //           },
+                      //           child: Container(
+                      //             decoration: BoxDecoration(
+                      //               border: Border(
+                      //                   bottom: BorderSide(
+                      //                       color: themeNotifier.status ==
+                      //                                   true ||
+                      //                               MediaQuery.of(context)
+                      //                                       .platformBrightness ==
+                      //                                   Brightness.dark
+                      //                           ? Colors.white
+                      //                           : Colors.grey.shade400,
+                      //                       width: 0.5)),
+                      //             ),
+                      //             child: Padding(
+                      //               padding:
+                      //                   const EdgeInsets.symmetric(vertical: 4),
+                      //               child: Row(
+                      //                 children: [
+                      //                   Expanded(
+                      //                     child: selectedUserInspection != null
+                      //                         ? Text(
+                      //                             selectedUserInspection!.name)
+                      //                         : Text(
+                      //                             'Pilih User',
+                      //                             style: TextStyle(
+                      //                                 color: themeNotifier
+                      //                                                 .status ==
+                      //                                             true ||
+                      //                                         MediaQuery.of(
+                      //                                                     context)
+                      //                                                 .platformBrightness ==
+                      //                                             Brightness
+                      //                                                 .dark
+                      //                                     ? Colors.grey.shade500
+                      //                                     : Colors.black
+                      //                                         .withOpacity(
+                      //                                             0.35)),
+                      //                           ),
+                      //                   ),
+                      //                   Icon(Icons.arrow_drop_down,
+                      //                       color: themeNotifier.status ==
+                      //                                   true ||
+                      //                               MediaQuery.of(context)
+                      //                                       .platformBrightness ==
+                      //                                   Brightness.dark
+                      //                           ? Colors.grey.shade400
+                      //                           : Colors.grey.shade700)
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
                       SizedBox(height: 8),
                       Text('Deskripsi :'),
                       SizedBox(height: 6),

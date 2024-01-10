@@ -98,91 +98,94 @@ class ValueService {
       typeTBS = 2;
     }
 
-    // Check Most Estate & Division Inti
-    int maxCountEstateInti = 0;
-    for (int i = 0; i < listSPBDetailInti.length; i++) {
-      int countEstateInti = 0;
-      for (int j = 0; j < listSPBDetailInti.length; j++) {
-        if (listSPBDetailInti[i].ophEstateCode ==
-            listSPBDetailInti[j].ophEstateCode) {
-          countEstateInti++;
+    if (typeTBS == 3) {
+// Check Most Estate & Division Inti
+      int maxCountEstateInti = 0;
+      for (int i = 0; i < listSPBDetailInti.length; i++) {
+        int countEstateInti = 0;
+        for (int j = 0; j < listSPBDetailInti.length; j++) {
+          if (listSPBDetailInti[i].ophEstateCode ==
+              listSPBDetailInti[j].ophEstateCode) {
+            countEstateInti++;
+          }
+        }
+
+        if (countEstateInti > maxCountEstateInti) {
+          maxCountEstateInti = countEstateInti;
+          mostEstateCodeInti = listSPBDetailInti[i].ophEstateCode!;
         }
       }
 
-      if (countEstateInti > maxCountEstateInti) {
-        maxCountEstateInti = countEstateInti;
-        mostEstateCodeInti = listSPBDetailInti[i].ophEstateCode!;
-      }
-    }
-
-    List<SPBDetail> listSPBDetailMostEstateInti = [];
-    for (int i = 0; i < listSPBDetailInti.length; i++) {
-      if (listSPBDetailInti[i].ophEstateCode! == mostEstateCodeInti) {
-        listSPBDetailMostEstateInti.add(listSPBDetailInti[i]);
-      }
-    }
-
-    int maxCountDivisionInti = 0;
-    for (int i = 0; i < listSPBDetailMostEstateInti.length; i++) {
-      int countDivisionInti = 0;
-      for (int j = 0; j < listSPBDetailMostEstateInti.length; j++) {
-        if (listSPBDetailMostEstateInti[i].ophDivisionCode ==
-            listSPBDetailMostEstateInti[j].ophDivisionCode) {
-          countDivisionInti++;
+      List<SPBDetail> listSPBDetailMostEstateInti = [];
+      for (int i = 0; i < listSPBDetailInti.length; i++) {
+        if (listSPBDetailInti[i].ophEstateCode! == mostEstateCodeInti) {
+          listSPBDetailMostEstateInti.add(listSPBDetailInti[i]);
         }
       }
 
-      if (countDivisionInti > maxCountDivisionInti) {
-        maxCountDivisionInti = countDivisionInti;
-        mostDivisionCodeInti = listSPBDetailMostEstateInti[i].ophDivisionCode!;
-      }
-    }
+      int maxCountDivisionInti = 0;
+      for (int i = 0; i < listSPBDetailMostEstateInti.length; i++) {
+        int countDivisionInti = 0;
+        for (int j = 0; j < listSPBDetailMostEstateInti.length; j++) {
+          if (listSPBDetailMostEstateInti[i].ophDivisionCode ==
+              listSPBDetailMostEstateInti[j].ophDivisionCode) {
+            countDivisionInti++;
+          }
+        }
 
-    // Check Most Estate & Division Plasma
-    int maxCountEstatePlasma = 0;
-    for (int i = 0; i < listSPBDetailPlasma.length; i++) {
-      int countEstatePlasma = 0;
-      for (int j = 0; j < listSPBDetailPlasma.length; j++) {
-        if (listSPBDetailPlasma[i].ophEstateCode ==
-            listSPBDetailPlasma[j].ophEstateCode) {
-          countEstatePlasma++;
+        if (countDivisionInti > maxCountDivisionInti) {
+          maxCountDivisionInti = countDivisionInti;
+          mostDivisionCodeInti =
+              listSPBDetailMostEstateInti[i].ophDivisionCode!;
         }
       }
 
-      if (countEstatePlasma > maxCountEstatePlasma) {
-        maxCountEstatePlasma = countEstatePlasma;
-        mostEstateCodePlasma = listSPBDetailPlasma[i].ophEstateCode!;
-      }
-    }
+      // Check Most Estate & Division Plasma
+      int maxCountEstatePlasma = 0;
+      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+        int countEstatePlasma = 0;
+        for (int j = 0; j < listSPBDetailPlasma.length; j++) {
+          if (listSPBDetailPlasma[i].ophEstateCode ==
+              listSPBDetailPlasma[j].ophEstateCode) {
+            countEstatePlasma++;
+          }
+        }
 
-    List<SPBDetail> listSPBDetailMostEstatePlasma = [];
-    for (int i = 0; i < listSPBDetailPlasma.length; i++) {
-      if (listSPBDetailPlasma[i].ophEstateCode! == mostEstateCodePlasma) {
-        listSPBDetailMostEstatePlasma.add(listSPBDetailPlasma[i]);
-      }
-    }
-
-    int maxCountDivisionPlasma = 0;
-    for (int i = 0; i < listSPBDetailMostEstatePlasma.length; i++) {
-      int countDivisionPlasma = 0;
-      for (int j = 0; j < listSPBDetailMostEstatePlasma.length; j++) {
-        if (listSPBDetailMostEstatePlasma[i].ophDivisionCode ==
-            listSPBDetailMostEstatePlasma[j].ophDivisionCode) {
-          countDivisionPlasma++;
+        if (countEstatePlasma > maxCountEstatePlasma) {
+          maxCountEstatePlasma = countEstatePlasma;
+          mostEstateCodePlasma = listSPBDetailPlasma[i].ophEstateCode!;
         }
       }
 
-      if (countDivisionPlasma > maxCountDivisionPlasma) {
-        maxCountDivisionPlasma = countDivisionPlasma;
-        mostDivisionCodePlasma =
-            listSPBDetailMostEstatePlasma[i].ophDivisionCode!;
+      List<SPBDetail> listSPBDetailMostEstatePlasma = [];
+      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+        if (listSPBDetailPlasma[i].ophEstateCode! == mostEstateCodePlasma) {
+          listSPBDetailMostEstatePlasma.add(listSPBDetailPlasma[i]);
+        }
       }
-    }
 
-    mEstateSchemaInti = await DatabaseMEstateSchema()
-        .selectMEstateSchemaByEstateCode(mostEstateCodeInti);
-    mEstateSchemaPlasma = await DatabaseMEstateSchema()
-        .selectMEstateSchemaByEstateCode(mostEstateCodePlasma);
+      int maxCountDivisionPlasma = 0;
+      for (int i = 0; i < listSPBDetailMostEstatePlasma.length; i++) {
+        int countDivisionPlasma = 0;
+        for (int j = 0; j < listSPBDetailMostEstatePlasma.length; j++) {
+          if (listSPBDetailMostEstatePlasma[i].ophDivisionCode ==
+              listSPBDetailMostEstatePlasma[j].ophDivisionCode) {
+            countDivisionPlasma++;
+          }
+        }
+
+        if (countDivisionPlasma > maxCountDivisionPlasma) {
+          maxCountDivisionPlasma = countDivisionPlasma;
+          mostDivisionCodePlasma =
+              listSPBDetailMostEstatePlasma[i].ophDivisionCode!;
+        }
+      }
+
+      mEstateSchemaInti = await DatabaseMEstateSchema()
+          .selectMEstateSchemaByEstateCode(mostEstateCodeInti);
+      mEstateSchemaPlasma = await DatabaseMEstateSchema()
+          .selectMEstateSchemaByEstateCode(mostEstateCodePlasma);
+    }
 
 /*remark bug
     for (int i = 0; i < list.length; i++) {
@@ -296,12 +299,12 @@ class ValueService {
           "${spb.spbEstimateTonnage}," +
           "${spb.createdDate}," +
           "${spb.createdTime}," +
-          "${mEstateSchemaPlasma.estateVendorCode}," +
+          "${mEstateSchemaPlasma?.estateVendorCode}," +
           "$typeTBS," +
-          "${mEstateSchemaPlasma.estateVendorCode!.substring(4)}[$blockListPlasma]," +
-          "${mEstateSchemaInti.estateVendorCode}," +
+          "${mEstateSchemaPlasma?.estateVendorCode!.substring(4)}[$blockListPlasma]," +
+          "${mEstateSchemaInti?.estateVendorCode}," +
           "$mostDivisionCodeInti," +
-          "${mEstateSchemaInti.estateVendorCode!.substring(4)}[$blockListInti]";
+          "${mEstateSchemaInti?.estateVendorCode!.substring(4)}[$blockListInti]";
       spbTag = spbTagCampuranNew;
     } else {
       int isPlasma = plasmaValidator(spb.spbEstateCode!);

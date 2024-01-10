@@ -12,7 +12,9 @@ import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:provider/provider.dart';
 
 class InspectionUserView extends StatefulWidget {
-  const InspectionUserView({super.key});
+  const InspectionUserView({super.key, this.companyId = ''});
+
+  final String companyId;
 
   @override
   State<InspectionUserView> createState() => _InspectionUserViewState();
@@ -30,7 +32,7 @@ class _InspectionUserViewState extends State<InspectionUserView> {
 
   Future<void> getUserInspection() async {
     isLoading = true;
-    final data = await DatabaseUserInspection.selectData();
+    final data = await DatabaseUserInspection.selectData(widget.companyId);
     listUserInspection = data;
     listSearchUserInspection = listUserInspection;
     isLoading = false;
@@ -135,7 +137,7 @@ class _InspectionUserViewState extends State<InspectionUserView> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(user.name),
-                                                Text(user.employeeNumber),
+                                                Text(user.code),
                                               ],
                                             ),
                                           ),
