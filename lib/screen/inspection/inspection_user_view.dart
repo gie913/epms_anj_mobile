@@ -137,7 +137,7 @@ class _InspectionUserViewState extends State<InspectionUserView> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(user.name),
-                                                Text(user.employeeNumber),
+                                                Text(user.code),
                                               ],
                                             ),
                                           ),

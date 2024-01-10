@@ -230,7 +230,7 @@ class _HomeInspectionScreenState extends State<HomeInspectionScreen> {
                                 child: Column(
                                   children: [
                                     Text(
-                                        "${homeInspectionNotifier.dataUser.employeeNumber}",
+                                        "${homeInspectionNotifier.dataUser.code}",
                                         style: Style.textBold14),
                                     Text(
                                         "${homeInspectionNotifier.dataUser.name}",

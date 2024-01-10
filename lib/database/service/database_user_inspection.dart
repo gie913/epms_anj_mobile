@@ -10,6 +10,7 @@ class DatabaseUserInspection {
     await db.execute('''
       CREATE TABLE $userInspectionTable(
        ${UserInspectionEntity.id} TEXT,
+       ${UserInspectionEntity.code} TEXT,
        ${UserInspectionEntity.name} TEXT,
        ${UserInspectionEntity.employeeCode} TEXT,
        ${UserInspectionEntity.employeeNumber} TEXT,
