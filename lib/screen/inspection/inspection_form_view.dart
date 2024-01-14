@@ -508,9 +508,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                       Row(
                         children: [
-                          Expanded(child: Text('Kategori :')),
+                          Expanded(
+                            flex: 2,
+                            child: Text('Kategori :'),
+                          ),
                           SizedBox(width: 12),
                           Expanded(
+                            flex: 4,
                             child: DropdownButton(
                               isExpanded: true,
                               hint: Text(
@@ -551,9 +555,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                       Row(
                         children: [
-                          Expanded(child: Text('Company :')),
+                          Expanded(
+                            flex: 2,
+                            child: Text('Company :'),
+                          ),
                           SizedBox(width: 12),
                           Expanded(
+                            flex: 4,
                             child: DropdownButton(
                               isExpanded: true,
                               hint: Text(
@@ -598,9 +606,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           listDivision.isNotEmpty)
                         Row(
                           children: [
-                            Expanded(child: Text('Divisi :')),
+                            Expanded(
+                              flex: 2,
+                              child: Text('Divisi :'),
+                            ),
                             SizedBox(width: 12),
                             Expanded(
+                              flex: 4,
                               child: DropdownButton(
                                 isExpanded: true,
                                 hint: Text(
@@ -648,9 +660,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           if (selectedDivision != null)
                             Row(
                               children: [
-                                Expanded(child: Text('User Assign :')),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text('User Assign :'),
+                                ),
                                 SizedBox(width: 12),
                                 Expanded(
+                                  flex: 4,
                                   child: InkWell(
                                     onTap: () async {
                                       final data =
@@ -725,9 +741,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         else
                           Row(
                             children: [
-                              Expanded(child: Text('User Assign :')),
+                              Expanded(
+                                flex: 2,
+                                child: Text('User Assign :'),
+                              ),
                               SizedBox(width: 12),
                               Expanded(
+                                flex: 4,
                                 child: InkWell(
                                   onTap: () async {
                                     final data = await _navigationService.push(
