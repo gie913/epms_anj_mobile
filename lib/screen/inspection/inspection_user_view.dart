@@ -32,7 +32,7 @@ class _InspectionUserViewState extends State<InspectionUserView> {
 
   Future<void> getUserInspection() async {
     isLoading = true;
-    final data = await DatabaseUserInspection.selectData(widget.companyId);
+    final data = await DatabaseUserInspection.selectData('', widget.companyId);
     listUserInspection = data;
     listSearchUserInspection = listUserInspection;
     isLoading = false;
@@ -137,7 +137,10 @@ class _InspectionUserViewState extends State<InspectionUserView> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(user.name),
-                                                Text(user.code),
+                                                Divider(
+                                                    height: 1,
+                                                    color: Colors.grey),
+                                                Text(user.mOccupationName),
                                               ],
                                             ),
                                           ),
@@ -145,7 +148,7 @@ class _InspectionUserViewState extends State<InspectionUserView> {
                                           IconButton(
                                             icon: const Icon(
                                               Icons.add,
-                                              color: Colors.white,
+                                              color: Colors.orange,
                                             ),
                                             onPressed: () => selectUser(user),
                                           ),

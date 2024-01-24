@@ -57,6 +57,7 @@ class LoginRepository extends APIConfiguration {
     BuildContext context,
     String username,
     String password,
+    bool isEpmsLoginSuccess,
     Function(BuildContext context, LoginInspectionData data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
@@ -64,6 +65,7 @@ class LoginRepository extends APIConfiguration {
       var map = new Map<String, dynamic>();
       map['username'] = username;
       map['password'] = password;
+      map['success_epms_login'] = '$isEpmsLoginSuccess';
 
       var urlInspection =
           'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signin';

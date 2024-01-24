@@ -1,11 +1,12 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/dialog_services.dart';
-import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_attachment_inspection.dart';
+import 'package:epms/model/attachment_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
@@ -27,8 +28,16 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
 
   bool isPreviewPhoto = false;
 
+  List<AttachmentInspectionModel> listInspectionAttachment =
+      <AttachmentInspectionModel>[];
+  Map<String, List<AttachmentInspectionModel>> listResponseAttachment =
+      <String, List<AttachmentInspectionModel>>{};
+
+  bool isLoading = false;
+
   @override
   void initState() {
+    initData();
     descriptionController.text = widget.data.description;
     super.initState();
   }
@@ -37,6 +46,40 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
   void dispose() {
     descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> initData() async {
+    isLoading = true;
+
+    for (final attachment in widget.data.attachments) {
+      final indexAttachment = widget.data.attachments.indexOf(attachment);
+      final code = '${widget.data.code}$indexAttachment';
+
+      final inspectionAttachment =
+          await DatabaseAttachmentInspection.selectData(code);
+      listInspectionAttachment.add(inspectionAttachment);
+    }
+
+    for (final response in widget.data.responses) {
+      final listResponseAttachmentTemp = <AttachmentInspectionModel>[];
+
+      for (final attachment in response.attachments) {
+        final indexAttachment = response.attachments.indexOf(attachment);
+        final code = '${response.code}$indexAttachment';
+
+        final inspectionAttachment =
+            await DatabaseAttachmentInspection.selectData(code);
+        listResponseAttachmentTemp.add(inspectionAttachment);
+      }
+
+      listResponseAttachment[response.code] = listResponseAttachmentTemp;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    isLoading = false;
+
+    setState(() {});
   }
 
   @override
@@ -59,213 +102,285 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
         },
         child: Scaffold(
           appBar: AppBar(title: Text("Inspection Detail")),
-          body: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.data.code),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Lokasi Buat :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(
-                              '${widget.data.gpsLng},${widget.data.gpsLat}',
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Tanggal :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(widget.data.trTime,
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Kategori :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(widget.data.mTeamName,
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Company :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(widget.data.mCompanyAlias,
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  if (widget.data.mDivisionEstateCode.isNotEmpty ||
-                      widget.data.mDivisionName.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Row(
-                        children: [
-                          Text('Divisi :'),
-                          SizedBox(width: 12),
-                          Expanded(
-                              child: Text(
-                                  'Estate ${widget.data.mDivisionEstateCode} | ${widget.data.mDivisionName}',
-                                  textAlign: TextAlign.end))
-                        ],
-                      ),
-                    ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('User Assign :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(widget.data.assignee,
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text('Status :'),
-                      SizedBox(width: 12),
-                      Expanded(
-                          child: Text(
-                              ConvertHelper.titleCase(widget.data.status
-                                  .replaceAll(RegExp(r'_'), ' ')),
-                              textAlign: TextAlign.end))
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Foto Inspection :'),
-                      SizedBox(height: 6),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.width / 4,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: widget.data.attachments.length,
-                          itemBuilder: (context, index) {
-                            final image = widget.data.attachments[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    isPreviewPhoto = true;
-                                  });
-                                  _dialogService.showDialogPreviewPhoto(
-                                    imagePath: image,
-                                    onTapClose: () {
-                                      setState(() {
-                                        isPreviewPhoto = false;
-                                      });
-                                      _dialogService.popDialog();
-                                    },
+          body: isLoading
+              ? const SizedBox()
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.data.code),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Dibuat Oleh :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(widget.data.submittedByName,
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Lokasi Buat :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(
+                                    '${widget.data.gpsLng},${widget.data.gpsLat}',
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Tanggal :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(widget.data.trTime,
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Kategori :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(widget.data.mTeamName,
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Company :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(widget.data.mCompanyAlias,
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        if (widget.data.mDivisionEstateCode.isNotEmpty ||
+                            widget.data.mDivisionName.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text('Estate :'),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                        child: Text(
+                                            'Estate ${widget.data.mDivisionEstateCode}',
+                                            textAlign: TextAlign.end))
+                                  ],
+                                ),
+                                SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Text('Divisi :'),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                        child: Text(
+                                            '${widget.data.mDivisionName}',
+                                            textAlign: TextAlign.end))
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('User Assign :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(widget.data.assignee,
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text('Status :'),
+                            SizedBox(width: 12),
+                            Expanded(
+                                child: Text(
+                                    ConvertHelper.titleCase(widget.data.status
+                                        .replaceAll(RegExp(r'_'), ' ')),
+                                    textAlign: TextAlign.end))
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Foto Inspection :'),
+                            SizedBox(height: 6),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width / 4,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: listInspectionAttachment.length,
+                                itemBuilder: (context, index) {
+                                  final image = base64Decode(
+                                    listInspectionAttachment[index].image,
                                   );
-                                },
-                                child: (image.toString().contains('http'))
-                                    ? FutureBuilder(
-                                        future: InspectionService
-                                            .isInternetConnectionExist(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.data == true) {
-                                            return Image.network(
-                                              image,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  4,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  4,
-                                              fit: BoxFit.cover,
-                                            );
-                                          } else {
-                                            return Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  4,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  4,
-                                              color: Colors.orange,
-                                            );
-                                          }
-                                        },
-                                      )
-                                    : Image.file(
-                                        File(image),
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          isPreviewPhoto = true;
+                                        });
+                                        _dialogService
+                                            .showDialogPreviewPhotoOffline(
+                                          image: image,
+                                          onTapClose: () {
+                                            setState(() {
+                                              isPreviewPhoto = false;
+                                            });
+                                            _dialogService.popDialog();
+                                          },
+                                        );
+                                      },
+                                      child: Image.memory(
+                                        image,
                                         width:
                                             MediaQuery.of(context).size.width /
                                                 4,
                                         height:
-                                            MediaQuery.of(context).size.width /
+                                            MediaQuery.of(context).size.height /
                                                 4,
                                         fit: BoxFit.cover,
                                       ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                    ],
-                  ),
-                  Text('Deskripsi :'),
-                  SizedBox(height: 6),
-                  InputPrimary(
-                    controller: descriptionController,
-                    maxLines: 10,
-                    validator: (value) => null,
-                    readOnly: true,
-                  ),
-                  Text('Riwayat Tindakan :'),
-                  if (widget.data.responses.isNotEmpty)
-                    ...widget.data.responses
-                        .map(
-                          (item) => CardHistoryInspection(
-                            data: item,
-                            onPreviewPhoto: (value) {
-                              setState(() {
-                                isPreviewPhoto = true;
-                              });
-                              _dialogService.showDialogPreviewPhoto(
-                                imagePath: value,
-                                onTapClose: () {
-                                  setState(() {
-                                    isPreviewPhoto = false;
-                                  });
-                                  _dialogService.popDialog();
+                                    ),
+                                  );
                                 },
-                              );
-                            },
+                              ),
+                            ),
+                            // SizedBox(
+                            //   height: MediaQuery.of(context).size.width / 4,
+                            //   child: ListView.builder(
+                            //     scrollDirection: Axis.horizontal,
+                            //     itemCount: widget.data.attachments.length,
+                            //     itemBuilder: (context, index) {
+                            //       final image = widget.data.attachments[index];
+                            //       return Padding(
+                            //         padding: const EdgeInsets.only(right: 8),
+                            //         child: InkWell(
+                            //           onTap: () {
+                            //             setState(() {
+                            //               isPreviewPhoto = true;
+                            //             });
+                            //             _dialogService.showDialogPreviewPhoto(
+                            //               imagePath: image,
+                            //               onTapClose: () {
+                            //                 setState(() {
+                            //                   isPreviewPhoto = false;
+                            //                 });
+                            //                 _dialogService.popDialog();
+                            //               },
+                            //             );
+                            //           },
+                            //           child: (image.toString().contains('http'))
+                            //               ? FutureBuilder(
+                            //                   future: InspectionService
+                            //                       .isInternetConnectionExist(),
+                            //                   builder: (context, snapshot) {
+                            //                     if (snapshot.data == true) {
+                            //                       return Image.network(
+                            //                         image,
+                            //                         width: MediaQuery.of(context)
+                            //                                 .size
+                            //                                 .width /
+                            //                             4,
+                            //                         height: MediaQuery.of(context)
+                            //                                 .size
+                            //                                 .width /
+                            //                             4,
+                            //                         fit: BoxFit.cover,
+                            //                       );
+                            //                     } else {
+                            //                       return Container(
+                            //                         width: MediaQuery.of(context)
+                            //                                 .size
+                            //                                 .width /
+                            //                             4,
+                            //                         height: MediaQuery.of(context)
+                            //                                 .size
+                            //                                 .width /
+                            //                             4,
+                            //                         color: Colors.orange,
+                            //                       );
+                            //                     }
+                            //                   },
+                            //                 )
+                            //               : Image.file(
+                            //                   File(image),
+                            //                   width:
+                            //                       MediaQuery.of(context).size.width /
+                            //                           4,
+                            //                   height:
+                            //                       MediaQuery.of(context).size.width /
+                            //                           4,
+                            //                   fit: BoxFit.cover,
+                            //                 ),
+                            //         ),
+                            //       );
+                            //     },
+                            //   ),
+                            // ),
+                            SizedBox(height: 12),
+                          ],
+                        ),
+                        Text('Deskripsi :'),
+                        SizedBox(height: 6),
+                        InputPrimary(
+                          controller: descriptionController,
+                          maxLines: 10,
+                          validator: (value) => null,
+                          readOnly: true,
+                        ),
+                        Text('Riwayat Tindakan :'),
+                        if (widget.data.responses.isNotEmpty)
+                          ...widget.data.responses.map((item) {
+                            final responseAttachment =
+                                listResponseAttachment[item.code];
+                            return CardHistoryInspection(
+                              data: item,
+                              listResponseAttachment: responseAttachment ?? [],
+                              onPreviewPhoto: (value) {
+                                setState(() {
+                                  isPreviewPhoto = true;
+                                });
+                                _dialogService.showDialogPreviewPhotoOffline(
+                                  image: value,
+                                  onTapClose: () {
+                                    setState(() {
+                                      isPreviewPhoto = false;
+                                    });
+                                    _dialogService.popDialog();
+                                  },
+                                );
+                              },
+                            );
+                          }).toList()
+                        else
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Center(
+                                child:
+                                    const Text('Belum Ada Riwayat Tindakan')),
                           ),
-                        )
-                        .toList()
-                  else
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Center(
-                          child: const Text('Belum Ada Riwayat Tindakan')),
+                      ],
                     ),
-                ],
-              ),
-            ),
-          ),
+                  ),
+                ),
         ),
       ),
     );

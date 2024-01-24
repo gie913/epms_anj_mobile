@@ -456,7 +456,7 @@ class HomeNotifier extends ChangeNotifier {
     await getDataUser();
     await DatabaseTicketInspection.deleteTicketThreeMonthAgo();
     await DatabaseSubordinateInspection.deleteSubordinateThreeMonthAgo();
-    await getDataInspection(context);
+    // await getDataInspection(context);
     await updateCountInspection();
   }
 

@@ -27,7 +27,7 @@ class _TabMyInspectionState extends State<TabMyInspection> {
                   label: 'Inspeksi Sedang Berlangsung :',
                   value: '${provider.totalInspectionNotClose}'),
               ItemRowInspection(
-                  label: 'Inspeksi Yang Perlu Dikerjakan :',
+                  label: 'Inspeksi Yang Perlu Tindakan :',
                   value: '${provider.totalInspectionToDo}'),
               ItemRowInspection(
                   label: 'Inspeksi Selesai :',

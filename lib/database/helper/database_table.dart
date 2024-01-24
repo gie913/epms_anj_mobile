@@ -51,3 +51,5 @@ const String memberInspectionTable = 'Member_Inspection';
 const String actionInspectionTable = 'Action_Inspection';
 const String companyInspectionTable = 'Company_Inspection';
 const String divisionInspectionTable = 'Division_Inspection';
+const String attachmentInspectionTable = 'Attachment_Inspection';
+const String estateInspectionTable = 'Estate_Inspection';

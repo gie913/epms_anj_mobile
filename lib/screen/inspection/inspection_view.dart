@@ -22,12 +22,12 @@ class _InspectionViewState extends State<InspectionView> {
 
   @override
   void initState() {
-    if (widget.arguments.isEmpty) {
-      context.read<InspectionNotifier>().initData(context);
-    } else {
-      context.read<InspectionNotifier>().getDataInspection(context);
-    }
-
+    // if (widget.arguments.isEmpty) {
+    //   context.read<InspectionNotifier>().initData(context);
+    // } else {
+    //   context.read<InspectionNotifier>().getDataInspection(context);
+    // }
+    context.read<InspectionNotifier>().initUploadAndSynch(context);
     super.initState();
   }
 
@@ -47,6 +47,8 @@ class _InspectionViewState extends State<InspectionView> {
                   enableFeedback: true,
                   onTap: (value) {
                     tabBarIndex = value;
+                    provider.updateMyInspectionFromLocal();
+                    provider.updateSubordinateInspectionFromLocal();
                     setState(() {});
                   },
                   tabs: [

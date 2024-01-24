@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:epms/model/supervisor.dart';
+import 'package:flutter/foundation.dart';
 
 class DialogService {
   late Function(NoOptionDialogRequest) _showNoOptionDialogListener;
@@ -10,7 +11,11 @@ class DialogService {
   late Function(LoadingDialogRequest) _showLoadingDialogListener;
   late Function(DialogScanOPHRequest) _showDialogScanOPHListener;
   late Function(DialogPreviewPhotoRequest) _showDialogPreviewPhotoListener;
+  late Function(DialogPreviewPhotoOfflineRequest)
+      _showDialogPreviewPhotoOfflineListener;
   late Function(DialogAttachmentRequest) _showDialogAttachmentListener;
+  late Function(DialogSubmitInspectionRequest)
+      _showDialogSubmitInspectionRequest;
   late Function _popDialogListener;
   Completer? _dialogCompleter;
 
@@ -23,7 +28,10 @@ class DialogService {
     Function(LoadingDialogRequest) showLoadingDialogListener,
     Function(DialogScanOPHRequest) showDialogScanOPHListener,
     Function(DialogPreviewPhotoRequest) showDialogPreviewPhotoListener,
+    Function(DialogPreviewPhotoOfflineRequest)
+        showDialogPreviewPhotoOfflineListener,
     Function(DialogAttachmentRequest) showDialogAttachmentListener,
+    Function(DialogSubmitInspectionRequest) showDialogSubmitInspectionRequest,
     Function popDialogListener,
   ) {
     _showNoOptionDialogListener = showNoOptionDialogListener;
@@ -33,7 +41,10 @@ class DialogService {
     _showLoadingDialogListener = showLoadingDialogListener;
     _showDialogScanOPHListener = showDialogScanOPHListener;
     _showDialogPreviewPhotoListener = showDialogPreviewPhotoListener;
+    _showDialogPreviewPhotoOfflineListener =
+        showDialogPreviewPhotoOfflineListener;
     _showDialogAttachmentListener = showDialogAttachmentListener;
+    _showDialogSubmitInspectionRequest = showDialogSubmitInspectionRequest;
     _popDialogListener = popDialogListener;
   }
 
@@ -134,6 +145,17 @@ class DialogService {
     return _dialogCompleter!.future;
   }
 
+  Future showDialogPreviewPhotoOffline({
+    required Uint8List image,
+    required Function() onTapClose,
+  }) {
+    _dialogCompleter = Completer();
+    _showDialogPreviewPhotoOfflineListener(
+      DialogPreviewPhotoOfflineRequest(image: image, onTapClose: onTapClose),
+    );
+    return _dialogCompleter!.future;
+  }
+
   Future showDialogAttachment({
     required Function() onTapCamera,
     required Function() onTapGallery,
@@ -144,6 +166,28 @@ class DialogService {
       DialogAttachmentRequest(
         onTapCamera: onTapCamera,
         onTapGallery: onTapGallery,
+        onTapCancel: onTapCancel,
+      ),
+    );
+    return _dialogCompleter!.future;
+  }
+
+  Future showDialogSubmitInspection({
+    required String title,
+    required String desc,
+    required String labelConfirm,
+    required String labelCancel,
+    required Function() onTapConfirm,
+    required Function() onTapCancel,
+  }) {
+    _dialogCompleter = Completer();
+    _showDialogSubmitInspectionRequest(
+      DialogSubmitInspectionRequest(
+        title: title,
+        desc: desc,
+        labelConfirm: labelConfirm,
+        labelCancel: labelCancel,
+        onTapConfirm: onTapConfirm,
         onTapCancel: onTapCancel,
       ),
     );
@@ -251,6 +295,16 @@ class DialogPreviewPhotoRequest {
   });
 }
 
+class DialogPreviewPhotoOfflineRequest {
+  Uint8List image;
+  Function()? onTapClose;
+
+  DialogPreviewPhotoOfflineRequest({
+    required this.image,
+    required this.onTapClose,
+  });
+}
+
 class DialogAttachmentRequest {
   Function() onTapCamera;
   Function() onTapGallery;
@@ -259,6 +313,24 @@ class DialogAttachmentRequest {
   DialogAttachmentRequest({
     required this.onTapCamera,
     required this.onTapGallery,
+    required this.onTapCancel,
+  });
+}
+
+class DialogSubmitInspectionRequest {
+  String title;
+  String desc;
+  String labelConfirm;
+  String labelCancel;
+  Function() onTapConfirm;
+  Function() onTapCancel;
+
+  DialogSubmitInspectionRequest({
+    required this.title,
+    required this.desc,
+    required this.labelConfirm,
+    required this.labelCancel,
+    required this.onTapConfirm,
     required this.onTapCancel,
   });
 }

@@ -1,19 +1,13 @@
 import 'dart:convert';
 
-import 'package:epms/base/common/locator.dart';
-import 'package:epms/base/common/routes.dart';
-import 'package:epms/common_manager/navigator_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-NavigatorService _navigationService = locator<NavigatorService>();
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('handle background Message');
   print('Title : ${message.notification?.title}');
   print('Body : ${message.notification?.body}');
   print('Payload : ${message.data}');
-  _navigationService.push(Routes.INSPECTION, arguments: 'click_notif');
 }
 
 class FirebaseApi {
@@ -28,14 +22,13 @@ class FirebaseApi {
 
   final _localNotifications = FlutterLocalNotificationsPlugin();
 
-  void handleMessage(RemoteMessage? message) {
+  Future<void> handleMessage(RemoteMessage? message) async {
     if (message == null) return;
 
     print('handle local foreground Message');
     print('Title : ${message.notification?.title}');
     print('Body : ${message.notification?.body}');
     print('Payload : ${message.data}');
-    _navigationService.push(Routes.INSPECTION, arguments: 'click_notif');
   }
 
   Future initLocalNotifications() async {

@@ -80,6 +80,18 @@ class InspectionItem extends StatelessWidget {
                   ),
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),
+                  Text(
+                    'Dibuat Oleh :',
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    data.submittedByName,
+                    style: Style.whiteBold12.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  Divider(color: Colors.white24, height: 1),
+                  SizedBox(height: 4),
                   // Row(
                   //   children: [
                   //     Text(
@@ -133,18 +145,47 @@ class InspectionItem extends StatelessWidget {
                   //       )
                   //     ],
                   //   ),
-                  Text(
-                    'User Assign :',
-                    style: Style.whiteBold12.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.normal),
-                  ),
-                  Text(
-                    data.assignee,
-                    style: Style.whiteBold12.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.normal),
-                  ),
-                  Divider(color: Colors.white24, height: 1),
-                  SizedBox(height: 4),
+                  if (data.responses.isNotEmpty &&
+                      data.responses.last.consultedWithName.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Consulted With :',
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        Text(
+                          data.responses.last.consultedWithName,
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        Divider(color: Colors.white24, height: 1),
+                        SizedBox(height: 4),
+                      ],
+                    )
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'User Assign :',
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        Text(
+                          data.assignee,
+                          style: Style.whiteBold12.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        Divider(color: Colors.white24, height: 1),
+                        SizedBox(height: 4),
+                      ],
+                    ),
                   Row(
                     children: [
                       Text(
