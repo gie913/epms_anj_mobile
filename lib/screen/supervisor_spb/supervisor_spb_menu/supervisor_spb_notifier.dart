@@ -159,13 +159,11 @@ class SupervisorSPBNotifier extends ChangeNotifier {
 
     switch (menu.toUpperCase()) {
       case 'INSPECTION':
-        if (dateLogin == dateNow) {
-          await _navigationService.push(Routes.INSPECTION);
-          await context.read<HomeNotifier>().updateCountInspection();
-        } else if (dateLoginParse.year != now.year) {
+        if (dateLoginParse.year != now.year) {
           dialogSettingDateTime();
         } else {
-          dialogReLogin();
+          await _navigationService.push(Routes.INSPECTION);
+          await context.read<HomeNotifier>().updateCountInspection();
         }
         break;
       case "KELUAR":
