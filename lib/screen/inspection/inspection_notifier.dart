@@ -390,8 +390,8 @@ class InspectionNotifier extends ChangeNotifier {
             (context, successMessage) async {
               await DatabaseTicketInspection.deleteTicketByCode(
                   ticketInspection);
-              await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  ticketInspection);
+              // await DatabaseAttachmentInspection.deleteInspectionByCode(
+              //     ticketInspection);
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
@@ -413,9 +413,9 @@ class InspectionNotifier extends ChangeNotifier {
                 responseInspection,
                 (context, successMessage) async {
                   await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                  await DatabaseAttachmentInspection.deleteInspectionByCode(
-                    toDoInspection,
-                  );
+                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                  //   toDoInspection,
+                  // );
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $successMessage');
                 },
@@ -446,9 +446,9 @@ class InspectionNotifier extends ChangeNotifier {
               responseInspection,
               (context, successMessage) async {
                 await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  toDoInspection,
-                );
+                // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                //   toDoInspection,
+                // );
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $successMessage');
               },
@@ -496,8 +496,8 @@ class InspectionNotifier extends ChangeNotifier {
             (context, successMessage) async {
               await DatabaseTicketInspection.deleteTicketByCode(
                   ticketInspection);
-              await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  ticketInspection);
+              // await DatabaseAttachmentInspection.deleteInspectionByCode(
+              //     ticketInspection);
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
@@ -519,9 +519,9 @@ class InspectionNotifier extends ChangeNotifier {
                 responseInspection,
                 (context, successMessage) async {
                   await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                  await DatabaseAttachmentInspection.deleteInspectionByCode(
-                    toDoInspection,
-                  );
+                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                  //   toDoInspection,
+                  // );
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $successMessage');
                 },
@@ -552,9 +552,9 @@ class InspectionNotifier extends ChangeNotifier {
               responseInspection,
               (context, successMessage) async {
                 await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  toDoInspection,
-                );
+                // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                //   toDoInspection,
+                // );
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $successMessage');
               },

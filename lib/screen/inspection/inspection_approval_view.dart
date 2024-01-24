@@ -288,8 +288,8 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
       responseInspection,
       (context, successMessage) async {
         await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-        await DatabaseAttachmentInspection.deleteInspectionByCode(
-            toDoInspection);
+        // await DatabaseAttachmentInspection.deleteInspectionByCode(
+        //     toDoInspection);
         await getDataInspection(context);
       },
       (context, errorMessage) async {
