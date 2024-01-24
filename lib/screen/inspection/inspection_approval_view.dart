@@ -528,6 +528,7 @@ class _InspectionApprovalViewState extends State<InspectionApprovalView> {
   }
 
   void showSubmitOption() {
+    FocusManager.instance.primaryFocus?.unfocus();
     _dialogService.showDialogSubmitInspection(
       title: 'Submit Inspection',
       desc: 'Apakah data yang Anda masukkan sudah benar ?',

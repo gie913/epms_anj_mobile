@@ -95,7 +95,7 @@ class InspectionNotifier extends ChangeNotifier {
     final isInternetExist = await InspectionService.isInternetConnectionExist();
     if (isInternetExist) {
       await DatabaseSubordinateInspection.deleteTable();
-      await _dialogService.showLoadingDialog(title: "Sync Data");
+      _dialogService.showLoadingDialog(title: "Sync Data");
 
       await InspectionRepository().getMyInspectionClose(
         context,

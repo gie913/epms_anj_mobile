@@ -612,6 +612,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   }
 
   void showSubmitOption() {
+    FocusManager.instance.primaryFocus?.unfocus();
     _dialogService.showDialogSubmitInspection(
       title: 'Submit Inspection',
       desc: 'Apakah data yang Anda masukkan sudah benar ?',
