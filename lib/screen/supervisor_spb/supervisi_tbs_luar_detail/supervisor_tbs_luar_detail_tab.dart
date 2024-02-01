@@ -104,7 +104,7 @@ class _SupervisorTBSLuarDetailTabState
                     children: [
                       Text("${notifier.tbsLuar?.supplierCode ?? ""}"),
                       Text(
-                          "${ValueService.rightTrimVendor(notifier.tbsLuar!.supplierName!)}"),
+                          "${ValueService.rightTrimVendor('${notifier.tbsLuar?.supplierName}')}"),
                     ],
                   ),
                 ],
