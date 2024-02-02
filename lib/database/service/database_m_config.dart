@@ -1,4 +1,3 @@
-
 import 'package:epms/database/entity/m_config_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
 import 'package:epms/model/login_response.dart';
@@ -49,8 +48,7 @@ class DatabaseMConfig {
   Future<MConfigSchema> selectMConfig() async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(mConfigSchemaTable);
-    MConfigSchema mConfigSchema =
-    MConfigSchema.fromJson(mapList.last);
+    MConfigSchema mConfigSchema = MConfigSchema.fromJson(mapList.last);
     return mConfigSchema;
   }
 

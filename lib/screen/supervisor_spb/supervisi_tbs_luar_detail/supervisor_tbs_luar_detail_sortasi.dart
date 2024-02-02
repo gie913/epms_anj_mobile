@@ -433,7 +433,7 @@ class _SupervisorTBSLuarDetailSortasiState
                 children: [
                   Text("Catatan"),
                   Container(
-                    width: 100,
+                    // width: 100,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       "${notifier.tbsLuar?.notes ?? ""}",

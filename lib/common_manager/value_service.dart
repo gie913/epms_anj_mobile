@@ -154,7 +154,17 @@ class ValueService {
         "${tbsLuar.bunchesCengkeh}," +
         "${tbsLuar.bunchesTotal}," +
         "${tbsLuar.deduction}," +
-        "${tbsLuar.small}";
+        "${tbsLuar.small}," +
+        "${tbsLuar.sortasiID}," +
+        "${tbsLuar.createdDate}," +
+        "${tbsLuar.createdTime}," +
+        "${tbsLuar.gpsLat}," +
+        "${tbsLuar.gpsLong}," +
+        "${tbsLuar.supplierCode}," +
+        "${tbsLuar.contractNumber}," +
+        "${tbsLuar.driverName}," +
+        "${tbsLuar.licenseNumber}," +
+        "${tbsLuar.notes}";
     return tbsLuarTag;
   }
 
