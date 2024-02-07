@@ -11,7 +11,7 @@
 
     <application
         android:icon="@mipmap/launcher_icon"
-        android:label="ePMS">
+        android:label="ePMS Papua">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
