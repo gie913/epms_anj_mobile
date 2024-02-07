@@ -5,6 +5,7 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
+import 'package:epms/database/service/database_attachment_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
@@ -49,7 +50,6 @@ class InspectionNotifier extends ChangeNotifier {
     await updateTodoInspectionFromLocal();
     await updateSubordinateInspectionFromLocal();
     updateTotalInspection();
-    // await getDataInspection(context);
   }
 
   Future<void> updateMyInspectionFromLocal() async {
@@ -72,21 +72,15 @@ class InspectionNotifier extends ChangeNotifier {
 
   void updateTotalInspection() {
     _totalCreateInspection = _listMyInspection.length;
-    var myInspectionNotClose =
-        _listMyInspection.where((element) => element.status != 'close').length;
-    var mySubordinateNotClose = _listSubordinateInspection
+    _totalInspectionNotClose = _listSubordinateInspection
         .where((element) => element.status != 'close')
         .length;
-    _totalInspectionNotClose = myInspectionNotClose + mySubordinateNotClose;
     _totalInspectionToDo = _listTodoInspection
         .where((element) => element.isSynchronize == 1)
         .length;
-    var myInspectionClose =
-        _listMyInspection.where((element) => element.status == 'close').length;
-    var mySubordinateClose = _listSubordinateInspection
+    _totalInspectionClose = _listSubordinateInspection
         .where((element) => element.status == 'close')
         .length;
-    _totalInspectionClose = myInspectionClose + mySubordinateClose;
     var myInspectionNeedUpload =
         _listMyInspection.where((element) => element.isSynchronize == 0).length;
     var myToDoInspectionNeedUpload = _listTodoInspection
@@ -100,137 +94,272 @@ class InspectionNotifier extends ChangeNotifier {
   Future<void> getDataInspection(BuildContext context) async {
     final isInternetExist = await InspectionService.isInternetConnectionExist();
     if (isInternetExist) {
-      await InspectionRepository().getMyInspection(
+      await DatabaseSubordinateInspection.deleteTable();
+      _dialogService.showLoadingDialog(title: "Sync Data");
+
+      await InspectionRepository().getMyInspectionClose(
         context,
         (context, data) async {
           await DatabaseTicketInspection.addAllData(data);
+          await DatabaseSubordinateInspection.addAllData(data);
+          await DatabaseAttachmentInspection.addAllDataNew(data);
           await updateMyInspectionFromLocal();
-          await InspectionRepository().getToDoInspection(
+
+          await InspectionRepository().getMyInspectionNotClose(
             context,
             (context, data) async {
-              await DatabaseTodoInspection.addAllData(data);
-              await updateTodoInspectionFromLocal();
-              await InspectionRepository().getMySubordinate(
+              await DatabaseTicketInspection.addAllData(data);
+              await DatabaseSubordinateInspection.addAllData(data);
+              await DatabaseAttachmentInspection.addAllDataNew(data);
+              await updateMyInspectionFromLocal();
+
+              await InspectionRepository().getToDoInspection(
                 context,
                 (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  updateTotalInspection();
-                  FlushBarManager.showFlushBarSuccess(
+                  await DatabaseTodoInspection.addAllData(data);
+                  await DatabaseAttachmentInspection.addAllDataNew(data);
+                  await updateTodoInspectionFromLocal();
+
+                  await InspectionRepository().getOnGoingInspectionClose(
                     context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
+                    (context, data) async {
+                      await DatabaseSubordinateInspection.addAllData(data);
+                      await DatabaseAttachmentInspection.addAllDataNew(data);
+                      await updateSubordinateInspectionFromLocal();
+
+                      await InspectionRepository().getOnGoingInspectionNotClose(
+                        context,
+                        (context, data) async {
+                          await DatabaseSubordinateInspection.addAllData(data);
+                          await DatabaseAttachmentInspection.addAllDataNew(
+                              data);
+                          await updateSubordinateInspectionFromLocal();
+
+                          await InspectionRepository().getToDoInspectionClose(
+                            context,
+                            (context, data) async {
+                              await DatabaseSubordinateInspection.addAllData(
+                                  data);
+                              await DatabaseAttachmentInspection.addAllDataNew(
+                                  data);
+                              await updateSubordinateInspectionFromLocal();
+
+                              await InspectionRepository()
+                                  .getToDoInspectionNotClose(
+                                context,
+                                (context, data) async {
+                                  await DatabaseSubordinateInspection
+                                      .addAllData(data);
+                                  await DatabaseAttachmentInspection
+                                      .addAllDataNew(data);
+                                  await updateSubordinateInspectionFromLocal();
+
+                                  updateTotalInspection();
+                                  FlushBarManager.showFlushBarSuccess(
+                                    context,
+                                    "Berhasil Synchronize",
+                                    "Data Inspection Berhasil Diperbaharui",
+                                  );
+                                  log('list My Inspection : $_listMyInspection');
+                                  log('list Todo Inspection : $_listTodoInspection');
+                                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                                  _dialogService.popDialog();
+                                },
+                                (context, errorMessage) {
+                                  FlushBarManager.showFlushBarError(context,
+                                      "Gagal Synchronize", errorMessage);
+                                  _dialogService.popDialog();
+                                },
+                              );
+                            },
+                            (context, errorMessage) {
+                              FlushBarManager.showFlushBarError(
+                                  context, "Gagal Synchronize", errorMessage);
+                              _dialogService.popDialog();
+                            },
+                          );
+                        },
+                        (context, errorMessage) {
+                          FlushBarManager.showFlushBarError(
+                              context, "Gagal Synchronize", errorMessage);
+                          _dialogService.popDialog();
+                        },
+                      );
+                    },
+                    (context, errorMessage) {
+                      FlushBarManager.showFlushBarError(
+                          context, "Gagal Synchronize", errorMessage);
+                      _dialogService.popDialog();
+                    },
                   );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
                 },
                 (context, errorMessage) {
                   FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
+                      context, "Gagal Synchronize", errorMessage);
+                  _dialogService.popDialog();
                 },
               );
             },
-            (context, errorMessage) async {
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  updateTotalInspection();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
+            (context, errorMessage) {
+              FlushBarManager.showFlushBarError(
+                  context, "Gagal Synchronize", errorMessage);
+              _dialogService.popDialog();
             },
           );
         },
-        (context, errorMessage) async {
-          await InspectionRepository().getToDoInspection(
-            context,
-            (context, data) async {
-              await DatabaseTodoInspection.addAllData(data);
-              await updateTodoInspectionFromLocal();
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  updateTotalInspection();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-            (context, errorMessage) async {
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  updateTotalInspection();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-          );
+        (context, errorMessage) {
+          FlushBarManager.showFlushBarError(
+              context, "Gagal Synchronize", errorMessage);
+          _dialogService.popDialog();
         },
       );
+
+      // await InspectionRepository().getMyInspection(
+      //   context,
+      //   (context, data) async {
+      //     await DatabaseTicketInspection.addAllData(data);
+      //     await DatabaseAttachmentInspection.addAllDataNew(data);
+      //     await updateMyInspectionFromLocal();
+      //     await InspectionRepository().getToDoInspection(
+      //       context,
+      //       (context, data) async {
+      //         await DatabaseTodoInspection.addAllData(data);
+      //         await DatabaseAttachmentInspection.addAllDataNew(data);
+      //         await updateTodoInspectionFromLocal();
+      //         await InspectionRepository().getMySubordinate(
+      //           context,
+      //           (context, data) async {
+      //             await DatabaseSubordinateInspection.addAllData(data);
+      //             await DatabaseAttachmentInspection.addAllDataNew(data);
+      //             await updateSubordinateInspectionFromLocal();
+      //             updateTotalInspection();
+      //             FlushBarManager.showFlushBarSuccess(
+      //               context,
+      //               "Berhasil Synchronize",
+      //               "Data Inspection Berhasil Diperbaharui",
+      //             );
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //             _dialogService.popDialog();
+      //           },
+      //           (context, errorMessage) {
+      //             FlushBarManager.showFlushBarError(
+      //               context,
+      //               "Gagal Synchronize",
+      //               errorMessage,
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //         );
+      //       },
+      //       (context, errorMessage) async {
+      //         await InspectionRepository().getMySubordinate(
+      //           context,
+      //           (context, data) async {
+      //             await DatabaseSubordinateInspection.addAllData(data);
+      //             await DatabaseAttachmentInspection.addAllDataNew(data);
+      //             await updateSubordinateInspectionFromLocal();
+      //             updateTotalInspection();
+      //             FlushBarManager.showFlushBarSuccess(
+      //               context,
+      //               "Berhasil Synchronize",
+      //               "Data Inspection Berhasil Diperbaharui",
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //           (context, errorMessage) {
+      //             FlushBarManager.showFlushBarError(
+      //               context,
+      //               "Gagal Synchronize",
+      //               errorMessage,
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //         );
+      //       },
+      //     );
+      //   },
+      //   (context, errorMessage) async {
+      //     await InspectionRepository().getToDoInspection(
+      //       context,
+      //       (context, data) async {
+      //         await DatabaseTodoInspection.addAllData(data);
+      //         await DatabaseAttachmentInspection.addAllDataNew(data);
+      //         await updateTodoInspectionFromLocal();
+      //         await InspectionRepository().getMySubordinate(
+      //           context,
+      //           (context, data) async {
+      //             await DatabaseSubordinateInspection.addAllData(data);
+      //             await DatabaseAttachmentInspection.addAllDataNew(data);
+      //             await updateSubordinateInspectionFromLocal();
+      //             updateTotalInspection();
+      //             FlushBarManager.showFlushBarSuccess(
+      //               context,
+      //               "Berhasil Synchronize",
+      //               "Data Inspection Berhasil Diperbaharui",
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //           (context, errorMessage) {
+      //             FlushBarManager.showFlushBarError(
+      //               context,
+      //               "Gagal Synchronize",
+      //               errorMessage,
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //         );
+      //       },
+      //       (context, errorMessage) async {
+      //         await InspectionRepository().getMySubordinate(
+      //           context,
+      //           (context, data) async {
+      //             await DatabaseSubordinateInspection.addAllData(data);
+      //             await DatabaseAttachmentInspection.addAllDataNew(data);
+      //             await updateSubordinateInspectionFromLocal();
+      //             updateTotalInspection();
+      //             FlushBarManager.showFlushBarSuccess(
+      //               context,
+      //               "Berhasil Synchronize",
+      //               "Data Inspection Berhasil Diperbaharui",
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //           (context, errorMessage) {
+      //             FlushBarManager.showFlushBarError(
+      //               context,
+      //               "Gagal Synchronize",
+      //               errorMessage,
+      //             );
+      //             _dialogService.popDialog();
+      //             log('list My Inspection : $_listMyInspection');
+      //             log('list Todo Inspection : $_listTodoInspection');
+      //             log('list Subordinate Inspection : $_listSubordinateInspection');
+      //           },
+      //         );
+      //       },
+      //     );
+      //   },
+      // );
     } else {
       await updateMyInspectionFromLocal();
       await updateTodoInspectionFromLocal();
@@ -261,15 +390,14 @@ class InspectionNotifier extends ChangeNotifier {
             (context, successMessage) async {
               await DatabaseTicketInspection.deleteTicketByCode(
                   ticketInspection);
+              // await DatabaseAttachmentInspection.deleteInspectionByCode(
+              //     ticketInspection);
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
             (context, errorMessage) async {
               await Future.delayed(const Duration(seconds: 1));
               log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
-              if (errorMessage == 'Tidak Ada Koneksi Internet') {
-                _dialogService.popDialog();
-              }
             },
           );
         }
@@ -285,25 +413,27 @@ class InspectionNotifier extends ChangeNotifier {
                 responseInspection,
                 (context, successMessage) async {
                   await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                  //   toDoInspection,
+                  // );
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $successMessage');
                 },
                 (context, errorMessage) async {
                   await Future.delayed(const Duration(seconds: 1));
                   log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-                  if (errorMessage == 'Tidak Ada Koneksi Internet') {
-                    _dialogService.popDialog();
-                  }
                 },
               );
             }
           }
 
-          await getDataInspection(context);
           _dialogService.popDialog();
+          notifyListeners();
+          await getDataInspection(context);
         } else {
-          await getDataInspection(context);
           _dialogService.popDialog();
+          notifyListeners();
+          await getDataInspection(context);
         }
       } else if (dataToDoInspection.isNotEmpty) {
         for (final toDoInspection in dataToDoInspection) {
@@ -316,25 +446,27 @@ class InspectionNotifier extends ChangeNotifier {
               responseInspection,
               (context, successMessage) async {
                 await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+                // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                //   toDoInspection,
+                // );
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $successMessage');
               },
               (context, errorMessage) async {
                 await Future.delayed(const Duration(seconds: 1));
                 log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-                if (errorMessage == 'Tidak Ada Koneksi Internet') {
-                  _dialogService.popDialog();
-                }
               },
             );
           }
         }
 
-        await getDataInspection(context);
         _dialogService.popDialog();
+        notifyListeners();
+        await getDataInspection(context);
       } else {
-        await getDataInspection(context);
         _dialogService.popDialog();
+        notifyListeners();
+        await getDataInspection(context);
       }
     } else {
       FlushBarManager.showFlushBarWarning(
@@ -342,6 +474,114 @@ class InspectionNotifier extends ChangeNotifier {
         "Gagal Upload",
         "Anda tidak memiliki akses internet",
       );
+    }
+  }
+
+  Future<void> initUploadAndSynch(BuildContext context) async {
+    final dataMyInspection =
+        await DatabaseTicketInspection.selectDataNeedUpload();
+    final dataToDoInspection =
+        await DatabaseTodoInspection.selectDataNeedUpload();
+    log('data my inspection unupload : $dataMyInspection');
+    log('data todo inspection unupload : $dataToDoInspection');
+    final isInternetExist = await InspectionService.isInternetConnectionExist();
+
+    if (isInternetExist) {
+      _dialogService.showLoadingDialog(title: "Upload Data");
+      if (dataMyInspection.isNotEmpty) {
+        for (final ticketInspection in dataMyInspection) {
+          await InspectionRepository().createInspection(
+            context,
+            ticketInspection,
+            (context, successMessage) async {
+              await DatabaseTicketInspection.deleteTicketByCode(
+                  ticketInspection);
+              // await DatabaseAttachmentInspection.deleteInspectionByCode(
+              //     ticketInspection);
+              await Future.delayed(const Duration(seconds: 1));
+              log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
+            },
+            (context, errorMessage) async {
+              await Future.delayed(const Duration(seconds: 1));
+              log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
+            },
+          );
+        }
+
+        if (dataToDoInspection.isNotEmpty) {
+          for (final toDoInspection in dataToDoInspection) {
+            if (toDoInspection.responses.isNotEmpty) {
+              final responseInspection = toDoInspection.responses.last;
+
+              await InspectionRepository().createResponseInspection(
+                context,
+                toDoInspection,
+                responseInspection,
+                (context, successMessage) async {
+                  await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                  //   toDoInspection,
+                  // );
+                  await Future.delayed(const Duration(seconds: 1));
+                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                },
+                (context, errorMessage) async {
+                  await Future.delayed(const Duration(seconds: 1));
+                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                },
+              );
+            }
+          }
+
+          _dialogService.popDialog();
+          notifyListeners();
+          await getDataInspection(context);
+        } else {
+          _dialogService.popDialog();
+          notifyListeners();
+          await getDataInspection(context);
+        }
+      } else if (dataToDoInspection.isNotEmpty) {
+        for (final toDoInspection in dataToDoInspection) {
+          if (toDoInspection.responses.isNotEmpty) {
+            final responseInspection = toDoInspection.responses.last;
+
+            await InspectionRepository().createResponseInspection(
+              context,
+              toDoInspection,
+              responseInspection,
+              (context, successMessage) async {
+                await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+                // await DatabaseAttachmentInspection.deleteInspectionByCode(
+                //   toDoInspection,
+                // );
+                await Future.delayed(const Duration(seconds: 1));
+                log('Response Inspection Code : ${responseInspection.code} $successMessage');
+              },
+              (context, errorMessage) async {
+                await Future.delayed(const Duration(seconds: 1));
+                log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+              },
+            );
+          }
+        }
+
+        _dialogService.popDialog();
+        notifyListeners();
+        await getDataInspection(context);
+      } else {
+        _dialogService.popDialog();
+        notifyListeners();
+        await getDataInspection(context);
+      }
+    } else {
+      await updateMyInspectionFromLocal();
+      await updateTodoInspectionFromLocal();
+      await updateSubordinateInspectionFromLocal();
+      updateTotalInspection();
+      log('list My Inspection : $_listMyInspection');
+      log('list Todo Inspection : $_listTodoInspection');
+      log('list Subordinate Inspection : $_listSubordinateInspection');
     }
   }
 }

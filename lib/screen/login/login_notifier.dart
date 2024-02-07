@@ -110,6 +110,7 @@ class LoginNotifier extends ChangeNotifier {
               context,
               _username.text,
               _password.text,
+              false,
               onSuccessLoginInspection,
               (context, errorMessage) async {
                 StorageManager.saveData('is_login_inspection_success', false);
@@ -130,6 +131,7 @@ class LoginNotifier extends ChangeNotifier {
           context,
           _username.text,
           _password.text,
+          false,
           onSuccessLoginInspection,
           (context, errorMessage) {
             StorageManager.saveData('is_login_inspection_success', false);
@@ -156,6 +158,7 @@ class LoginNotifier extends ChangeNotifier {
       context,
       _username.text,
       _password.text,
+      true,
       onSuccessLoginInspection,
       (context, errorMessage) async {
         StorageManager.saveData('is_login_inspection_success', false);

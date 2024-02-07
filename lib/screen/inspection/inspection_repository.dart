@@ -61,6 +61,98 @@ class InspectionRepository extends APIConfiguration {
     }
   }
 
+  Future<void> getMyInspectionNotClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getMyInspectionNotClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlMyInspection =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/inspector';
+      var responseMyInspection =
+          await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
+      log('cek url : $urlMyInspection');
+      log('cek response getMyInspectionNotClose : ${responseMyInspection.body}');
+
+      MyInspectionResponse res =
+          MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getMyInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getMyInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getMyInspectionNotClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getMyInspectionNotClose : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> getMyInspectionClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getMyInspectionClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlMyInspection =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/inspector';
+      var responseMyInspection =
+          await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
+      log('cek url : $urlMyInspection');
+      log('cek response getMyInspectionClose : ${responseMyInspection.body}');
+
+      MyInspectionResponse res =
+          MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getMyInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getMyInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getMyInspectionClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getMyInspectionClose : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
   Future<void> getToDoInspection(
     BuildContext context,
     Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
@@ -107,6 +199,98 @@ class InspectionRepository extends APIConfiguration {
     }
   }
 
+  Future<void> getToDoInspectionNotClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getToDoInspectionNotClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlToDoInspection =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/assignee';
+      var responseToDoInspection =
+          await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
+      log('cek url : $urlToDoInspection');
+      log('cek response getToDoInspectionNotClose : ${responseToDoInspection.body}');
+
+      TodoInspectionResponse res = TodoInspectionResponse.fromJson(
+          jsonDecode(responseToDoInspection.body));
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getToDoInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getToDoInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getToDoInspectionNotClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getToDoInspectionNotClose : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> getToDoInspectionClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getToDoInspectionClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlToDoInspection =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/assignee';
+      var responseToDoInspection =
+          await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
+      log('cek url : $urlToDoInspection');
+      log('cek response getToDoInspectionClose : ${responseToDoInspection.body}');
+
+      TodoInspectionResponse res = TodoInspectionResponse.fromJson(
+          jsonDecode(responseToDoInspection.body));
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getToDoInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getToDoInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getToDoInspectionClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getToDoInspectionClose : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
   Future<void> getMySubordinate(
     BuildContext context,
     Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
@@ -147,6 +331,96 @@ class InspectionRepository extends APIConfiguration {
       onError(context, 'Response Format Gagal');
     } catch (exception) {
       log('cek error get my subordinate : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> getOnGoingInspectionNotClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getOnGoingInspectionNotClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlMySubordinate =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/subordinate';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
+      log('cek url : $urlMySubordinate');
+      MySubordinateResponse res = MySubordinateResponse.fromJson(
+          jsonDecode(responseMySubordinate.body));
+      log('cek response getOnGoingInspectionNotClose : ${res.data}');
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getOnGoingInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getOnGoingInspectionNotClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getOnGoingInspectionNotClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getOnGoingInspectionNotClose : $exception');
+      onError(context, exception.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> getOnGoingInspectionClose(
+    BuildContext context,
+    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, String errorMessage) onError,
+  ) async {
+    String inspectionToken = await StorageManager.readData("inspectionToken");
+    log('cek getOnGoingInspectionClose : $inspectionToken');
+
+    try {
+      var headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $inspectionToken'
+      };
+
+      var urlMySubordinate =
+          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/subordinate';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
+      log('cek url : $urlMySubordinate');
+      MySubordinateResponse res = MySubordinateResponse.fromJson(
+          jsonDecode(responseMySubordinate.body));
+      log('cek response getOnGoingInspectionClose : ${res.data}');
+
+      if (res.success) {
+        onSuccess(context, res.data);
+      } else {
+        onError(context, res.message);
+      }
+    } on SocketException {
+      log('cek error getOnGoingInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on HttpException {
+      log('cek error getOnGoingInspectionClose : Tidak Ada Koneksi Internet');
+      onError(context, 'Tidak Ada Koneksi Internet');
+    } on FormatException {
+      log('cek error getOnGoingInspectionClose : Response Format Gagal');
+      onError(context, 'Response Format Gagal');
+    } catch (exception) {
+      log('cek error getOnGoingInspectionClose : $exception');
       onError(context, exception.toString());
       rethrow;
     }
@@ -336,6 +610,30 @@ class InspectionRepository extends APIConfiguration {
     } catch (exception) {
       onError(context, exception.toString());
       rethrow;
+    }
+  }
+
+  Future<String> saveFoto(String imageUrl) async {
+    if (imageUrl.contains('http')) {
+      try {
+        var res = await ioClient!.get(Uri.parse(imageUrl));
+
+        if (res.statusCode == 200) {
+          log('download foto success : $imageUrl');
+          return base64.encode(res.bodyBytes);
+        }
+        return '';
+      } catch (e) {
+        return '';
+      }
+    } else if (imageUrl.isNotEmpty) {
+      File imageFile = File(imageUrl);
+      final image = await imageFile.readAsBytes();
+      log('convert foto success : ${imageFile.path}');
+
+      return base64.encode(image);
+    } else {
+      return '';
     }
   }
 }

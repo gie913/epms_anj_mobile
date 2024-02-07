@@ -39,42 +39,42 @@ class TBSLuar {
 
   TBSLuar(
       {this.sortasiID,
-        this.supervisiName,
-        this.gpsLat,
-        this.gpsLong,
-        this.quantity,
-        this.formType,
-        this.contractNumber,
-        this.supplierCode,
-        this.supplierName,
-        this.driverName,
-        this.licenseNumber,
-        this.spdID,
-        this.bunchesUnripe,
-        this.bunchesLess4Kg,
-        this.brondolanRotten,
-        this.bunchesCengkeh,
-        this.bunchesHalfripe,
-        this.bunchesOverripe,
-        this.bunchesRotten,
-        this.bunchesAbnormal,
-        this.bunchesEmpty,
-        this.rubbish,
-        this.water,
-        this.longStalk,
-        this.bunchesTotal,
-        this.deduction,
-        this.small,
-        this.medium,
-        this.large,
-        this.notes,
-        this.gradingPhoto,
-        this.createdBy,
-        this.createdDate,
-        this.createdTime,
-        this.updatedBy,
-        this.updatedDate,
-        this.updatedTime});
+      this.supervisiName,
+      this.gpsLat,
+      this.gpsLong,
+      this.quantity,
+      this.formType,
+      this.contractNumber,
+      this.supplierCode,
+      this.supplierName,
+      this.driverName,
+      this.licenseNumber,
+      this.spdID,
+      this.bunchesUnripe,
+      this.bunchesLess4Kg,
+      this.brondolanRotten,
+      this.bunchesCengkeh,
+      this.bunchesHalfripe,
+      this.bunchesOverripe,
+      this.bunchesRotten,
+      this.bunchesAbnormal,
+      this.bunchesEmpty,
+      this.rubbish,
+      this.water,
+      this.longStalk,
+      this.bunchesTotal,
+      this.deduction,
+      this.small,
+      this.medium,
+      this.large,
+      this.notes,
+      this.gradingPhoto,
+      this.createdBy,
+      this.createdDate,
+      this.createdTime,
+      this.updatedBy,
+      this.updatedDate,
+      this.updatedTime});
 
   TBSLuar.fromJson(Map<String, dynamic> json) {
     sortasiID = json['sortasi_id'];
@@ -131,7 +131,7 @@ class TBSLuar {
     data['spb_id'] = this.spdID;
     data['bunches_unripe'] = this.bunchesUnripe;
     data['form_type'] = this.formType;
-    data['bunches_less_4_kg'] =  this.bunchesLess4Kg;
+    data['bunches_less_4_kg'] = this.bunchesLess4Kg;
     data['bunches_cengkeh'] = this.bunchesCengkeh;
     data['brondolan_rotten'] = this.brondolanRotten;
     data['bunches_halfripe'] = this.bunchesHalfripe;
@@ -156,5 +156,10 @@ class TBSLuar {
     data['updated_date'] = this.updatedDate;
     data['updated_time'] = this.updatedTime;
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'TBSLuar(sortasi_id: $sortasiID, supervisi_name: $supervisiName, gps_lat: $gpsLat, gps_long: $gpsLong, quantity: $quantity, contract_number: $contractNumber, supplier_code: $supplierCode, supplier_name: $supplierName, driver_name: $driverName, license_number: $licenseNumber, spb_id: $spdID, bunches_unripe: $bunchesUnripe, form_type: $formType, bunches_less_4_kg: $bunchesLess4Kg, bunches_cengkeh: $bunchesCengkeh, brondolan_rotten: $brondolanRotten, bunches_halfripe: $bunchesHalfripe, bunches_overripe: $bunchesOverripe, bunches_rotten: $bunchesRotten, bunches_abnormal: $bunchesAbnormal, bunches_empty: $bunchesEmpty, rubbish: $rubbish, water: $water, long_stalk: $longStalk, bunches_total: $bunchesTotal, deduction: $deduction, small: $small, medium: $medium, large: $large, notes: $notes, grading_photo: $gradingPhoto, created_by: $createdBy, created_date: $createdDate, created_time: $createdTime, updated_by: $updatedBy, updated_date: $updatedDate, updated_time: $updatedTime)';
   }
 }

@@ -28,12 +28,13 @@ class DatabaseDivisionInspection {
   }
 
   static Future<List<DivisionInspectionModel>> selectDataByCompanyId(
-      String companyId) async {
+      {required String companyId, required String estateCode}) async {
     Database db = await DatabaseHelper().database;
     var mapList = await db.query(
       divisionInspectionTable,
-      where: '${DivisionInspectionEntity.mCompanyId}=?',
-      whereArgs: [companyId],
+      where:
+          '${DivisionInspectionEntity.mCompanyId}=? AND ${DivisionInspectionEntity.estateCode}=?',
+      whereArgs: [companyId, estateCode],
     );
     List<DivisionInspectionModel> data =
         List<DivisionInspectionModel>.from(mapList.map((e) {

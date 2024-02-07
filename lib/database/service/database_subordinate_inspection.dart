@@ -1,5 +1,6 @@
 import 'package:epms/database/entity/subordinate_inspection_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
+import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
@@ -47,7 +48,9 @@ class DatabaseSubordinateInspection {
 
     // await db.delete(subordinateInspectionTable);
 
-    // final batch = db.batch();
+    final batchInspectionNew = db.batch();
+    final batchInspectionExisting1 = db.batch();
+    final batchInspectionExisting2 = db.batch();
     // for (final item in data) {
     //   batch.insert(subordinateInspectionTable, item.toDatabase());
     // }
@@ -58,6 +61,7 @@ class DatabaseSubordinateInspection {
       return TicketInspectionModel.fromDatabase(e);
     }));
     List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+    final user = await DatabaseUserInspectionConfig.selectData();
 
     for (var i = 0; i < data.length; i++) {
       if (!dataFromLocalCode.contains(data[i].code)) {
@@ -74,7 +78,26 @@ class DatabaseSubordinateInspection {
           gpsLng: data[i].gpsLng,
           id: data[i].id,
           isClosed: data[i].isClosed,
-          isNewResponse: 1,
+          // isNewResponse: 1,
+          // isNewResponse: data[i].responses.isNotEmpty &&
+          //         data[i].responses.last.submittedBy != user.id
+          //     ? 1
+          //     : 0,
+          isNewResponse:
+              (data[i].responses.isEmpty && data[i].submittedBy != user.id)
+                  ? 1
+                  : (data[i].responses.isNotEmpty &&
+                          data[i].responses.last.submittedBy != user.id &&
+                          data[i].responses.last.status == 'Close')
+                      ? 1
+                      : (data[i].responses.isNotEmpty &&
+                              data[i].responses.last.submittedBy == user.id &&
+                              data[i].responses.last.status == 'Close')
+                          ? 0
+                          : (data[i].responses.isNotEmpty &&
+                                  data[i].responses.last.submittedBy != user.id)
+                              ? 1
+                              : 0,
           isSynchronize: data[i].isSynchronize,
           mCompanyAlias: data[i].mCompanyAlias,
           mCompanyId: data[i].mCompanyId,
@@ -92,8 +115,10 @@ class DatabaseSubordinateInspection {
           trTime: data[i].trTime,
           usingGps: data[i].usingGps,
         );
-        await db.insert(
+        batchInspectionNew.insert(
             subordinateInspectionTable, inspectionTemp.toDatabase());
+        // await db.insert(
+        //     subordinateInspectionTable, inspectionTemp.toDatabase());
       } else {
         var indexDataLocal = dataFromLocalCode.indexOf(data[i].code);
         if (dataFromLocal[indexDataLocal].responses.length !=
@@ -111,7 +136,11 @@ class DatabaseSubordinateInspection {
             gpsLng: data[i].gpsLng,
             id: data[i].id,
             isClosed: data[i].isClosed,
-            isNewResponse: 1,
+            // isNewResponse: 1,
+            isNewResponse: data[i].responses.isNotEmpty &&
+                    data[i].responses.last.submittedBy != user.id
+                ? 1
+                : 0,
             isSynchronize: data[i].isSynchronize,
             mCompanyAlias: data[i].mCompanyAlias,
             mCompanyId: data[i].mCompanyId,
@@ -129,12 +158,18 @@ class DatabaseSubordinateInspection {
             trTime: data[i].trTime,
             usingGps: data[i].usingGps,
           );
-          await db.update(
+          batchInspectionExisting1.update(
             subordinateInspectionTable,
             inspectionTemp.toDatabase(),
             where: '${SubordinateInspectionEntity.code}=?',
             whereArgs: [data[i].code],
           );
+          // await db.update(
+          //   subordinateInspectionTable,
+          //   inspectionTemp.toDatabase(),
+          //   where: '${SubordinateInspectionEntity.code}=?',
+          //   whereArgs: [data[i].code],
+          // );
         } else {
           final inspectionTemp = TicketInspectionModel(
             assignee: data[i].assignee,
@@ -167,15 +202,25 @@ class DatabaseSubordinateInspection {
             trTime: data[i].trTime,
             usingGps: data[i].usingGps,
           );
-          await db.update(
+          batchInspectionExisting2.update(
             subordinateInspectionTable,
             inspectionTemp.toDatabase(),
             where: '${SubordinateInspectionEntity.code}=?',
             whereArgs: [data[i].code],
           );
+          // await db.update(
+          //   subordinateInspectionTable,
+          //   inspectionTemp.toDatabase(),
+          //   where: '${SubordinateInspectionEntity.code}=?',
+          //   whereArgs: [data[i].code],
+          // );
         }
       }
     }
+
+    await batchInspectionNew.commit();
+    await batchInspectionExisting1.commit();
+    await batchInspectionExisting2.commit();
   }
 
   static Future<List<TicketInspectionModel>> selectData() async {
@@ -186,6 +231,7 @@ class DatabaseSubordinateInspection {
     }));
     data.sort((a, b) =>
         DateTime.parse(b.submittedAt).compareTo(DateTime.parse(a.submittedAt)));
+    data.sort((a, b) => a.isClosed.compareTo(b.isClosed));
     return data;
   }
 
@@ -193,6 +239,48 @@ class DatabaseSubordinateInspection {
     Database db = await DatabaseHelper().database;
     await db.update(subordinateInspectionTable, data.toDatabase(),
         where: '${SubordinateInspectionEntity.code}=?', whereArgs: [data.code]);
+  }
+
+  static Future<void> updateDataFromListMyInspection(
+      TicketInspectionModel data) async {
+    Database db = await DatabaseHelper().database;
+    final mapList = await db.query(subordinateInspectionTable,
+        where: '${SubordinateInspectionEntity.code}=?', whereArgs: [data.code]);
+    if (mapList.isNotEmpty) {
+      final dataTemp = TicketInspectionModel.fromDatabase(mapList.first);
+      final dataTempUpdate = TicketInspectionModel(
+        assignee: dataTemp.assignee,
+        assigneeId: dataTemp.assigneeId,
+        attachments: dataTemp.attachments,
+        closedAt: dataTemp.closedAt,
+        closedBy: dataTemp.closedBy,
+        closedByName: dataTemp.closedByName,
+        code: dataTemp.code,
+        description: dataTemp.description,
+        gpsLat: dataTemp.gpsLat,
+        gpsLng: dataTemp.gpsLng,
+        id: dataTemp.id,
+        isClosed: dataTemp.isClosed,
+        isNewResponse: 0,
+        isSynchronize: dataTemp.isSynchronize,
+        mCompanyAlias: dataTemp.mCompanyAlias,
+        mCompanyId: dataTemp.mCompanyId,
+        mCompanyName: dataTemp.mCompanyName,
+        mDivisionEstateCode: dataTemp.mDivisionEstateCode,
+        mDivisionId: dataTemp.mDivisionId,
+        mDivisionName: dataTemp.mDivisionName,
+        mTeamId: dataTemp.mTeamId,
+        mTeamName: dataTemp.mTeamName,
+        responses: dataTemp.responses,
+        status: dataTemp.status,
+        submittedAt: dataTemp.submittedAt,
+        submittedBy: dataTemp.submittedBy,
+        submittedByName: dataTemp.submittedByName,
+        trTime: dataTemp.trTime,
+        usingGps: dataTemp.usingGps,
+      );
+      await updateData(dataTempUpdate);
+    }
   }
 
   static Future<void> deleteSubordinateThreeMonthAgo() async {
@@ -207,7 +295,7 @@ class DatabaseSubordinateInspection {
         ['$threeMonthAgoDate%', 'close', 1]);
   }
 
-  static void deleteTable() async {
+  static Future<void> deleteTable() async {
     Database db = await DatabaseHelper().database;
     db.delete(subordinateInspectionTable);
   }

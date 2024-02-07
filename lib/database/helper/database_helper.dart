@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_activity.dart';
+import 'package:epms/database/service/database_attachment_inspection.dart';
 import 'package:epms/database/service/database_attendance.dart';
 import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_cost_control.dart';
 import 'package:epms/database/service/database_destination.dart';
 import 'package:epms/database/service/database_division_inspection.dart';
+import 'package:epms/database/service/database_estate_inspection.dart';
 import 'package:epms/database/service/database_harvesting_plan.dart';
 import 'package:epms/database/service/database_access_inspection.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
@@ -121,6 +123,8 @@ class DatabaseHelper {
     DatabaseActionInspection().createTable(db);
     DatabaseCompanyInspection().createTable(db);
     DatabaseDivisionInspection().createTable(db);
+    DatabaseAttachmentInspection().createTable(db);
+    DatabaseEstateInspection().createTable(db);
   }
 
   Future<Database> get database async {
@@ -142,6 +146,8 @@ class DatabaseHelper {
     DatabaseActionInspection.deleteTable();
     DatabaseCompanyInspection.deleteTable();
     DatabaseDivisionInspection.deleteTable();
+    DatabaseAttachmentInspection.deleteTable();
+    DatabaseEstateInspection.deleteTable();
   }
 
   void deleteMasterDataInspectionReSynch() {
@@ -154,5 +160,7 @@ class DatabaseHelper {
     DatabaseActionInspection.deleteTable();
     DatabaseCompanyInspection.deleteTable();
     DatabaseDivisionInspection.deleteTable();
+    DatabaseAttachmentInspection.deleteTable();
+    DatabaseEstateInspection.deleteTable();
   }
 }

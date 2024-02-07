@@ -40,7 +40,7 @@ class DatabaseMVendorSchema {
     // return count;
     Batch batch = db.batch();
     object.forEach((val) {
-      MVendorSchema mVendorSchema =  val;
+      MVendorSchema mVendorSchema = val;
       batch.insert(mVendorSchemaTable, mVendorSchema.toJson());
     });
     List<Object?> i = await batch.commit();
@@ -56,6 +56,23 @@ class DatabaseMVendorSchema {
       list.add(mVendorSchema);
     }
     return list;
+  }
+
+  Future<MVendorSchema> selectMVendorSchemaByCode(String code) async {
+    Database db = await DatabaseHelper().database;
+    var mapList = await db.query(
+      mVendorSchemaTable,
+      where: '${MVendorEntity.vendorCode}=?',
+      whereArgs: [code],
+    );
+
+    if (mapList.isNotEmpty) {
+      MVendorSchema data = MVendorSchema.fromJson(mapList.first);
+
+      return data;
+    } else {
+      return MVendorSchema();
+    }
   }
 
   void deleteMVendorSchema() async {

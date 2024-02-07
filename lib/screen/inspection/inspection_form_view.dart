@@ -13,8 +13,11 @@ import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/location_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/value_service.dart';
+import 'package:epms/database/service/database_attachment_inspection.dart';
 import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_division_inspection.dart';
+import 'package:epms/database/service/database_estate_inspection.dart';
+import 'package:epms/database/service/database_member_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
@@ -23,6 +26,8 @@ import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/company_inspection_model.dart';
 import 'package:epms/model/division_inspection_model.dart';
+import 'package:epms/model/estate_inspection_model.dart';
+import 'package:epms/model/member_inspection_model.dart';
 import 'package:epms/model/team_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/user_inspection_config_model.dart';
@@ -55,6 +60,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   String gpsLocation = '';
 
   UserInspectionModel? selectedUserInspection;
+  MemberInspectionModel? selectedUserInspectionMember;
 
   List<TeamInspectionModel> listCategory = const [];
   TeamInspectionModel? selectedCategory;
@@ -65,6 +71,9 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   List<DivisionInspectionModel> listDivision = const [];
   DivisionInspectionModel? selectedDivision;
 
+  List<EstateInspectionModel> listEstate = const [];
+  EstateInspectionModel? selectedEstate;
+
   bool isLoading = false;
 
   bool usingGps = true;
@@ -72,6 +81,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   bool isPreviewPhoto = false;
 
   bool isShowDialogAttachment = false;
+
+  bool isShowDialogSubmit = false;
 
   final desctiptionController = TextEditingController();
   final listInspectionPhoto = [];
@@ -92,12 +103,21 @@ class _InspectionFormViewState extends State<InspectionFormView> {
       return false;
     }
 
-    if (selectedCategory != null && selectedCategory!.code == 'est') {
+    if (selectedCategory != null && selectedCategory!.name == 'Estate') {
       if (selectedCompany == null) {
         FlushBarManager.showFlushBarWarning(
           context,
           "Form Belum Lengkap",
           "Mohon memilih company terlebih dahulu",
+        );
+        return false;
+      }
+
+      if (selectedEstate == null) {
+        FlushBarManager.showFlushBarWarning(
+          context,
+          "Form Belum Lengkap",
+          "Mohon memilih estate terlebih dahulu",
         );
         return false;
       }
@@ -240,132 +260,281 @@ class _InspectionFormViewState extends State<InspectionFormView> {
     setState(() {});
   }
 
+  Future<void> getEstate() async {
+    final data = await DatabaseEstateInspection.selectData(selectedCompany!.id);
+    listEstate = data;
+    log('cek list estate : $listEstate');
+    setState(() {});
+  }
+
   Future<void> getDivision() async {
     final data = await DatabaseDivisionInspection.selectDataByCompanyId(
-      selectedCompany!.id,
+      companyId: selectedCompany!.id,
+      estateCode: selectedEstate!.code,
     );
     listDivision = data;
     log('cek list division : $listDivision');
     setState(() {});
   }
 
-  Future<void> getDefaultUserInspection() async {
-    final companyId = selectedCompany != null ? selectedCompany!.id : '';
-    final listUserInspection =
-        await DatabaseUserInspection.selectData(companyId);
-    selectedUserInspection = listUserInspection.first;
+  // Future<void> getDefaultUserInspection() async {
+  //   final companyId = selectedCompany != null ? selectedCompany!.id : '';
+  //   final listUserInspection =
+  //       await DatabaseUserInspection.selectData(companyId);
+  //   selectedUserInspection = listUserInspection.first;
+  //   setState(() {});
+  // }
+
+  Future<void> getDefaultUserInspectionMember() async {
+    final listUserInspectionMember = await DatabaseMemberInspection.selectData(
+      teamId: selectedCategory != null ? selectedCategory!.id : '',
+      companyId: selectedCompany != null ? selectedCompany!.id : '',
+      estateId: selectedEstate != null ? selectedEstate!.id : '',
+      divisiId: selectedDivision != null ? selectedDivision!.id : '',
+    );
+    log('list team member : $listUserInspectionMember');
+    log('list team member total : ${listUserInspectionMember.length}');
+
+    if (listUserInspectionMember.isNotEmpty) {
+      selectedUserInspectionMember = listUserInspectionMember.first;
+      final listUserInspection = await DatabaseUserInspection.selectData(
+          selectedUserInspectionMember!.mUserId, '');
+      if (listUserInspection.isNotEmpty) {
+        selectedUserInspection = listUserInspection.first;
+      }
+    } else {
+      final listUserInspection =
+          await DatabaseUserInspection.selectData('', selectedCompany!.id);
+
+      selectedUserInspectionMember = null;
+      selectedUserInspection = listUserInspection.first;
+    }
+
     setState(() {});
   }
 
   Future<void> getDataInspection(BuildContext context) async {
-    await InspectionRepository().getMyInspection(
+    await DatabaseSubordinateInspection.deleteTable();
+    await InspectionRepository().getMyInspectionClose(
       context,
       (context, data) async {
         await DatabaseTicketInspection.addAllData(data);
-        await InspectionRepository().getToDoInspection(
+        await DatabaseSubordinateInspection.addAllData(data);
+        await DatabaseAttachmentInspection.addAllDataNew(data);
+
+        await InspectionRepository().getMyInspectionNotClose(
           context,
           (context, data) async {
-            await DatabaseTodoInspection.addAllData(data);
-            await InspectionRepository().getMySubordinate(
+            await DatabaseTicketInspection.addAllData(data);
+            await DatabaseSubordinateInspection.addAllData(data);
+            await DatabaseAttachmentInspection.addAllDataNew(data);
+
+            await InspectionRepository().getToDoInspection(
               context,
               (context, data) async {
-                await DatabaseSubordinateInspection.addAllData(data);
-                _dialogService.popDialog();
-                _navigationService.pop();
-                FlushBarManager.showFlushBarSuccess(
+                await DatabaseTodoInspection.addAllData(data);
+                await DatabaseAttachmentInspection.addAllDataNew(data);
+
+                await InspectionRepository().getOnGoingInspectionClose(
                   context,
-                  "Berhasil Upload",
-                  'Data Berhasil Di Upload',
+                  (context, data) async {
+                    await DatabaseSubordinateInspection.addAllData(data);
+                    await DatabaseAttachmentInspection.addAllDataNew(data);
+
+                    await InspectionRepository().getOnGoingInspectionNotClose(
+                      context,
+                      (context, data) async {
+                        await DatabaseSubordinateInspection.addAllData(data);
+                        await DatabaseAttachmentInspection.addAllDataNew(data);
+
+                        await InspectionRepository().getToDoInspectionClose(
+                          context,
+                          (context, data) async {
+                            await DatabaseSubordinateInspection.addAllData(
+                                data);
+                            await DatabaseAttachmentInspection.addAllDataNew(
+                                data);
+
+                            await InspectionRepository()
+                                .getToDoInspectionNotClose(
+                              context,
+                              (context, data) async {
+                                await DatabaseSubordinateInspection.addAllData(
+                                    data);
+                                await DatabaseAttachmentInspection
+                                    .addAllDataNew(data);
+                                _dialogService.popDialog();
+                                _navigationService.pop();
+                                FlushBarManager.showFlushBarSuccess(
+                                  context,
+                                  "Berhasil Upload",
+                                  'Data Berhasil Di Upload',
+                                );
+                              },
+                              (context, errorMessage) {
+                                FlushBarManager.showFlushBarError(
+                                    context, "Gagal Upload", errorMessage);
+                                _dialogService.popDialog();
+                              },
+                            );
+                          },
+                          (context, errorMessage) {
+                            FlushBarManager.showFlushBarError(
+                                context, "Gagal Upload", errorMessage);
+                            _dialogService.popDialog();
+                          },
+                        );
+                      },
+                      (context, errorMessage) {
+                        FlushBarManager.showFlushBarError(
+                            context, "Gagal Upload", errorMessage);
+                        _dialogService.popDialog();
+                      },
+                    );
+                  },
+                  (context, errorMessage) {
+                    FlushBarManager.showFlushBarError(
+                        context, "Gagal Upload", errorMessage);
+                    _dialogService.popDialog();
+                  },
                 );
               },
               (context, errorMessage) {
-                _dialogService.popDialog();
                 FlushBarManager.showFlushBarError(
-                  context,
-                  "Gagal Upload",
-                  errorMessage,
-                );
+                    context, "Gagal Upload", errorMessage);
+                _dialogService.popDialog();
               },
             );
           },
-          (context, errorMessage) async {
-            await InspectionRepository().getMySubordinate(
-              context,
-              (context, data) async {
-                await DatabaseSubordinateInspection.addAllData(data);
-                _dialogService.popDialog();
-                _navigationService.pop();
-                FlushBarManager.showFlushBarSuccess(
-                  context,
-                  "Berhasil Upload",
-                  'Data Berhasil Di Upload',
-                );
-              },
-              (context, errorMessage) {
-                _dialogService.popDialog();
-                FlushBarManager.showFlushBarError(
-                  context,
-                  "Gagal Upload",
-                  errorMessage,
-                );
-              },
-            );
+          (context, errorMessage) {
+            FlushBarManager.showFlushBarError(
+                context, "Gagal Upload", errorMessage);
+            _dialogService.popDialog();
           },
         );
       },
-      (context, errorMessage) async {
-        await InspectionRepository().getToDoInspection(
-          context,
-          (context, data) async {
-            await DatabaseTodoInspection.addAllData(data);
-            await InspectionRepository().getMySubordinate(
-              context,
-              (context, data) async {
-                await DatabaseSubordinateInspection.addAllData(data);
-                _dialogService.popDialog();
-                _navigationService.pop();
-                FlushBarManager.showFlushBarSuccess(
-                  context,
-                  "Berhasil Upload",
-                  'Data Berhasil Di Upload',
-                );
-              },
-              (context, errorMessage) {
-                _dialogService.popDialog();
-                FlushBarManager.showFlushBarError(
-                  context,
-                  "Gagal Upload",
-                  errorMessage,
-                );
-              },
-            );
-          },
-          (context, errorMessage) async {
-            await InspectionRepository().getMySubordinate(
-              context,
-              (context, data) async {
-                await DatabaseSubordinateInspection.addAllData(data);
-                _dialogService.popDialog();
-                _navigationService.pop();
-                FlushBarManager.showFlushBarSuccess(
-                  context,
-                  "Berhasil Upload",
-                  'Data Berhasil Di Upload',
-                );
-              },
-              (context, errorMessage) {
-                _dialogService.popDialog();
-                FlushBarManager.showFlushBarError(
-                  context,
-                  "Gagal Upload",
-                  errorMessage,
-                );
-              },
-            );
-          },
-        );
+      (context, errorMessage) {
+        FlushBarManager.showFlushBarError(
+            context, "Gagal Upload", errorMessage);
+        _dialogService.popDialog();
       },
     );
+
+    // await InspectionRepository().getMyInspection(
+    //   context,
+    //   (context, data) async {
+    //     await DatabaseTicketInspection.addAllData(data);
+    //     await DatabaseAttachmentInspection.addAllDataNew(data);
+    //     await InspectionRepository().getToDoInspection(
+    //       context,
+    //       (context, data) async {
+    //         await DatabaseTodoInspection.addAllData(data);
+    //         await DatabaseAttachmentInspection.addAllDataNew(data);
+    //         await InspectionRepository().getMySubordinate(
+    //           context,
+    //           (context, data) async {
+    //             await DatabaseSubordinateInspection.addAllData(data);
+    //             await DatabaseAttachmentInspection.addAllDataNew(data);
+    //             _dialogService.popDialog();
+    //             _navigationService.pop();
+    //             FlushBarManager.showFlushBarSuccess(
+    //               context,
+    //               "Berhasil Upload",
+    //               'Data Berhasil Di Upload',
+    //             );
+    //           },
+    //           (context, errorMessage) {
+    //             _dialogService.popDialog();
+    //             FlushBarManager.showFlushBarError(
+    //               context,
+    //               "Gagal Upload",
+    //               errorMessage,
+    //             );
+    //           },
+    //         );
+    //       },
+    //       (context, errorMessage) async {
+    //         await InspectionRepository().getMySubordinate(
+    //           context,
+    //           (context, data) async {
+    //             await DatabaseSubordinateInspection.addAllData(data);
+    //             await DatabaseAttachmentInspection.addAllDataNew(data);
+    //             _dialogService.popDialog();
+    //             _navigationService.pop();
+    //             FlushBarManager.showFlushBarSuccess(
+    //               context,
+    //               "Berhasil Upload",
+    //               'Data Berhasil Di Upload',
+    //             );
+    //           },
+    //           (context, errorMessage) {
+    //             _dialogService.popDialog();
+    //             FlushBarManager.showFlushBarError(
+    //               context,
+    //               "Gagal Upload",
+    //               errorMessage,
+    //             );
+    //           },
+    //         );
+    //       },
+    //     );
+    //   },
+    //   (context, errorMessage) async {
+    //     await InspectionRepository().getToDoInspection(
+    //       context,
+    //       (context, data) async {
+    //         await DatabaseTodoInspection.addAllData(data);
+    //         await DatabaseAttachmentInspection.addAllDataNew(data);
+    //         await InspectionRepository().getMySubordinate(
+    //           context,
+    //           (context, data) async {
+    //             await DatabaseSubordinateInspection.addAllData(data);
+    //             await DatabaseAttachmentInspection.addAllDataNew(data);
+    //             _dialogService.popDialog();
+    //             _navigationService.pop();
+    //             FlushBarManager.showFlushBarSuccess(
+    //               context,
+    //               "Berhasil Upload",
+    //               'Data Berhasil Di Upload',
+    //             );
+    //           },
+    //           (context, errorMessage) {
+    //             _dialogService.popDialog();
+    //             FlushBarManager.showFlushBarError(
+    //               context,
+    //               "Gagal Upload",
+    //               errorMessage,
+    //             );
+    //           },
+    //         );
+    //       },
+    //       (context, errorMessage) async {
+    //         await InspectionRepository().getMySubordinate(
+    //           context,
+    //           (context, data) async {
+    //             await DatabaseSubordinateInspection.addAllData(data);
+    //             await DatabaseAttachmentInspection.addAllDataNew(data);
+    //             _dialogService.popDialog();
+    //             _navigationService.pop();
+    //             FlushBarManager.showFlushBarSuccess(
+    //               context,
+    //               "Berhasil Upload",
+    //               'Data Berhasil Di Upload',
+    //             );
+    //           },
+    //           (context, errorMessage) {
+    //             _dialogService.popDialog();
+    //             FlushBarManager.showFlushBarError(
+    //               context,
+    //               "Gagal Upload",
+    //               errorMessage,
+    //             );
+    //           },
+    //         );
+    //       },
+    //     );
+    //   },
+    // );
   }
 
   Future<void> uploadInspection(
@@ -378,6 +547,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
       ticketInspection,
       (context, successMessage) async {
         await DatabaseTicketInspection.deleteTicketByCode(ticketInspection);
+        // await DatabaseAttachmentInspection.deleteInspectionByCode(
+        //     ticketInspection);
         await getDataInspection(context);
       },
       (context, errorMessage) async {
@@ -414,6 +585,12 @@ class _InspectionFormViewState extends State<InspectionFormView> {
             selectedUserInspection != null ? selectedUserInspection!.name : '-',
         assigneeId:
             selectedUserInspection != null ? selectedUserInspection!.id : '-',
+        // assignee: selectedUserInspectionMember != null
+        //     ? selectedUserInspectionMember!.mUserName
+        //     : '-',
+        // assigneeId: selectedUserInspectionMember != null
+        //     ? selectedUserInspectionMember!.mUserId
+        //     : '-',
         status: 'waiting',
         description: desctiptionController.text,
         isSynchronize: 0,
@@ -421,6 +598,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
         attachments: listInspectionPhoto,
         responses: [],
       );
+
+      await DatabaseAttachmentInspection.insertInspection(ticketInspection);
       await DatabaseTicketInspection.insertData(ticketInspection);
       final isInternetExist =
           await InspectionService.isInternetConnectionExist();
@@ -430,6 +609,29 @@ class _InspectionFormViewState extends State<InspectionFormView> {
         _navigationService.pop();
       }
     }
+  }
+
+  void showSubmitOption() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    _dialogService.showDialogSubmitInspection(
+      title: 'Submit Inspection',
+      desc: 'Apakah data yang Anda masukkan sudah benar ?',
+      labelConfirm: 'YA',
+      labelCancel: 'TIDAK',
+      onTapConfirm: () async {
+        setState(() {
+          isShowDialogSubmit = false;
+        });
+        _dialogService.popDialog();
+        await createInspection();
+      },
+      onTapCancel: () {
+        setState(() {
+          isShowDialogSubmit = false;
+        });
+        _dialogService.popDialog();
+      },
+    );
   }
 
   @override
@@ -448,10 +650,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
             canPop: false,
             onPopInvoked: (didPop) async {
               if (didPop == false) {
-                if (isPreviewPhoto || isShowDialogAttachment) {
+                if (isPreviewPhoto ||
+                    isShowDialogAttachment ||
+                    isShowDialogSubmit) {
                   setState(() {
                     isPreviewPhoto = false;
                     isShowDialogAttachment = false;
+                    isShowDialogSubmit = false;
                   });
                   _dialogService.popDialog();
                 } else {
@@ -508,9 +713,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                       Row(
                         children: [
-                          Expanded(child: Text('Kategori :')),
-                          SizedBox(width: 12),
                           Expanded(
+                            flex: 2,
+                            child: Text('Kategori :'),
+                          ),
+                          // SizedBox(width: 12),
+                          Expanded(
+                            flex: 4,
                             child: DropdownButton(
                               isExpanded: true,
                               hint: Text(
@@ -539,8 +748,10 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 if (value != null) {
                                   selectedCategory = value;
                                   selectedCompany = null;
+                                  selectedEstate = null;
                                   selectedDivision = null;
                                   selectedUserInspection = null;
+                                  selectedUserInspectionMember = null;
                                   log('selectedCategory : $selectedCategory');
                                   setState(() {});
                                 }
@@ -551,9 +762,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                       Row(
                         children: [
-                          Expanded(child: Text('Company :')),
-                          SizedBox(width: 12),
                           Expanded(
+                            flex: 2,
+                            child: Text('Company :'),
+                          ),
+                          // SizedBox(width: 12),
+                          Expanded(
+                            flex: 4,
                             child: DropdownButton(
                               isExpanded: true,
                               hint: Text(
@@ -581,10 +796,14 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                               onChanged: (value) {
                                 if (value != null) {
                                   selectedCompany = value;
+                                  selectedEstate = null;
                                   selectedDivision = null;
-                                  getDivision();
+                                  selectedUserInspectionMember = null;
+                                  getEstate();
+                                  // getDivision();
                                   // initialSelectedUser();
-                                  getDefaultUserInspection();
+                                  // getDefaultUserInspection();
+                                  getDefaultUserInspectionMember();
                                   log('selectedCompany : $selectedCompany');
                                   setState(() {});
                                 }
@@ -595,12 +814,70 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                       ),
                       if (selectedCategory?.name == 'Estate' &&
                           selectedCompany != null &&
+                          listEstate.isNotEmpty)
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text('Estate :'),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                hint: Text(
+                                  "Pilih Estate",
+                                  style: Style.whiteBold14.copyWith(
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey),
+                                ),
+                                value: selectedEstate,
+                                style: Style.whiteBold14.copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  color: themeNotifier.status == true ||
+                                          MediaQuery.of(context)
+                                                  .platformBrightness ==
+                                              Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                                items: listEstate.map((value) {
+                                  return DropdownMenuItem(
+                                    child: Text(value.name),
+                                    value: value,
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    selectedEstate = value;
+                                    selectedDivision = null;
+                                    selectedUserInspectionMember = null;
+                                    getDivision();
+                                    getDefaultUserInspectionMember();
+                                    log('selected estate : $selectedEstate');
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                            )
+                          ],
+                        )
+                      else
+                        const SizedBox(),
+
+                      if (selectedCategory?.name == 'Estate' &&
+                          selectedCompany != null &&
+                          selectedEstate != null &&
                           listDivision.isNotEmpty)
                         Row(
                           children: [
-                            Expanded(child: Text('Divisi :')),
-                            SizedBox(width: 12),
                             Expanded(
+                              flex: 2,
+                              child: Text('Divisi :'),
+                            ),
+                            // SizedBox(width: 12),
+                            Expanded(
+                              flex: 4,
                               child: DropdownButton(
                                 isExpanded: true,
                                 hint: Text(
@@ -629,6 +906,8 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                                 onChanged: (value) {
                                   if (value != null) {
                                     selectedDivision = value;
+                                    selectedUserInspectionMember = null;
+                                    getDefaultUserInspectionMember();
                                     log('selected divisi : $selectedDivision');
                                     setState(() {});
                                   }
@@ -638,28 +917,37 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                           ],
                         )
                       else if (selectedCategory?.name == 'Estate' &&
-                          selectedCompany != null)
+                          selectedCompany != null &&
+                          selectedEstate != null)
                         Text(
                             'Company ${selectedCompany?.alias} Tidak Mempunyai Divisi'),
 
                       // User Assign
                       if (selectedCompany != null)
                         if (selectedCategory?.name == 'Estate')
-                          if (selectedDivision != null)
+                          if (selectedEstate != null &&
+                              selectedDivision != null)
                             Row(
                               children: [
-                                Expanded(child: Text('User Assign :')),
-                                SizedBox(width: 12),
                                 Expanded(
+                                  flex: 2,
+                                  child: Text('User Assign :'),
+                                ),
+                                // SizedBox(width: 12),
+                                Expanded(
+                                  flex: 4,
                                   child: InkWell(
                                     onTap: () async {
                                       final data =
                                           await _navigationService.push(
                                         Routes.INSPECTION_USER,
-                                        arguments: selectedCompany?.id,
+                                        arguments:
+                                            selectedUserInspection!.mCompanyId,
                                       );
+
                                       if (data != null) {
                                         selectedUserInspection = data;
+                                        selectedUserInspectionMember = null;
                                         setState(() {});
                                         log('selected user inspection : $selectedUserInspection');
                                       }
@@ -725,17 +1013,24 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         else
                           Row(
                             children: [
-                              Expanded(child: Text('User Assign :')),
-                              SizedBox(width: 12),
                               Expanded(
+                                flex: 2,
+                                child: Text('User Assign :'),
+                              ),
+                              // SizedBox(width: 12),
+                              Expanded(
+                                flex: 4,
                                 child: InkWell(
                                   onTap: () async {
                                     final data = await _navigationService.push(
                                       Routes.INSPECTION_USER,
-                                      arguments: selectedCompany?.id,
+                                      arguments:
+                                          selectedUserInspection!.mCompanyId,
                                     );
+
                                     if (data != null) {
                                       selectedUserInspection = data;
+                                      selectedUserInspectionMember = null;
                                       setState(() {});
                                       log('selected user inspection : $selectedUserInspection');
                                     }
@@ -952,6 +1247,7 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         controller: desctiptionController,
                         maxLines: 10,
                         hintText: 'Masukkan Deskripsi',
+                        keyboardType: TextInputType.multiline,
                         validator: (value) => null,
                       ),
                       if (listInspectionPhoto.isNotEmpty)
@@ -1065,8 +1361,11 @@ class _InspectionFormViewState extends State<InspectionFormView> {
                         ),
                       ),
                       InkWell(
-                        onTap: () async {
-                          await createInspection();
+                        onTap: () {
+                          setState(() {
+                            isShowDialogSubmit = true;
+                          });
+                          showSubmitOption();
                         },
                         child: Card(
                           color: Palette.primaryColorProd,

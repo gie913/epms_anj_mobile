@@ -1,5 +1,6 @@
 import 'package:epms/database/entity/user_inspection_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
+import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/user_inspection_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,7 +15,10 @@ class DatabaseUserInspection {
        ${UserInspectionEntity.name} TEXT,
        ${UserInspectionEntity.employeeCode} TEXT,
        ${UserInspectionEntity.employeeNumber} TEXT,
-       ${UserInspectionEntity.mCompanyId} TEXT)
+       ${UserInspectionEntity.userEstate} TEXT,
+       ${UserInspectionEntity.userDivision} TEXT,
+       ${UserInspectionEntity.mCompanyId} TEXT,
+       ${UserInspectionEntity.mOccupationName} TEXT)
     ''');
   }
 
@@ -28,24 +32,58 @@ class DatabaseUserInspection {
     await batch.commit();
   }
 
-  static Future<List<UserInspectionModel>> selectData(String companyId) async {
+  static Future<List<UserInspectionModel>> selectData(
+      String userId, String companyId) async {
     Database db = await DatabaseHelper().database;
 
-    if (companyId.isNotEmpty) {
+    final dataUser = await DatabaseUserInspectionConfig.selectData();
+
+    if (userId.isNotEmpty) {
+      var mapList = await db.query(
+        userInspectionTable,
+        where: '${UserInspectionEntity.id}=?',
+        whereArgs: [userId],
+      );
+
+      var data = List<UserInspectionModel>.from(mapList.map((e) {
+        return UserInspectionModel.fromJson(e);
+      }));
+
+      final userInspection = data.where((element) => element.id == dataUser.id);
+      if (userInspection.isNotEmpty) {
+        data.remove(userInspection.first);
+      }
+
+      return data;
+    } else if (companyId.isNotEmpty) {
       var mapList = await db.query(
         userInspectionTable,
         where: '${UserInspectionEntity.mCompanyId}=?',
         whereArgs: [companyId],
       );
+
       var data = List<UserInspectionModel>.from(mapList.map((e) {
         return UserInspectionModel.fromJson(e);
       }));
+
+      final userInspection = data.where((element) => element.id == dataUser.id);
+      if (userInspection.isNotEmpty) {
+        data.remove(userInspection.first);
+      }
+
       return data;
     } else {
       var mapList = await db.query(userInspectionTable);
+
       var data = List<UserInspectionModel>.from(mapList.map((e) {
         return UserInspectionModel.fromJson(e);
       }));
+
+      final userInspection = data.where((element) => element.id == dataUser.id);
+      if (userInspection.isNotEmpty) {
+        data.remove(userInspection.first);
+      }
+
       return data;
     }
   }

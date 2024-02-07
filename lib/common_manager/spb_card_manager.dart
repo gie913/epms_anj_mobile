@@ -45,6 +45,7 @@ class SPBCardManager {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       ValueService.tagReader(tag).then((value) {
         String decryptData = EncryptionManager.decryptData(value);
+        log('cek decryptData SPB Card : $decryptData');
         if (decryptData.characters.first == "S") {
           final split = decryptData.split(',');
           final Map<int, String> values = {

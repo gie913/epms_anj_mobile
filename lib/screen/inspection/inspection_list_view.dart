@@ -4,6 +4,7 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
@@ -90,6 +91,10 @@ class _InspectionListViewState extends State<InspectionListView> {
                           arguments: data,
                         );
                         await DatabaseTicketInspection.updateData(
+                          inspectionTemp,
+                        );
+                        await DatabaseSubordinateInspection
+                            .updateDataFromListMyInspection(
                           inspectionTemp,
                         );
                         updateMyInspectionFromLocal();

@@ -498,13 +498,12 @@ class FormSPBNotifier extends ChangeNotifier {
         print(json.encode(_listOPHScanned)); //check : ok
         _lastOPH = _listSPBDetail.last.ophCardId!;
         _countOPH = _listSPBDetail.length;
-
+        // azis
         _estateCode = getMostEstateCodeValue(_listOPHScanned);
         _mDivisionCode =
             getMostDivisionCodeValue(_listOPHScanned, _estateCode!);
         _mEstateSchema = await DatabaseMEstateSchema()
             .selectMEstateSchemaByEstateCode(_estateCode!);
-
         /*  original */
         _totalBunches = _totalBunches + spbDetail.ophBunchesDelivered!;
         _totalLooseFruits =
@@ -571,8 +570,8 @@ class FormSPBNotifier extends ChangeNotifier {
         ? getMostDivisionCodeValue(_listOPHScanned, _estateCode!)
         : '';
     _mEstateSchema = _listSPBDetail.isNotEmpty
-        ? await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(
-            getMostEstateCodeValue(_listOPHScanned))
+        ? await DatabaseMEstateSchema()
+            .selectMEstateSchemaByEstateCode(_estateCode!)
         : MEstateSchema();
     notifyListeners();
   }

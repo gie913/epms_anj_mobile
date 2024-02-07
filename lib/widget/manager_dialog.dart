@@ -2,7 +2,9 @@ import 'package:epms/base/common/locator.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/widget/dialog_attachment.dart';
 import 'package:epms/widget/dialog_preview_photo.dart';
+import 'package:epms/widget/dialog_preview_photo_offline.dart';
 import 'package:epms/widget/dialog_scan_oph.dart';
+import 'package:epms/widget/dialog_submit_inspection.dart';
 import 'package:epms/widget/loading_dialog.dart';
 import 'package:epms/widget/nfc_read_dialog.dart';
 import 'package:epms/widget/no_option_dialog.dart';
@@ -43,7 +45,9 @@ class _DialogManagerState extends State<DialogManager> {
       _showLoadingDialog,
       _showDialogScanOPH,
       _showDialogPreviewPhoto,
+      _showDialogPreviewPhotoOffline,
       _showDialogAttachment,
+      _showDialogSubmitInspection,
       _popDialog,
     );
   }
@@ -141,6 +145,20 @@ class _DialogManagerState extends State<DialogManager> {
     );
   }
 
+  void _showDialogPreviewPhotoOffline(
+      DialogPreviewPhotoOfflineRequest request) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return DialogPreviewPhotoOffline(
+          image: request.image,
+          onTapClose: request.onTapClose,
+        );
+      },
+    );
+  }
+
   void _showDialogAttachment(DialogAttachmentRequest request) {
     showDialog(
       context: context,
@@ -149,6 +167,23 @@ class _DialogManagerState extends State<DialogManager> {
         return DialogAttachment(
           onTapCamera: request.onTapCamera,
           onTapGallery: request.onTapGallery,
+          onTapCancel: request.onTapCancel,
+        );
+      },
+    );
+  }
+
+  void _showDialogSubmitInspection(DialogSubmitInspectionRequest request) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return DialogSubmitInspection(
+          title: request.title,
+          desc: request.desc,
+          labelConfirm: request.labelConfirm,
+          labelCancel: request.labelCancel,
+          onTapConfirm: request.onTapConfirm,
           onTapCancel: request.onTapCancel,
         );
       },

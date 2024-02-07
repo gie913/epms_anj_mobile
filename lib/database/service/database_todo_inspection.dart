@@ -1,5 +1,6 @@
 import 'package:epms/database/entity/todo_inspection_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
+import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -46,7 +47,9 @@ class DatabaseTodoInspection {
 
     // await db.delete(todoInspectionTable);
 
-    // final batch = db.batch();
+    final batchInspectionNew = db.batch();
+    final batchInspectionExisting1 = db.batch();
+    final batchInspectionExisting2 = db.batch();
     // for (final item in data) {
     //   batch.insert(todoInspectionTable, item.toDatabase());
     // }
@@ -57,6 +60,7 @@ class DatabaseTodoInspection {
       return TicketInspectionModel.fromDatabase(e);
     }));
     List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+    final user = await DatabaseUserInspectionConfig.selectData();
 
     for (var i = 0; i < data.length; i++) {
       if (!dataFromLocalCode.contains(data[i].code)) {
@@ -73,7 +77,13 @@ class DatabaseTodoInspection {
           gpsLng: data[i].gpsLng,
           id: data[i].id,
           isClosed: data[i].isClosed,
-          isNewResponse: 1,
+          // isNewResponse: 1,
+          isNewResponse: data[i].responses.isEmpty
+              ? 1
+              : (data[i].responses.isNotEmpty &&
+                      data[i].responses.last.submittedBy != user.id)
+                  ? 1
+                  : 0,
           isSynchronize: data[i].isSynchronize,
           mCompanyAlias: data[i].mCompanyAlias,
           mCompanyId: data[i].mCompanyId,
@@ -91,7 +101,9 @@ class DatabaseTodoInspection {
           trTime: data[i].trTime,
           usingGps: data[i].usingGps,
         );
-        await db.insert(todoInspectionTable, inspectionTemp.toDatabase());
+        batchInspectionNew.insert(
+            todoInspectionTable, inspectionTemp.toDatabase());
+        // await db.insert(todoInspectionTable, inspectionTemp.toDatabase());
       } else {
         var indexDataLocal = dataFromLocalCode.indexOf(data[i].code);
         if (dataFromLocal[indexDataLocal].responses.length !=
@@ -109,7 +121,11 @@ class DatabaseTodoInspection {
             gpsLng: data[i].gpsLng,
             id: data[i].id,
             isClosed: data[i].isClosed,
-            isNewResponse: 1,
+            // isNewResponse: 1,
+            isNewResponse: data[i].responses.isNotEmpty &&
+                    data[i].responses.last.submittedBy != user.id
+                ? 1
+                : 0,
             isSynchronize: data[i].isSynchronize,
             mCompanyAlias: data[i].mCompanyAlias,
             mCompanyId: data[i].mCompanyId,
@@ -127,13 +143,20 @@ class DatabaseTodoInspection {
             trTime: data[i].trTime,
             usingGps: data[i].usingGps,
           );
-          await db.update(
+          batchInspectionExisting1.update(
             todoInspectionTable,
             inspectionTemp.toDatabase(),
             where:
                 '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
             whereArgs: [data[i].code, 1],
           );
+          // await db.update(
+          //   todoInspectionTable,
+          //   inspectionTemp.toDatabase(),
+          //   where:
+          //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+          //   whereArgs: [data[i].code, 1],
+          // );
         } else {
           final inspectionTemp = TicketInspectionModel(
             assignee: data[i].assignee,
@@ -166,16 +189,27 @@ class DatabaseTodoInspection {
             trTime: data[i].trTime,
             usingGps: data[i].usingGps,
           );
-          await db.update(
+          batchInspectionExisting2.update(
             todoInspectionTable,
             inspectionTemp.toDatabase(),
             where:
                 '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
             whereArgs: [data[i].code, 1],
           );
+          // await db.update(
+          //   todoInspectionTable,
+          //   inspectionTemp.toDatabase(),
+          //   where:
+          //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+          //   whereArgs: [data[i].code, 1],
+          // );
         }
       }
     }
+
+    await batchInspectionNew.commit();
+    await batchInspectionExisting1.commit();
+    await batchInspectionExisting2.commit();
   }
 
   static Future<void> insertData(TicketInspectionModel data) async {

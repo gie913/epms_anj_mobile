@@ -104,7 +104,7 @@ class _SupervisorTBSLuarDetailTabState
                     children: [
                       Text("${notifier.tbsLuar?.supplierCode ?? ""}"),
                       Text(
-                          "${ValueService.rightTrimVendor(notifier.tbsLuar!.supplierName!)}"),
+                          "${ValueService.rightTrimVendor('${notifier.tbsLuar?.supplierName}')}"),
                     ],
                   ),
                 ],
@@ -190,14 +190,72 @@ class _SupervisorTBSLuarDetailTabState
                     ),
                   )
                 : Container(),
-            notifier.onEdit
-                ? Column(
-                    children: [
-                      Padding(
+            !notifier.isExist
+                ? const SizedBox()
+                : notifier.onEdit
+                    ? Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                notifier.showDialogApprovalTbsLuar(context);
+                              },
+                              child: Card(
+                                color: Palette.primaryColorProd,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.all(14),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text(
+                                    "SIMPAN",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                notifier.onChangeEdit(false);
+                              },
+                              child: Card(
+                                color: Palette.redColorDark,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.all(14),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text(
+                                    "BATAL",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
                           onTap: () {
-                            notifier.showDialogApprovalTbsLuar(context);
+                            notifier.onChangeEdit(true);
                           },
                           child: Card(
                             color: Palette.primaryColorProd,
@@ -209,7 +267,7 @@ class _SupervisorTBSLuarDetailTabState
                               padding: EdgeInsets.all(14),
                               width: MediaQuery.of(context).size.width,
                               child: Text(
-                                "SIMPAN",
+                                "UBAH DATA",
                                 style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -220,62 +278,6 @@ class _SupervisorTBSLuarDetailTabState
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () {
-                            notifier.onChangeEdit(false);
-                          },
-                          child: Card(
-                            color: Palette.redColorDark,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all(14),
-                              width: MediaQuery.of(context).size.width,
-                              child: Text(
-                                "BATAL",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {
-                        notifier.onChangeEdit(true);
-                      },
-                      child: Card(
-                        color: Palette.primaryColorProd,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.all(14),
-                          width: MediaQuery.of(context).size.width,
-                          child: Text(
-                            "UBAH DATA",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
           ]),
         ),
       );
