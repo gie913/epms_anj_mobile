@@ -105,6 +105,7 @@ class LoginNotifier extends ChangeNotifier {
           _password.text,
           onSuccessLogin,
           (context, errorMessage) async {
+            log('Error Login Epms');
             StorageManager.saveData('is_login_epms_success', false);
             await LoginRepository().loginInspection(
               context,

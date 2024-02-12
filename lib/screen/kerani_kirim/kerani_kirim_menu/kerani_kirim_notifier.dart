@@ -72,17 +72,37 @@ class KeraniKirimNotifier extends ChangeNotifier {
       String mostDivisionCodeInti = '';
       String mostDivisionCodePlasma = '';
 
+      int totalOphInti = 0;
+      int totalJanjangInti = 0;
+      int totalBrondolanInti = 0;
+
+      int totalOphPlasma = 0;
+      int totalJanjangPlasma = 0;
+      int totalBrondolanPlasma = 0;
+
       for (int i = 0; i < _listSPBDetail.length; i++) {
         if (typeTBS == 3) {
           if (ValueService.plasmaValidator(_listSPBDetail[i].ophEstateCode!) ==
               1) {
             SPBDetail spbDetailTemp = _listSPBDetail[i];
             spbDetailTemp.spbId = '${spbDetailTemp.spbId}_2';
+            totalOphInti = totalOphInti + 1;
+            totalJanjangInti =
+                totalJanjangInti + _listSPBDetail[i].ophBunchesDelivered!;
+            totalBrondolanInti =
+                totalBrondolanInti + _listSPBDetail[i].ophLooseFruitDelivered!;
             listSPBDetailInti.add(spbDetailTemp);
             String jsonString = jsonEncode(spbDetailTemp);
             mapListSPBDetailInti
                 .add("\"${mapListSPBDetailInti.length}\":$jsonString");
           } else {
+            SPBDetail spbDetailTemp = _listSPBDetail[i];
+            spbDetailTemp.spbId = '${spbDetailTemp.spbId}_1';
+            totalOphPlasma = totalOphPlasma + 1;
+            totalJanjangPlasma =
+                totalJanjangPlasma + _listSPBDetail[i].ophBunchesDelivered!;
+            totalBrondolanPlasma = totalBrondolanPlasma +
+                _listSPBDetail[i].ophLooseFruitDelivered!;
             listSPBDetailPlasma.add(_listSPBDetail[i]);
             String jsonString = jsonEncode(_listSPBDetail[i]);
             mapListSPBDetailPlasma
@@ -182,8 +202,12 @@ class KeraniKirimNotifier extends ChangeNotifier {
       for (int i = 0; i < _listSPB.length; i++) {
         if (typeTBS == 3) {
           SPB spbPlasmaTemp = _listSPB[i];
+          spbPlasmaTemp.spbId = '${spbPlasmaTemp.spbId}_1';
           spbPlasmaTemp.spbEstateCode = mostEstateCodePlasma;
           spbPlasmaTemp.spbDivisionCode = mostDivisionCodePlasma;
+          spbPlasmaTemp.spbTotalOph = totalOphPlasma;
+          spbPlasmaTemp.spbTotalBunches = totalJanjangPlasma;
+          spbPlasmaTemp.spbTotalLooseFruit = totalBrondolanPlasma;
           String jsonStringPlasma = jsonEncode(spbPlasmaTemp);
           mapListSPBPlasma.add("\"0\":$jsonStringPlasma");
           log('spbPlasmaTemp : $spbPlasmaTemp');
@@ -191,6 +215,9 @@ class KeraniKirimNotifier extends ChangeNotifier {
           SPB spbIntiTemp = _listSPB[i];
           spbIntiTemp.spbId = '${spbIntiTemp.spbId}_2';
           spbIntiTemp.spbEstateCode = mostEstateCodeInti;
+          spbPlasmaTemp.spbTotalOph = totalOphInti;
+          spbPlasmaTemp.spbTotalBunches = totalJanjangInti;
+          spbPlasmaTemp.spbTotalLooseFruit = totalBrondolanInti;
           spbIntiTemp.spbDivisionCode = mostDivisionCodeInti;
           String jsonString = jsonEncode(spbIntiTemp);
           mapListSPBInti.add("\"0\":$jsonString");
@@ -246,7 +273,7 @@ class KeraniKirimNotifier extends ChangeNotifier {
                 UploadImageOPHRepository().doUploadPhoto(
                     context,
                     listSPB[i].spbPhoto!,
-                    listSPB[i].spbId!,
+                    '${listSPB[i].spbId!}_1',
                     "spb",
                     onSuccessUploadImage,
                     onErrorUploadImage);

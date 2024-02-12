@@ -31,9 +31,12 @@ class LoginRepository extends APIConfiguration {
       //   uri,
       //   body: map,
       // );
-      log('cek response login epms : ${response.body}');
+      // log('cek response login epms : ${response.body}');
       LoginResponse loginResponseRevamp =
           LoginResponse.fromJson(json.decode(response.body));
+      log('cek url : $url');
+      log('cek body : $map');
+      log('cek response : ${response.body}');
       if (response.statusCode == 200) {
         StorageManager.saveData(
             'formType', json.decode(response.body)['form_type']);
@@ -71,6 +74,7 @@ class LoginRepository extends APIConfiguration {
           'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signin';
       var responseInspection =
           await ioClient!.post(Uri.parse(urlInspection), body: map);
+      log('Login Inspection');
       log('cek url : $urlInspection');
       log('cek body : $map');
       log('cek response : ${responseInspection.body}');
