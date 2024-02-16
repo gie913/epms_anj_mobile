@@ -36,7 +36,7 @@ class _NFCDialogState extends State<NFCDialog> {
           child: Text("${widget.title}", style: Style.textBoldBlack14),
         ),
         content: Container(
-          height: MediaQuery.of(context).size.height * 0.28,
+          height: MediaQuery.of(context).size.height * 0.32,
           child: Column(children: [
             Center(
               child: Container(
