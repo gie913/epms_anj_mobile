@@ -102,11 +102,13 @@ class SynchRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlSynchInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/synch';
-      var responseSynchInspection =
-          await ioClient!.get(Uri.parse(urlSynchInspection), headers: headers);
-      log('cek url : $urlSynchInspection');
+      // var urlSynchInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/synch';
+      var urlSynchInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/synch';
+      var responseSynchInspection = await ioClient!
+          .get(Uri.parse(urlSynchInspectionProd), headers: headers);
+      log('cek url : $urlSynchInspectionProd');
       log('cek response synch inspection : ${responseSynchInspection.body}');
       SynchInspectionResponse res = SynchInspectionResponse.fromJson(
           jsonDecode(responseSynchInspection.body));

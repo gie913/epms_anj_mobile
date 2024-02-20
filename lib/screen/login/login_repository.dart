@@ -67,11 +67,13 @@ class LoginRepository extends APIConfiguration {
       map['password'] = password;
       map['success_epms_login'] = '$isEpmsLoginSuccess';
 
-      var urlInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signin';
+      // var urlInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signin';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/signin';
       var responseInspection =
-          await ioClient!.post(Uri.parse(urlInspection), body: map);
-      log('cek url : $urlInspection');
+          await ioClient!.post(Uri.parse(urlInspectionProd), body: map);
+      log('cek url : $urlInspectionProd');
       log('cek body : $map');
       log('cek response : ${responseInspection.body}');
       LoginInspectionResponse res = LoginInspectionResponse.fromJson(

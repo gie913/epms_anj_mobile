@@ -30,11 +30,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMyInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myinspection';
+      // var urlMyInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myinspection';
+      var urlMyInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/myinspection';
       var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
-      log('cek url : $urlMyInspection');
+          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
+      log('cek url : $urlMyInspectionProd');
       log('cek response get my inspection : ${responseMyInspection.body}');
 
       MyInspectionResponse res =
@@ -76,11 +78,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMyInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/inspector';
+      // var urlMyInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/inspector';
+      var urlMyInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/inspector';
       var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
-      log('cek url : $urlMyInspection');
+          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
+      log('cek url : $urlMyInspectionProd');
       log('cek response getMyInspectionNotClose : ${responseMyInspection.body}');
 
       MyInspectionResponse res =
@@ -122,11 +126,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMyInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/inspector';
+      // var urlMyInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/inspector';
+      var urlMyInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/inspector';
       var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspection), headers: headers);
-      log('cek url : $urlMyInspection');
+          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
+      log('cek url : $urlMyInspectionProd');
       log('cek response getMyInspectionClose : ${responseMyInspection.body}');
 
       MyInspectionResponse res =
@@ -168,11 +174,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlToDoInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myduty';
-      var responseToDoInspection =
-          await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
-      log('cek url : $urlToDoInspection');
+      // var urlToDoInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myduty';
+      var urlToDoInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/myduty';
+      var responseToDoInspection = await ioClient!
+          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
+      log('cek url : $urlToDoInspectionProd');
       log('cek response todo inspection : ${responseToDoInspection.body}');
 
       TodoInspectionResponse res = TodoInspectionResponse.fromJson(
@@ -214,11 +222,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlToDoInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/assignee';
-      var responseToDoInspection =
-          await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
-      log('cek url : $urlToDoInspection');
+      // var urlToDoInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/assignee';
+      var urlToDoInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/assignee';
+      var responseToDoInspection = await ioClient!
+          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
+      log('cek url : $urlToDoInspectionProd');
       log('cek response getToDoInspectionNotClose : ${responseToDoInspection.body}');
 
       TodoInspectionResponse res = TodoInspectionResponse.fromJson(
@@ -260,11 +270,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlToDoInspection =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/assignee';
-      var responseToDoInspection =
-          await ioClient!.get(Uri.parse(urlToDoInspection), headers: headers);
-      log('cek url : $urlToDoInspection');
+      // var urlToDoInspectionDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/assignee';
+      var urlToDoInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/assignee';
+      var responseToDoInspection = await ioClient!
+          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
+      log('cek url : $urlToDoInspectionProd');
       log('cek response getToDoInspectionClose : ${responseToDoInspection.body}');
 
       TodoInspectionResponse res = TodoInspectionResponse.fromJson(
@@ -306,11 +318,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMySubordinate =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/mysubordinate';
-      var responseMySubordinate =
-          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
-      log('cek url : $urlMySubordinate');
+      // var urlMySubordinateDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/mysubordinate';
+      var urlMySubordinateProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/mysubordinate';
+      var responseMySubordinate = await ioClient!
+          .get(Uri.parse(urlMySubordinateProd), headers: headers);
+      log('cek url : $urlMySubordinateProd');
       MySubordinateResponse res = MySubordinateResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response get my subordinate : ${res.data}');
@@ -351,11 +365,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMySubordinate =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/subordinate';
-      var responseMySubordinate =
-          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
-      log('cek url : $urlMySubordinate');
+      // var urlMySubordinateDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/subordinate';
+      var urlMySubordinateProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/subordinate';
+      var responseMySubordinate = await ioClient!
+          .get(Uri.parse(urlMySubordinateProd), headers: headers);
+      log('cek url : $urlMySubordinateProd');
       MySubordinateResponse res = MySubordinateResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response getOnGoingInspectionNotClose : ${res.data}');
@@ -396,11 +412,13 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      var urlMySubordinate =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/subordinate';
-      var responseMySubordinate =
-          await ioClient!.get(Uri.parse(urlMySubordinate), headers: headers);
-      log('cek url : $urlMySubordinate');
+      // var urlMySubordinateDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/subordinate';
+      var urlMySubordinateProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/subordinate';
+      var responseMySubordinate = await ioClient!
+          .get(Uri.parse(urlMySubordinateProd), headers: headers);
+      log('cek url : $urlMySubordinateProd');
       MySubordinateResponse res = MySubordinateResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response getOnGoingInspectionClose : ${res.data}');
@@ -442,9 +460,11 @@ class InspectionRepository extends APIConfiguration {
     };
 
     try {
-      var url =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/create';
-      var request = http.MultipartRequest("POST", Uri.parse(url));
+      // var urlDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/create';
+      var urlProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/create';
+      var request = http.MultipartRequest("POST", Uri.parse(urlProd));
       for (final image in ticketInspection.attachments) {
         if (image.toString().contains('http')) {
           var response = await http.get(Uri.parse(image));
@@ -537,9 +557,11 @@ class InspectionRepository extends APIConfiguration {
     };
 
     try {
-      var url =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/response/create';
-      var request = http.MultipartRequest("POST", Uri.parse(url));
+      // var urlDev =
+      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/response/create';
+      var urlProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/response/create';
+      var request = http.MultipartRequest("POST", Uri.parse(urlProd));
       for (final image in responseInspection.attachments) {
         if (image.toString().contains('http')) {
           var response = await http.get(Uri.parse(image));
