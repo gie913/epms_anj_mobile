@@ -36,6 +36,7 @@ class DatabaseUserInspection {
       String userId, String companyId) async {
     Database db = await DatabaseHelper().database;
 
+    // Hide User Login From User Assign List
     final dataUser = await DatabaseUserInspectionConfig.selectData();
 
     if (userId.isNotEmpty) {
@@ -49,10 +50,11 @@ class DatabaseUserInspection {
         return UserInspectionModel.fromJson(e);
       }));
 
-      final userInspection = data.where((element) => element.id == dataUser.id);
-      if (userInspection.isNotEmpty) {
-        data.remove(userInspection.first);
-      }
+      // Hide User Login From User Assign List
+      // final userInspection = data.where((element) => element.id == dataUser.id);
+      // if (userInspection.isNotEmpty) {
+      //   data.remove(userInspection.first);
+      // }
 
       return data;
     } else if (companyId.isNotEmpty) {
@@ -66,10 +68,11 @@ class DatabaseUserInspection {
         return UserInspectionModel.fromJson(e);
       }));
 
-      final userInspection = data.where((element) => element.id == dataUser.id);
-      if (userInspection.isNotEmpty) {
-        data.remove(userInspection.first);
-      }
+      // Hide User Login From User Assign List
+      // final userInspection = data.where((element) => element.id == dataUser.id);
+      // if (userInspection.isNotEmpty) {
+      //   data.remove(userInspection.first);
+      // }
 
       return data;
     } else {
@@ -79,6 +82,7 @@ class DatabaseUserInspection {
         return UserInspectionModel.fromJson(e);
       }));
 
+      // Hide User Login From User Assign List
       final userInspection = data.where((element) => element.id == dataUser.id);
       if (userInspection.isNotEmpty) {
         data.remove(userInspection.first);
