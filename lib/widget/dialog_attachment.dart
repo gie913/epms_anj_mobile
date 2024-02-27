@@ -1,5 +1,6 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
+import 'package:epms/common_manager/storage_manager.dart';
 import 'package:flutter/material.dart';
 
 class DialogAttachment extends StatefulWidget {
@@ -19,6 +20,20 @@ class DialogAttachment extends StatefulWidget {
 }
 
 class _DialogAttachmentState extends State<DialogAttachment> {
+  bool isEpmsUser = false;
+
+  @override
+  void initState() {
+    checkEpmsUser();
+    super.initState();
+  }
+
+  Future<void> checkEpmsUser() async {
+    final result = await StorageManager.readData('is_login_epms_success');
+    isEpmsUser = result;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
@@ -46,22 +61,29 @@ class _DialogAttachmentState extends State<DialogAttachment> {
               child: Text("KAMERA",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             ),
-            SizedBox(height: 12),
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Palette.primaryColorProd,
-                minimumSize: Size(MediaQuery.of(context).size.width, 50),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                    side: BorderSide(color: Palette.primaryColorProd)),
-                padding: const EdgeInsets.all(16.0),
-                textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+            if (isEpmsUser)
+              const SizedBox()
+            else
+              Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Palette.primaryColorProd,
+                    minimumSize: Size(MediaQuery.of(context).size.width, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: BorderSide(color: Palette.primaryColorProd)),
+                    padding: const EdgeInsets.all(16.0),
+                    textStyle:
+                        const TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onPressed: widget.onTapGallery,
+                  child: Text("GALERI",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
               ),
-              onPressed: widget.onTapGallery,
-              child: Text("GALERI",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            ),
           ],
         ),
         actions: [
