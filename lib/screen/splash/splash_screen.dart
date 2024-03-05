@@ -9,7 +9,6 @@ import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/model/supervisor.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -46,10 +45,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void autoLogIn() async {
     dynamic session = await StorageManager.readData('userToken');
-    dynamic inspectionToken = await StorageManager.readData("inspectionToken");
     dynamic lastSynchDate = await StorageManager.readData('lastSynchDate');
     String? roles = await StorageManager.readData('userRoles');
-    Permission.location.request();
+    // Permission.location.request();
     var duration = const Duration(seconds: 3);
     Timer(duration, () {
       if (session != null) {
@@ -66,8 +64,6 @@ class _SplashScreenState extends State<SplashScreen> {
             navigationService.push(Routes.HOME_PAGE);
           }
         }
-      } else if (inspectionToken != null) {
-        navigationService.push(Routes.HOME_INSPECTION_PAGE);
       } else {
         navigationService.push(Routes.LOGIN_PAGE);
       }

@@ -497,12 +497,11 @@ class FormSPBNotifier extends ChangeNotifier {
         _lastOPH = _listSPBDetail.last.ophCardId!;
         _countOPH = _listSPBDetail.length;
         // azis
-        _estateCode =
-            getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length);
-        _mDivisionCode = getMDivisionCode(_listOPHScanned, _estateCode!);
+        _estateCode = getMostEstateCodeValue(_listOPHScanned);
+        _mDivisionCode =
+            getMostDivisionCodeValue(_listOPHScanned, _estateCode!);
         _mEstateSchema = await DatabaseMEstateSchema()
-            .selectMEstateSchemaByEstateCode(getMostEstateCodeValue(
-                _listOPHScanned, _listOPHScanned.length));
+            .selectMEstateSchemaByEstateCode(_estateCode!);
         /*  original */
         _totalBunches = _totalBunches + spbDetail.ophBunchesDelivered!;
         _totalLooseFruits =
@@ -546,21 +545,6 @@ class FormSPBNotifier extends ChangeNotifier {
     _totalBunches = _totalBunches - listSPBDetail[index].ophBunchesDelivered!;
     _totalLooseFruits =
         _totalLooseFruits - listSPBDetail[index].ophLooseFruitDelivered!;
-    _listSPBDetail.removeAt(index);
-    _listOPHScanned.removeAt(index);
-    _lastOPH = _listSPBDetail.isNotEmpty ? _listSPBDetail.last.ophCardId! : "";
-    _countOPH = _listSPBDetail.length;
-    // azis
-    _estateCode = _listSPBDetail.isNotEmpty
-        ? getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length)
-        : '';
-    _mDivisionCode = _listSPBDetail.isNotEmpty
-        ? getMDivisionCode(_listOPHScanned, _estateCode!)
-        : '';
-    _mEstateSchema = _listSPBDetail.isNotEmpty
-        ? await DatabaseMEstateSchema().selectMEstateSchemaByEstateCode(
-            getMostEstateCodeValue(_listOPHScanned, _listOPHScanned.length))
-        : MEstateSchema();
     if (_mvraSchema != null) {
       _totalWeightEstimation =
           _totalWeightEstimation - _listOPHScanned[index].ophEstimateTonnage!;
@@ -570,8 +554,23 @@ class FormSPBNotifier extends ChangeNotifier {
         _totalCapacityTruck =
             (_totalCapacityTruck + _listOPHScanned[index].ophEstimateTonnage!);
       }
-      _listOPHScanned.removeAt(index);
     }
+
+    _listSPBDetail.removeAt(index);
+    _listOPHScanned.removeAt(index);
+    _lastOPH = _listSPBDetail.isNotEmpty ? _listSPBDetail.last.ophCardId! : "";
+    _countOPH = _listSPBDetail.length;
+    // azis
+    _estateCode = _listSPBDetail.isNotEmpty
+        ? getMostEstateCodeValue(_listOPHScanned)
+        : '';
+    _mDivisionCode = _listSPBDetail.isNotEmpty
+        ? getMostDivisionCodeValue(_listOPHScanned, _estateCode!)
+        : '';
+    _mEstateSchema = _listSPBDetail.isNotEmpty
+        ? await DatabaseMEstateSchema()
+            .selectMEstateSchemaByEstateCode(_estateCode!)
+        : MEstateSchema();
     notifyListeners();
   }
 
@@ -1063,13 +1062,13 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   // azis
-  String getMostEstateCodeValue(List<OPH> list, int listLength) {
+  String getMostEstateCodeValue(List<OPH> list) {
     int maxCount = 0;
     String maxFreq = '';
 
-    for (int i = 0; i < listLength; i++) {
+    for (int i = 0; i < list.length; i++) {
       int count = 0;
-      for (int j = 0; j < listLength; j++) {
+      for (int j = 0; j < list.length; j++) {
         if (list[i].ophEstateCode == list[j].ophEstateCode) {
           count++;
         }
@@ -1078,6 +1077,34 @@ class FormSPBNotifier extends ChangeNotifier {
       if (count > maxCount) {
         maxCount = count;
         maxFreq = list[i].ophEstateCode!;
+      }
+    }
+    return maxFreq;
+  }
+
+  String getMostDivisionCodeValue(List<OPH> list, String estateCode) {
+    int maxCount = 0;
+    String maxFreq = '';
+    List<OPH> listOPHMostEstate = [];
+
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].ophEstateCode! == estateCode) {
+        listOPHMostEstate.add(list[i]);
+      }
+    }
+
+    for (int i = 0; i < listOPHMostEstate.length; i++) {
+      int count = 0;
+      for (int j = 0; j < listOPHMostEstate.length; j++) {
+        if (listOPHMostEstate[i].ophDivisionCode ==
+            listOPHMostEstate[j].ophDivisionCode) {
+          count++;
+        }
+      }
+
+      if (count > maxCount) {
+        maxCount = count;
+        maxFreq = listOPHMostEstate[i].ophDivisionCode!;
       }
     }
     return maxFreq;

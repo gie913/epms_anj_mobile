@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:epms/base/api/api_configuration.dart';
@@ -27,42 +25,6 @@ class LogOutRepository extends APIConfiguration {
         onSuccess();
       } else {
         onError(response.statusCode.toString());
-      }
-      print(response.body);
-    } on SocketException {
-      onError('No Internet');
-    } on HttpException {
-      onError('No Service Found');
-    } on FormatException {
-      onError('Invalid Response format');
-    } catch (exception) {
-      onError(exception.toString());
-    }
-  }
-
-  Future<void> doPostLogOutInspection(
-    Function(String value) onSuccess,
-    Function(String value) onError,
-  ) async {
-    String inspectionToken = await StorageManager.readData("inspectionToken");
-    try {
-      var headers = {
-        'Content-type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $inspectionToken'
-      };
-      var url =
-          'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signout';
-      var uri = Uri.parse(url);
-      var response = await ioClient!.get(uri, headers: headers);
-      final data = jsonDecode(response.body);
-      log('cek url : $url');
-      log('cek response logout inspection : ${response.body}');
-
-      if (data['success'] == true) {
-        onSuccess(data['message']);
-      } else {
-        onError(data['message']);
       }
       print(response.body);
     } on SocketException {

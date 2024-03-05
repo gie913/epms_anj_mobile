@@ -5,6 +5,7 @@ import 'package:epms/base/ui/style.dart';
 import 'package:epms/screen/login/login_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/elusive_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -117,8 +118,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                             )),
                                       )
                                     : InkWell(
-                                        onTap: () {
-                                          login.doLogin(context);
+                                        onTap: () async {
+                                          if (await Permission.location
+                                              .request()
+                                              .isGranted) {
+                                            login.doLogin(context);
+                                          } else {
+                                            login.dialogService
+                                                .showNoOptionDialog(
+                                              title: 'Permission Akses Lokasi',
+                                              subtitle:
+                                                  'Mohon mengaktifkan lokasi untuk menggunakan aplikasi',
+                                              onPress: () {
+                                                login.dialogService.popDialog();
+                                                openAppSettings();
+                                              },
+                                            );
+                                          }
                                         },
                                         child: Card(
                                           color: Palette.primaryColorProd,
@@ -160,8 +176,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       InkWell(
-                                          onTap: () {
-                                            login.onPressConfiguration(context);
+                                          onTap: () async {
+                                            if (await Permission.location
+                                                .request()
+                                                .isGranted) {
+                                              login.onPressConfiguration(
+                                                  context);
+                                            } else {
+                                              login.dialogService
+                                                  .showNoOptionDialog(
+                                                title:
+                                                    'Permission Akses Lokasi',
+                                                subtitle:
+                                                    'Mohon mengaktifkan lokasi untuk menggunakan aplikasi',
+                                                onPress: () {
+                                                  login.dialogService
+                                                      .popDialog();
+                                                  openAppSettings();
+                                                },
+                                              );
+                                            }
                                           },
                                           child: Text(
                                             "Halaman Konfigurasi",

@@ -9,13 +9,10 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/value_service.dart';
-import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_activity.dart';
 import 'package:epms/database/service/database_attendance.dart';
-import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_cost_control.dart';
 import 'package:epms/database/service/database_destination.dart';
-import 'package:epms/database/service/database_division_inspection.dart';
 import 'package:epms/database/service/database_harvesting_plan.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
 import 'package:epms/database/service/database_laporan_restan.dart';
@@ -35,8 +32,6 @@ import 'package:epms/database/service/database_m_vra.dart';
 import 'package:epms/database/service/database_material.dart';
 import 'package:epms/database/service/database_mc_oph.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
-import 'package:epms/database/service/database_member_inspection.dart';
-import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/database/service/database_t_auth.dart';
@@ -44,17 +39,10 @@ import 'package:epms/database/service/database_t_user_assignment.dart';
 import 'package:epms/database/service/database_t_workplan_schema.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/database/service/database_tbs_luar_one_month.dart';
-import 'package:epms/database/service/database_team_inspection.dart';
-import 'package:epms/database/service/database_ticket_inspection.dart';
-import 'package:epms/database/service/database_todo_inspection.dart';
-import 'package:epms/database/service/database_user_inspection.dart';
 import 'package:epms/model/m_config_schema.dart';
 import 'package:epms/model/sync_response_revamp.dart';
-import 'package:epms/model/synch_inspection_data.dart';
 import 'package:epms/screen/home/home_notifier.dart';
 import 'package:epms/screen/home/logout_repository.dart';
-import 'package:epms/screen/home_inspection/home_inspection_notifier.dart';
-import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:epms/screen/synch/synch_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
@@ -79,60 +67,11 @@ class SynchNotifier extends ChangeNotifier {
       MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
       SynchRepository().doPostSynch(
           context, mConfigSchema.estateCode!, onSuccessSynch, onErrorSynch);
-    } else {
-      log('Synch Inspection');
-      SynchRepository().synchInspection(
-        context,
-        onSuccessSynchInspection,
-        onErrorSynchEpmsInspection,
-      );
     }
   }
 
   onSuccessSynch(BuildContext context, SynchResponse synchResponse) {
     saveDatabase(context, synchResponse);
-  }
-
-  onSuccessSynchInspection(
-      BuildContext context, SynchInspectionData data) async {
-    await saveDatabaseSynchInspection(context, data);
-    await InspectionRepository().getMyInspection(
-      context,
-      (context, data) async {
-        _dataText = "Synch data my inspection";
-        notifyListeners();
-        await DatabaseTicketInspection.addAllData(data);
-
-        await InspectionRepository().getToDoInspection(
-          context,
-          (context, data) async {
-            _dataText = "Synch data todo inspection";
-            notifyListeners();
-            await DatabaseTodoInspection.addAllData(data);
-
-            await InspectionRepository().getMySubordinate(
-              context,
-              (context, data) async {
-                _dataText = "Synch data subordinate inspection";
-                notifyListeners();
-                await DatabaseSubordinateInspection.addAllData(data);
-
-                _navigationService.push(Routes.HOME_INSPECTION_PAGE);
-              },
-              (context, errorMessage) {
-                onErrorSynchEpmsInspection(context, errorMessage);
-              },
-            );
-          },
-          (context, errorMessage) {
-            onErrorSynchEpmsInspection(context, errorMessage);
-          },
-        );
-      },
-      (context, errorMessage) {
-        onErrorSynchEpmsInspection(context, errorMessage);
-      },
-    );
   }
 
   onErrorSynch(BuildContext context, String message) {
@@ -146,64 +85,9 @@ class SynchNotifier extends ChangeNotifier {
         onPressNo: HomeNotifier().doLogOut);
   }
 
-  onErrorSynchEpmsInspection(BuildContext context, String message) {
-    print(message);
-    _dialogService.showOptionDialog(
-      title: "Gagal Synch",
-      subtitle: "$message",
-      buttonTextYes: "Ulang",
-      buttonTextNo: "Log Out",
-      onPressYes: onClickReSynch,
-      onPressNo: () {
-        HomeInspectionNotifier().logOut();
-      },
-    );
-  }
-
   onClickReSynch() {
     _dialogService.popDialog();
     _navigationService.push(Routes.SYNCH_PAGE);
-  }
-
-  saveDatabaseSynchInspection(
-      BuildContext context, SynchInspectionData data) async {
-    try {
-      _dataText = "Synch data user inspection";
-      notifyListeners();
-      await DatabaseUserInspection.insetData(data.user);
-
-      _dataText = "Synch data team inspection";
-      notifyListeners();
-      await DatabaseTeamInspection.insetData(data.team);
-
-      _dataText = "Synch data member inspection";
-      notifyListeners();
-      await DatabaseMemberInspection.insetData(data.team);
-
-      _dataText = "Synch data action inspection";
-      notifyListeners();
-      await DatabaseActionInspection.insetData(data.action);
-
-      _dataText = "Synch data company inspection";
-      notifyListeners();
-      await DatabaseCompanyInspection.insetData(data.company);
-
-      _dataText = "Synch data division inspection";
-      notifyListeners();
-      await DatabaseDivisionInspection.insetData(data.division);
-    } catch (e) {
-      print(e);
-      _dialogService.showOptionDialog(
-        title: "Gagal Synch",
-        subtitle: "$e",
-        buttonTextYes: "Ulang",
-        buttonTextNo: "Log Out",
-        onPressYes: onClickReSynch,
-        onPressNo: () {
-          HomeInspectionNotifier().logOut();
-        },
-      );
-    }
   }
 
   saveDatabase(BuildContext context, SynchResponse synchResponse) async {

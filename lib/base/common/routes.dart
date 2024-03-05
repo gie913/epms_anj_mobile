@@ -3,7 +3,6 @@ class Routes {
   static const LOGIN_PAGE = "/login";
   static const MAIN_PAGE = "/main";
   static const HOME_PAGE = "/home";
-  static const HOME_INSPECTION_PAGE = "/home-inspection";
 
   static const CONFIGURATION_PAGE = "/configuration";
   static const SUPERVISOR_FORM_PAGE = "/supervisor_form";
@@ -45,11 +44,4 @@ class Routes {
   static const TBS_LUAR_FORM_PAGE = "/tbs_luar_form_page";
   static const TBS_LUAR_DETAIL_PAGE = "/tbs_luar_detail_page";
   static const TBS_LUAR_HISTORY_PAGE = "/tbs_luar_history_page";
-
-  static const INSPECTION = '/inspection';
-  static const INSPECTION_FORM = '/inspection-form';
-  static const INSPECTION_ASSIGNMENT_DETAIL = '/inspection-assignment-detail';
-  static const INSPECTION_DETAIL = '/inspection-detail';
-  static const INSPECTION_APPROVAL = '/inspection-approval';
-  static const INSPECTION_USER = '/inspection-user';
 }

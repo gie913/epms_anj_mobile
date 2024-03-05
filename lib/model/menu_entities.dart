@@ -76,7 +76,6 @@ final List<String> supervisorSPBMenuEntries = <String>[
   'HISTORY SUPERVISI SPB',
   'BACA KARTU SPB',
   'BACA KARTU TBS LUAR',
-  // 'INSPECTION',
   'UPLOAD DATA',
   'KELUAR'
 ];

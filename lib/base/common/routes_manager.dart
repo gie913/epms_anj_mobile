@@ -2,16 +2,8 @@ import 'package:epms/base/common/routes.dart';
 import 'package:epms/model/laporan_restan.dart';
 import 'package:epms/model/laporan_spb_kemarin.dart';
 import 'package:epms/model/spb_supervise.dart';
-import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/configuration/configuration_page.dart';
 import 'package:epms/screen/home/home_page.dart';
-import 'package:epms/screen/home_inspection/home_inspection_page.dart';
-import 'package:epms/screen/inspection/inspection_approval_view.dart';
-import 'package:epms/screen/inspection/inspection_assignment_detail_view.dart';
-import 'package:epms/screen/inspection/inspection_detail_view.dart';
-import 'package:epms/screen/inspection/inspection_form_view.dart';
-import 'package:epms/screen/inspection/inspection_page.dart';
-import 'package:epms/screen/inspection/inspection_user_view.dart';
 import 'package:epms/screen/kerani_kirim/administration_spb/administration_spb_screen.dart';
 import 'package:epms/screen/kerani_kirim/detail_spb/detail_spb_page.dart';
 import 'package:epms/screen/kerani_kirim/edit_spb/edit_spb_page.dart';
@@ -62,12 +54,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => HomePage(),
       );
-    case Routes.HOME_INSPECTION_PAGE:
-      // int current = settings.arguments as int;
-      return MaterialPageRoute(
-        builder: (context) => HomeInspectionPage(),
-      );
-
     case Routes.CONFIGURATION_PAGE:
       // int current = settings.arguments as int;
       return MaterialPageRoute(
@@ -249,39 +235,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           tbsLuar: arguments['tbs_luar'],
           method: arguments['method'],
         ),
-      );
-    case Routes.INSPECTION:
-      return MaterialPageRoute(
-        builder: (context) => InspectionPage(),
-      );
-    case Routes.INSPECTION_FORM:
-      return MaterialPageRoute(
-        builder: (context) => InspectionFormView(),
-      );
-    case Routes.INSPECTION_ASSIGNMENT_DETAIL:
-      final arguments = settings.arguments != null
-          ? settings.arguments as TicketInspectionModel
-          : const TicketInspectionModel();
-      return MaterialPageRoute(
-        builder: (context) => InspectionAssignmentDetailView(data: arguments),
-      );
-    case Routes.INSPECTION_DETAIL:
-      final arguments = settings.arguments != null
-          ? settings.arguments as TicketInspectionModel
-          : const TicketInspectionModel();
-      return MaterialPageRoute(
-        builder: (context) => InspectionDetailView(data: arguments),
-      );
-    case Routes.INSPECTION_APPROVAL:
-      final arguments = settings.arguments != null
-          ? settings.arguments as TicketInspectionModel
-          : const TicketInspectionModel();
-      return MaterialPageRoute(
-        builder: (context) => InspectionApprovalView(data: arguments),
-      );
-    case Routes.INSPECTION_USER:
-      return MaterialPageRoute(
-        builder: (context) => InspectionUserView(),
       );
     default:
       return MaterialPageRoute(

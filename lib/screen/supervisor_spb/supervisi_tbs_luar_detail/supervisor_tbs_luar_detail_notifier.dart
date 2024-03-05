@@ -7,9 +7,11 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/tbs_luar_card_manager.dart';
+import 'package:epms/database/service/database_m_vendor.dart';
 import 'package:epms/database/service/database_t_auth.dart';
 import 'package:epms/database/service/database_tbs_luar.dart';
 import 'package:epms/model/auth_model.dart';
+import 'package:epms/model/m_vendor_schema.dart';
 import 'package:epms/model/tbs_luar.dart';
 import 'package:epms/widget/dialog_approval_tbs_luar.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,10 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
   TBSLuar? _tbsLuar;
 
   TBSLuar? get tbsLuar => _tbsLuar;
+
+  bool _isExist = false;
+
+  bool get isExist => _isExist;
 
   bool _onEdit = false;
 
@@ -381,8 +387,11 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
   void checkTBSLuarExist(TBSLuar tbsLuarTemp) async {
     TBSLuar? tbsLuar =
         await DatabaseTBSLuar().selectTBSLuarByID(tbsLuarTemp.spdID!);
+    MVendorSchema vendor = await DatabaseMVendorSchema()
+        .selectMVendorSchemaByCode(tbsLuarTemp.supplierCode!);
     if (tbsLuar != null) {
       _tbsLuar = tbsLuar;
+      log('cek tbsLuar from database local : $_tbsLuar');
       _bunchesUnRipe.text = _tbsLuar!.bunchesUnripe.toString();
       _bunchesHalfRipe.text = _tbsLuar!.bunchesHalfripe.toString();
       _bunchesOverRipe.text = _tbsLuar!.bunchesOverripe.toString();
@@ -402,16 +411,41 @@ class SupervisorTBSLuarDetailNotifier extends ChangeNotifier {
       _bunchesLess4Kg.text = _tbsLuar!.bunchesLess4Kg.toString();
       _notesOPH.text = _tbsLuar!.notes ?? "";
       _pickedFile = _tbsLuar!.gradingPhoto ?? "";
-      notifyListeners();
-      Future.delayed(Duration(seconds: 1), () {
-        NfcManager.instance.stopSession();
-      });
-      _dialogService.popDialog();
+      _isExist = true;
     } else {
-      FlushBarManager.showFlushBarWarning(
-          _navigationService.navigatorKey.currentContext!,
-          "Detail Grading Luar",
-          "Tidak tersedia di gadget");
+      _tbsLuar = tbsLuarTemp;
+      _tbsLuar?.supplierName = vendor.vendorName;
+      _bunchesUnRipe.text = _tbsLuar!.bunchesUnripe.toString();
+      _bunchesHalfRipe.text = _tbsLuar!.bunchesHalfripe.toString();
+      _bunchesOverRipe.text = _tbsLuar!.bunchesOverripe.toString();
+      _bunchesRotten.text = _tbsLuar!.bunchesRotten.toString();
+      _bunchesAbnormal.text = _tbsLuar!.bunchesAbnormal.toString();
+      _bunchesEmpty.text = _tbsLuar!.bunchesEmpty.toString();
+      _rubbish.text = _tbsLuar!.rubbish.toString();
+      _water.text = _tbsLuar!.water.toString();
+      _longStalk.text = _tbsLuar!.longStalk.toString();
+      _bunchesTotal.text = _tbsLuar!.bunchesTotal.toString();
+      _deduction.text = _tbsLuar!.deduction.toString();
+      _bunchesLarge.text = _tbsLuar!.large.toString();
+      _bunchesSmall.text = _tbsLuar!.small.toString();
+      _bunchesMedium.text = _tbsLuar!.medium.toString();
+      _brondolanRotten.text = _tbsLuar!.brondolanRotten.toString();
+      _bunchesCengkeh.text = _tbsLuar!.bunchesCengkeh.toString();
+      _bunchesLess4Kg.text = _tbsLuar!.bunchesLess4Kg.toString();
+      _notesOPH.text = _tbsLuar!.notes ?? "";
+      _pickedFile = _tbsLuar?.gradingPhoto;
+      _isExist = false;
+      log('cek tbsLuar from card NFC : $_tbsLuar');
+      // FlushBarManager.showFlushBarWarning(
+      //     _navigationService.navigatorKey.currentContext!,
+      //     "Detail Grading Luar",
+      //     "Tidak tersedia di gadget");
     }
+
+    Future.delayed(Duration(seconds: 1), () {
+      NfcManager.instance.stopSession();
+    });
+    _dialogService.popDialog();
+    notifyListeners();
   }
 }

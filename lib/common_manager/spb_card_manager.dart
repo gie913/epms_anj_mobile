@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/model/spb.dart';
 import 'package:epms/model/spb_detail.dart';
@@ -9,8 +11,10 @@ import 'encryption_manager.dart';
 class SPBCardManager {
   ValueNotifier<dynamic> resultNFC = ValueNotifier(null);
 
-  writeSPBCard(BuildContext context, SPB spb, List<SPBDetail> listSPBDetail, onSuccess, onError) {
+  writeSPBCard(BuildContext context, SPB spb, List<SPBDetail> listSPBDetail,
+      onSuccess, onError) {
     String spbTag = ValueService.spbCardTag(spb, listSPBDetail);
+    log('cek spbTag : $spbTag');
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       var ndef = Ndef.from(tag);
       if (ndef == null || !ndef.isWritable) {
@@ -41,6 +45,7 @@ class SPBCardManager {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       ValueService.tagReader(tag).then((value) {
         String decryptData = EncryptionManager.decryptData(value);
+        log('cek decryptData SPB Card : $decryptData');
         if (decryptData.characters.first == "S") {
           final split = decryptData.split(',');
           final Map<int, String> values = {
