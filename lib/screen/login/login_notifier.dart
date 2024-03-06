@@ -106,6 +106,7 @@ class LoginNotifier extends ChangeNotifier {
           onSuccessLogin,
           (context, errorMessage) async {
             log('Error Login Epms');
+            final errorLoginEpms = errorMessage;
             StorageManager.saveData('is_login_epms_success', false);
             await LoginRepository().loginInspection(
               context,
@@ -115,7 +116,10 @@ class LoginNotifier extends ChangeNotifier {
               onSuccessLoginInspection,
               (context, errorMessage) async {
                 StorageManager.saveData('is_login_inspection_success', false);
-                onErrorLogin(context, errorMessage);
+                onErrorLogin(
+                  context,
+                  'Error Login Epms : $errorLoginEpms\nError Login Inspection : $errorMessage',
+                );
                 _loading = false;
                 notifyListeners();
               },
@@ -138,9 +142,10 @@ class LoginNotifier extends ChangeNotifier {
             StorageManager.saveData('is_login_inspection_success', false);
             _loading = false;
             _dialogService.showNoOptionDialog(
-                subtitle: "$errorMessage",
-                title: 'Gagal Login',
-                onPress: _dialogService.popDialog);
+              subtitle: "Error Login Inspection : $errorMessage",
+              title: 'Gagal Login',
+              onPress: _dialogService.popDialog,
+            );
             notifyListeners();
           },
         );

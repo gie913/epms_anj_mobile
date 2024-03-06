@@ -47,6 +47,20 @@ class SPBDetail extends Equatable {
     return data;
   }
 
+  Map<String, dynamic> toJson2() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['spb_id'] = this.spbId;
+    data['oph_id'] = this.ophId;
+    data['oph_bunches_delivered'] = this.ophBunchesDelivered;
+    data['oph_loose_fruit_delivered'] = this.ophLooseFruitDelivered;
+    data['oph_estate_code'] = this.ophEstateCode;
+    data['oph_division_code'] = this.ophDivisionCode;
+    data['oph_block_code'] = this.ophBlockCode;
+    data['oph_tph_code'] = this.ophTphCode;
+    data['oph_card_id'] = this.ophCardId;
+    return data;
+  }
+
   Map<String, dynamic> toDatabase() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['spb_id'] = this.spbId;

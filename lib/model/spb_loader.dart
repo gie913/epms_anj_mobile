@@ -43,5 +43,5 @@ class SPBLoader extends Equatable {
   }
 
   @override
-  List<Object?> get props => [spbLoaderId];
+  List<Object?> get props => [spbId, spbLoaderId];
 }

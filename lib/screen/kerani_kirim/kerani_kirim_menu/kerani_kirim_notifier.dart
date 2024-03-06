@@ -55,156 +55,197 @@ class KeraniKirimNotifier extends ChangeNotifier {
       List<String> mapListSPB = [];
       List<String> mapListSPBDetail = [];
       List<String> mapListSPBLoader = [];
+      List<Map<String, dynamic>> listFotoSPB = [];
 
-      // typeTBS = 1 Inti, 2 Plasma, 3 Campuran
-      int typeTBS = ValueService.checkTypeTBS(_listSPBDetail);
-      List<String> mapListSPBInti = [];
-      List<String> mapListSPBPlasma = [];
-      List<String> mapListSPBDetailInti = [];
-      List<String> mapListSPBDetailPlasma = [];
+      for (int i = 0; i < _listSPBLoader.length; i++) {
+        final spbDetailByLoaderSpbId = _listSPBDetail
+            .where((element) => element.spbId! == _listSPBLoader[i].spbId!);
+        final listSPBDetailTemp =
+            List<SPBDetail>.from(spbDetailByLoaderSpbId.map((e) {
+          return SPBDetail.fromJson(e.toJson2());
+        }));
 
-      List<SPBDetail> listSPBDetailInti = [];
-      List<SPBDetail> listSPBDetailPlasma = [];
-
-      List<Map<String, dynamic>> listFotoInti = [];
-      List<Map<String, dynamic>> listFotoPlasma = [];
-
-      String mostEstateCodeInti = '';
-      String mostEstateCodePlasma = '';
-
-      String mostDivisionCodeInti = '';
-      String mostDivisionCodePlasma = '';
-
-      int totalOphInti = 0;
-      int totalJanjangInti = 0;
-      int totalBrondolanInti = 0;
-
-      int totalOphPlasma = 0;
-      int totalJanjangPlasma = 0;
-      int totalBrondolanPlasma = 0;
-
-      for (int i = 0; i < _listSPBDetail.length; i++) {
+        int typeTBS = ValueService.checkTypeTBS(listSPBDetailTemp);
         if (typeTBS == 3) {
-          if (ValueService.plasmaValidator(_listSPBDetail[i].ophEstateCode!) ==
-              1) {
-            SPBDetail spbDetailTemp = _listSPBDetail[i];
-            spbDetailTemp.spbId = '${_listSPBDetail[i].spbId}_2';
-            totalOphInti = totalOphInti + 1;
-            totalJanjangInti =
-                totalJanjangInti + _listSPBDetail[i].ophBunchesDelivered!;
-            totalBrondolanInti =
-                totalBrondolanInti + _listSPBDetail[i].ophLooseFruitDelivered!;
-            listSPBDetailInti.add(spbDetailTemp);
-            log('listSPBDetailInti : $listSPBDetailInti');
-            String jsonString = jsonEncode(spbDetailTemp);
-            mapListSPBDetailInti
-                .add("\"${mapListSPBDetailInti.length}\":$jsonString");
-          } else {
-            SPBDetail spbDetailTemp = _listSPBDetail[i];
-            spbDetailTemp.spbId = '${_listSPBDetail[i].spbId}_1';
-            totalOphPlasma = totalOphPlasma + 1;
-            totalJanjangPlasma =
-                totalJanjangPlasma + _listSPBDetail[i].ophBunchesDelivered!;
-            totalBrondolanPlasma = totalBrondolanPlasma +
-                _listSPBDetail[i].ophLooseFruitDelivered!;
-            listSPBDetailPlasma.add(spbDetailTemp);
-            log('listSPBDetailPlasma : $listSPBDetailPlasma');
-            String jsonString = jsonEncode(spbDetailTemp);
-            mapListSPBDetailPlasma
-                .add("\"${mapListSPBDetailPlasma.length}\":$jsonString");
-          }
-        }
-
-        String jsonString = jsonEncode(_listSPBDetail[i]);
-        mapListSPBDetail.add("\"$i\":$jsonString");
-      }
-      log('cek mapListSPBDetail : $mapListSPBDetail');
-      log('cek mapListSPBDetailInti : $mapListSPBDetailInti');
-      log('cek listSPBDetailPlasma : $listSPBDetailPlasma');
-
-      // Check Most Estate & Division Inti
-      int maxCountEstateInti = 0;
-      for (int i = 0; i < listSPBDetailInti.length; i++) {
-        int countEstateInti = 0;
-        for (int j = 0; j < listSPBDetailInti.length; j++) {
-          if (listSPBDetailInti[i].ophEstateCode ==
-              listSPBDetailInti[j].ophEstateCode) {
-            countEstateInti++;
-          }
-        }
-
-        if (countEstateInti > maxCountEstateInti) {
-          maxCountEstateInti = countEstateInti;
-          mostEstateCodeInti = listSPBDetailInti[i].ophEstateCode!;
+          String jsonString2 = jsonEncode(
+            SPBLoader(
+              loaderDestinationType: _listSPBLoader[i].loaderDestinationType,
+              loaderEmployeeCode: _listSPBLoader[i].loaderEmployeeCode,
+              loaderEmployeeName: _listSPBLoader[i].loaderEmployeeName,
+              loaderPercentage: _listSPBLoader[i].loaderPercentage,
+              loaderType: _listSPBLoader[i].loaderType,
+              spbId: "${_listSPBLoader[i].spbId}_2",
+              spbLoaderId: _listSPBLoader[i].spbLoaderId,
+            ),
+          );
+          mapListSPBLoader.add("\"${mapListSPBLoader.length}\":$jsonString2");
+          String jsonString1 = jsonEncode(
+            SPBLoader(
+              loaderDestinationType: _listSPBLoader[i].loaderDestinationType,
+              loaderEmployeeCode: _listSPBLoader[i].loaderEmployeeCode,
+              loaderEmployeeName: _listSPBLoader[i].loaderEmployeeName,
+              loaderPercentage: _listSPBLoader[i].loaderPercentage,
+              loaderType: _listSPBLoader[i].loaderType,
+              spbId: "${_listSPBLoader[i].spbId}_1",
+              spbLoaderId: _listSPBLoader[i].spbLoaderId,
+            ),
+          );
+          mapListSPBLoader.add("\"${mapListSPBLoader.length}\":$jsonString1");
+        } else {
+          String jsonString = jsonEncode(_listSPBLoader[i]);
+          mapListSPBLoader.add("\"${mapListSPBLoader.length}\":$jsonString");
         }
       }
-
-      List<SPBDetail> listSPBDetailMostEstateInti = [];
-      for (int i = 0; i < listSPBDetailInti.length; i++) {
-        if (listSPBDetailInti[i].ophEstateCode! == mostEstateCodeInti) {
-          listSPBDetailMostEstateInti.add(listSPBDetailInti[i]);
-        }
-      }
-
-      int maxCountDivisionInti = 0;
-      for (int i = 0; i < listSPBDetailMostEstateInti.length; i++) {
-        int countDivisionInti = 0;
-        for (int j = 0; j < listSPBDetailMostEstateInti.length; j++) {
-          if (listSPBDetailMostEstateInti[i].ophDivisionCode ==
-              listSPBDetailMostEstateInti[j].ophDivisionCode) {
-            countDivisionInti++;
-          }
-        }
-
-        if (countDivisionInti > maxCountDivisionInti) {
-          maxCountDivisionInti = countDivisionInti;
-          mostDivisionCodeInti =
-              listSPBDetailMostEstateInti[i].ophDivisionCode!;
-        }
-      }
-
-      // Check Most Estate & Division Plasma
-      int maxCountEstatePlasma = 0;
-      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
-        int countEstatePlasma = 0;
-        for (int j = 0; j < listSPBDetailPlasma.length; j++) {
-          if (listSPBDetailPlasma[i].ophEstateCode ==
-              listSPBDetailPlasma[j].ophEstateCode) {
-            countEstatePlasma++;
-          }
-        }
-
-        if (countEstatePlasma > maxCountEstatePlasma) {
-          maxCountEstatePlasma = countEstatePlasma;
-          mostEstateCodePlasma = listSPBDetailPlasma[i].ophEstateCode!;
-        }
-      }
-
-      List<SPBDetail> listSPBDetailMostEstatePlasma = [];
-      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
-        if (listSPBDetailPlasma[i].ophEstateCode! == mostEstateCodePlasma) {
-          listSPBDetailMostEstatePlasma.add(listSPBDetailPlasma[i]);
-        }
-      }
-
-      int maxCountDivisionPlasma = 0;
-      for (int i = 0; i < listSPBDetailMostEstatePlasma.length; i++) {
-        int countDivisionPlasma = 0;
-        for (int j = 0; j < listSPBDetailMostEstatePlasma.length; j++) {
-          if (listSPBDetailMostEstatePlasma[i].ophDivisionCode ==
-              listSPBDetailMostEstatePlasma[j].ophDivisionCode) {
-            countDivisionPlasma++;
-          }
-        }
-
-        if (countDivisionPlasma > maxCountDivisionPlasma) {
-          maxCountDivisionPlasma = countDivisionPlasma;
-          mostDivisionCodePlasma =
-              listSPBDetailMostEstatePlasma[i].ophDivisionCode!;
-        }
-      }
+      log('cek mapListSPBLoader : $mapListSPBLoader');
 
       for (int i = 0; i < _listSPB.length; i++) {
+        // Mapping listSPBDetail
+        final spbDetailBySpbId = _listSPBDetail
+            .where((element) => element.spbId! == _listSPB[i].spbId!);
+        final listSPBDetailTemp =
+            List<SPBDetail>.from(spbDetailBySpbId.map((e) {
+          return SPBDetail.fromJson(e.toJson2());
+        }));
+
+        // Mapping listSPB by Checking TBS Type is Mix / Original
+        // typeTBS = 1 Inti, 2 Plasma, 3 Campuran
+        int typeTBS = ValueService.checkTypeTBS(listSPBDetailTemp);
+
+        int totalOphInti = 0;
+        int totalJanjangInti = 0;
+        int totalBrondolanInti = 0;
+        List<SPBDetail> listSPBDetailInti = [];
+        String mostEstateCodeInti = '';
+        String mostDivisionCodeInti = '';
+
+        int totalOphPlasma = 0;
+        int totalJanjangPlasma = 0;
+        int totalBrondolanPlasma = 0;
+        List<SPBDetail> listSPBDetailPlasma = [];
+        String mostEstateCodePlasma = '';
+        String mostDivisionCodePlasma = '';
+
+        if (typeTBS == 3) {
+          for (int i = 0; i < listSPBDetailTemp.length; i++) {
+            if (ValueService.plasmaValidator(
+                    listSPBDetailTemp[i].ophEstateCode!) ==
+                1) {
+              SPBDetail spbDetailTemp = listSPBDetailTemp[i];
+              spbDetailTemp.spbId = '${listSPBDetailTemp[i].spbId}_2';
+              totalOphInti = totalOphInti + 1;
+              totalJanjangInti =
+                  totalJanjangInti + listSPBDetailTemp[i].ophBunchesDelivered!;
+              totalBrondolanInti = totalBrondolanInti +
+                  listSPBDetailTemp[i].ophLooseFruitDelivered!;
+              listSPBDetailInti.add(spbDetailTemp);
+              String jsonString = jsonEncode(spbDetailTemp);
+              mapListSPBDetail
+                  .add("\"${mapListSPBDetail.length}\":$jsonString");
+            } else if (ValueService.plasmaValidator(
+                    listSPBDetailTemp[i].ophEstateCode!) ==
+                2) {
+              SPBDetail spbDetailTemp = listSPBDetailTemp[i];
+              spbDetailTemp.spbId = '${listSPBDetailTemp[i].spbId}_1';
+              totalOphPlasma = totalOphPlasma + 1;
+              totalJanjangPlasma = totalJanjangPlasma +
+                  listSPBDetailTemp[i].ophBunchesDelivered!;
+              totalBrondolanPlasma = totalBrondolanPlasma +
+                  listSPBDetailTemp[i].ophLooseFruitDelivered!;
+              listSPBDetailPlasma.add(spbDetailTemp);
+              String jsonString = jsonEncode(spbDetailTemp);
+              mapListSPBDetail
+                  .add("\"${mapListSPBDetail.length}\":$jsonString");
+            }
+          }
+        } else {
+          for (int i = 0; i < listSPBDetailTemp.length; i++) {
+            String jsonString = jsonEncode(listSPBDetailTemp[i]);
+            mapListSPBDetail.add("\"${mapListSPBDetail.length}\":$jsonString");
+          }
+        }
+
+        // Check Most Estate & Division Inti
+        int maxCountEstateInti = 0;
+        for (int i = 0; i < listSPBDetailInti.length; i++) {
+          int countEstateInti = 0;
+          for (int j = 0; j < listSPBDetailInti.length; j++) {
+            if (listSPBDetailInti[i].ophEstateCode ==
+                listSPBDetailInti[j].ophEstateCode) {
+              countEstateInti++;
+            }
+          }
+
+          if (countEstateInti > maxCountEstateInti) {
+            maxCountEstateInti = countEstateInti;
+            mostEstateCodeInti = listSPBDetailInti[i].ophEstateCode!;
+          }
+        }
+
+        List<SPBDetail> listSPBDetailMostEstateInti = [];
+        for (int i = 0; i < listSPBDetailInti.length; i++) {
+          if (listSPBDetailInti[i].ophEstateCode! == mostEstateCodeInti) {
+            listSPBDetailMostEstateInti.add(listSPBDetailInti[i]);
+          }
+        }
+
+        int maxCountDivisionInti = 0;
+        for (int i = 0; i < listSPBDetailMostEstateInti.length; i++) {
+          int countDivisionInti = 0;
+          for (int j = 0; j < listSPBDetailMostEstateInti.length; j++) {
+            if (listSPBDetailMostEstateInti[i].ophDivisionCode ==
+                listSPBDetailMostEstateInti[j].ophDivisionCode) {
+              countDivisionInti++;
+            }
+          }
+
+          if (countDivisionInti > maxCountDivisionInti) {
+            maxCountDivisionInti = countDivisionInti;
+            mostDivisionCodeInti =
+                listSPBDetailMostEstateInti[i].ophDivisionCode!;
+          }
+        }
+
+        // Check Most Estate & Division Plasma
+        int maxCountEstatePlasma = 0;
+        for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+          int countEstatePlasma = 0;
+          for (int j = 0; j < listSPBDetailPlasma.length; j++) {
+            if (listSPBDetailPlasma[i].ophEstateCode ==
+                listSPBDetailPlasma[j].ophEstateCode) {
+              countEstatePlasma++;
+            }
+          }
+
+          if (countEstatePlasma > maxCountEstatePlasma) {
+            maxCountEstatePlasma = countEstatePlasma;
+            mostEstateCodePlasma = listSPBDetailPlasma[i].ophEstateCode!;
+          }
+        }
+
+        List<SPBDetail> listSPBDetailMostEstatePlasma = [];
+        for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+          if (listSPBDetailPlasma[i].ophEstateCode! == mostEstateCodePlasma) {
+            listSPBDetailMostEstatePlasma.add(listSPBDetailPlasma[i]);
+          }
+        }
+
+        int maxCountDivisionPlasma = 0;
+        for (int i = 0; i < listSPBDetailMostEstatePlasma.length; i++) {
+          int countDivisionPlasma = 0;
+          for (int j = 0; j < listSPBDetailMostEstatePlasma.length; j++) {
+            if (listSPBDetailMostEstatePlasma[i].ophDivisionCode ==
+                listSPBDetailMostEstatePlasma[j].ophDivisionCode) {
+              countDivisionPlasma++;
+            }
+          }
+
+          if (countDivisionPlasma > maxCountDivisionPlasma) {
+            maxCountDivisionPlasma = countDivisionPlasma;
+            mostDivisionCodePlasma =
+                listSPBDetailMostEstatePlasma[i].ophDivisionCode!;
+          }
+        }
+
         if (typeTBS == 3) {
           SPB spbPlasmaTemp = _listSPB[i];
           spbPlasmaTemp.spbId = '${_listSPB[i].spbId}_1';
@@ -214,15 +255,13 @@ class KeraniKirimNotifier extends ChangeNotifier {
           spbPlasmaTemp.spbTotalBunches = totalJanjangPlasma;
           spbPlasmaTemp.spbTotalLooseFruit = totalBrondolanPlasma;
           String jsonStringPlasma = jsonEncode(spbPlasmaTemp);
-          mapListSPBPlasma.add("\"$i\":$jsonStringPlasma");
-          listFotoPlasma.add(
+          mapListSPB.add("\"${mapListSPB.length}\":$jsonStringPlasma");
+          listFotoSPB.add(
             {
               'id': '${_listSPB[i].spbId!.replaceAll(RegExp(r'_1'), '_1')}',
               'foto': _listSPB[i].spbPhoto,
             },
           );
-          log('listFotoPlasma : $listFotoPlasma');
-          log('spbPlasmaTemp : $spbPlasmaTemp');
 
           SPB spbIntiTemp = _listSPB[i];
           spbIntiTemp.spbId =
@@ -232,154 +271,82 @@ class KeraniKirimNotifier extends ChangeNotifier {
           spbPlasmaTemp.spbTotalBunches = totalJanjangInti;
           spbPlasmaTemp.spbTotalLooseFruit = totalBrondolanInti;
           spbIntiTemp.spbDivisionCode = mostDivisionCodeInti;
-          String jsonString = jsonEncode(spbIntiTemp);
-          mapListSPBInti.add("\"$i\":$jsonString");
-          listFotoInti.add(
+          String jsonStringInti = jsonEncode(spbIntiTemp);
+          mapListSPB.add("\"${mapListSPB.length}\":$jsonStringInti");
+          listFotoSPB.add(
             {
               'id': '${_listSPB[i].spbId!.replaceAll(RegExp(r'_1'), '_2')}',
               'foto': _listSPB[i].spbPhoto,
             },
           );
-          log('listFotoInti : $listFotoInti');
-          log('spbIntiTemp : $spbIntiTemp');
+        } else {
+          String jsonString = jsonEncode(_listSPB[i]);
+          mapListSPB.add("\"${mapListSPB.length}\":$jsonString");
+          listFotoSPB.add(
+            {
+              'id': '${_listSPB[i].spbId!}',
+              'foto': _listSPB[i].spbPhoto,
+            },
+          );
         }
-
-        String jsonString = jsonEncode(_listSPB[i]);
-        mapListSPB.add("\"$i\":$jsonString");
       }
 
-      for (int i = 0; i < _listSPBLoader.length; i++) {
-        String jsonString = jsonEncode(_listSPBLoader[i]);
-        mapListSPBLoader.add("\"$i\":$jsonString");
-      }
+      var stringListSPB = mapListSPB.join(",");
+      var stringListSPBDetail = mapListSPBDetail.join(",");
+      var stringListSPBLoader = mapListSPBLoader.join(",");
 
-      log('mapListSPBInti : $mapListSPBInti');
-      // log('mapListSPBDetailInti : $mapListSPBDetailInti');
-
-      log('mapListSPBPlasma : $mapListSPBPlasma');
-      // log('mapListSPBDetailPlasma : $mapListSPBDetailPlasma');
+      String listSPB = "{$stringListSPB}";
+      String listSPBDetail = "{$stringListSPBDetail}";
+      String listSPBLoader = "{$stringListSPBLoader}";
 
       _dialogService.showLoadingDialog(title: "Mengupload SPB");
-
-      if (typeTBS == 3) {
-        var stringListSPBLoader = mapListSPBLoader.join(",");
-        String listSPBLoader = "{$stringListSPBLoader}";
-
-        var stringListSPBInti = mapListSPBInti.join(",");
-        var stringListSPBDetailInti = mapListSPBDetailInti.join(",");
-        String listSPBInti = "{$stringListSPBInti}";
-        String listSPBDetailInti = "{$stringListSPBDetailInti}";
-
-        var stringListSPBPlasma = mapListSPBPlasma.join(",");
-        var stringListSPBDetailPlasma = mapListSPBDetailPlasma.join(",");
-        String listSPBPlasma = "{$stringListSPBPlasma}";
-        String listSPBDetailPlasma = "{$stringListSPBDetailPlasma}";
-
-        log('cek stringListSPBInti : $stringListSPBInti');
-        log('cek listSPBInti : $listSPBInti');
-
-        log('cek stringListSPBPlasma : $stringListSPBPlasma');
-        log('cek listSPBPlasma : $listSPBPlasma');
-
-        UploadSPBRepository().doPostUploadSPB(
-          _navigationService.navigatorKey.currentContext!,
-          listSPBPlasma,
-          listSPBDetailPlasma,
-          listSPBLoader,
-          (BuildContext context, response) {
-            // List<SPB> listSPB = await DatabaseSPB().selectSPB();
-            for (int i = 0; i < listFotoPlasma.length; i++) {
-              if (listFotoPlasma[i]['foto'] != null) {
-                UploadImageOPHRepository().doUploadPhoto(
-                  context,
-                  listFotoPlasma[i]['foto'],
-                  listFotoPlasma[i]['id'],
-                  "spb",
-                  onSuccessUploadImage,
-                  onErrorUploadImage,
-                );
-              }
-            }
-            FlushBarManager.showFlushBarSuccess(
-                context, "Upload SPB", "Berhasil mengupload data");
-
-            UploadSPBRepository().doPostUploadSPB(
-              _navigationService.navigatorKey.currentContext!,
-              listSPBInti,
-              listSPBDetailInti,
-              listSPBLoader,
-              (BuildContext context, response) async {
-                // List<SPB> listSPB = await DatabaseSPB().selectSPB();
-                for (int i = 0; i < listFotoInti.length; i++) {
-                  if (listFotoInti[i]['foto'] != null) {
-                    UploadImageOPHRepository().doUploadPhoto(
-                      context,
-                      listFotoInti[i]['foto'],
-                      listFotoInti[i]['id'],
-                      "spb",
-                      onSuccessUploadImage,
-                      onErrorUploadImage,
-                    );
-                  }
-                }
-                DatabaseSPB().deleteSPB();
-                DatabaseSPBDetail().deleteSPBDetail();
-                DatabaseSPBLoader().deleteSPBLoader();
-                _dialogService.popDialog();
-                FlushBarManager.showFlushBarSuccess(
-                    context, "Upload SPB", "Berhasil mengupload data");
-              },
-              onErrorUploadSPB,
-            );
-          },
-          onErrorUploadSPB,
-        );
-      } else {
-        var stringListSPB = mapListSPB.join(",");
-        var stringListSPBDetail = mapListSPBDetail.join(",");
-        var stringListSPBLoader = mapListSPBLoader.join(",");
-
-        String listSPB = "{$stringListSPB}";
-        String listSPBDetail = "{$stringListSPBDetail}";
-        String listSPBLoader = "{$stringListSPBLoader}";
-
-        log('cek stringListSPB : $stringListSPB');
-        log('cek listSPB : $listSPB');
-
-        UploadSPBRepository().doPostUploadSPB(
-          _navigationService.navigatorKey.currentContext!,
-          listSPB,
-          listSPBDetail,
-          listSPBLoader,
-          onSuccessUploadSPB,
-          onErrorUploadSPB,
-        );
-      }
+      UploadSPBRepository().doPostUploadSPB(
+        _navigationService.navigatorKey.currentContext!,
+        listSPB,
+        listSPBDetail,
+        listSPBLoader,
+        (BuildContext context, response) {
+          onSuccessUploadSPB(context, listFotoSPB);
+        },
+        onErrorUploadSPB,
+      );
     } else {
       FlushBarManager.showFlushBarWarning(
-          _navigationService.navigatorKey.currentContext!,
-          "Upload SPB",
-          "Belum ada SPB dibuat");
+        _navigationService.navigatorKey.currentContext!,
+        "Upload SPB",
+        "Belum ada SPB dibuat",
+      );
     }
   }
 
-  onSuccessUploadSPB(BuildContext context, response) {
-    uploadImage(context);
+  onSuccessUploadSPB(
+    BuildContext context,
+    List<Map<String, dynamic>> listFotoSPB,
+  ) {
+    uploadImage(context, listFotoSPB);
   }
 
   onErrorUploadSPB(BuildContext context, String response) {
     _dialogService.popDialog();
     log('Error upload SPB : $response');
     FlushBarManager.showFlushBarError(
-        context, "Upload SPB", "Gagal mengupload data");
+        context, "Upload SPB", "Gagal mengupload data\n$response");
   }
 
-  uploadImage(BuildContext context) async {
-    List<SPB> listSPB = await DatabaseSPB().selectSPB();
-    for (int i = 0; i < listSPB.length; i++) {
-      if (listSPB[i].spbPhoto != null) {
-        UploadImageOPHRepository().doUploadPhoto(context, listSPB[i].spbPhoto!,
-            listSPB[i].spbId!, "spb", onSuccessUploadImage, onErrorUploadImage);
+  uploadImage(
+    BuildContext context,
+    List<Map<String, dynamic>> listFotoSPB,
+  ) async {
+    for (int i = 0; i < listFotoSPB.length; i++) {
+      if (listFotoSPB[i]['foto'] != null) {
+        UploadImageOPHRepository().doUploadPhoto(
+          context,
+          listFotoSPB[i]['foto'],
+          listFotoSPB[i]['id'],
+          "spb",
+          onSuccessUploadImage,
+          onErrorUploadImage,
+        );
       }
     }
     DatabaseSPB().deleteSPB();
@@ -394,8 +361,9 @@ class KeraniKirimNotifier extends ChangeNotifier {
 
   onErrorUploadImage(BuildContext context, String response) {
     _dialogService.popDialog();
+    log('Error upload Image : $response');
     FlushBarManager.showFlushBarError(
-        context, "Upload Foto SPB", "Gagal mengupload data Foto");
+        context, "Upload Foto SPB", "Gagal mengupload data Foto\n$response");
   }
 
   dialogReLogin() {
