@@ -361,6 +361,9 @@ class FormSPBNotifier extends ChangeNotifier {
       } else {
         _mvraSchema =
             await DatabaseMVRASchema().selectMVRASchemaByNumber(vehicleNumber);
+        _mvraSchema ??
+            FlushBarManager.showFlushBarWarning(
+                context, "Nomor Kendaraan", "Tidak sesuai");
         if (_mvraSchema != null) {
           _totalCapacityTruck = _mvraSchema!.vraMaxCap!.toDouble();
         }
@@ -921,50 +924,55 @@ class FormSPBNotifier extends ChangeNotifier {
           if (_isOthersVendor) {
             if (_vendorOther.text.isNotEmpty) {
               if (vehicleNumber.text.isNotEmpty) {
-                if (spbCardNumber.text.isNotEmpty) {
-                  if (_mcspbCardSchema != null) {
-                    if (_countOPH != 0) {
-                      if (_spbLoaderList.isNotEmpty) {
-                        if (!_isLoaderExist) {
-                          if (!_isLoaderZero) {
-                            if (_totalPercentageAngkut == 100) {
-                              if (_totalPercentageAngkut >= 100) {
-                                showDialogQuestion(context);
+                if (_mvraSchema != null) {
+                  if (spbCardNumber.text.isNotEmpty) {
+                    if (_mcspbCardSchema != null) {
+                      if (_countOPH != 0) {
+                        if (_spbLoaderList.isNotEmpty) {
+                          if (!_isLoaderExist) {
+                            if (!_isLoaderZero) {
+                              if (_totalPercentageAngkut == 100) {
+                                if (_totalPercentageAngkut >= 100) {
+                                  showDialogQuestion(context);
+                                } else {
+                                  FlushBarManager.showFlushBarWarning(context,
+                                      "Daftar Loader", "Lebih dari dari 100 %");
+                                }
                               } else {
                                 FlushBarManager.showFlushBarWarning(context,
-                                    "Daftar Loader", "Lebih dari dari 100 %");
+                                    "Daftar Loader", "Harus memuat 100 %");
                               }
                             } else {
-                              FlushBarManager.showFlushBarWarning(context,
-                                  "Daftar Loader", "Harus memuat 100 %");
+                              FlushBarManager.showFlushBarWarning(
+                                  context,
+                                  "Daftar Loader",
+                                  "Anda belum menginput percentase loader");
                             }
                           } else {
                             FlushBarManager.showFlushBarWarning(
                                 context,
                                 "Daftar Loader",
-                                "Anda belum menginput percentase loader");
+                                "Anda menginput loader yang sama");
                           }
                         } else {
-                          FlushBarManager.showFlushBarWarning(
-                              context,
-                              "Daftar Loader",
-                              "Anda menginput loader yang sama");
+                          FlushBarManager.showFlushBarWarning(context,
+                              "Daftar Loader", "Belum menginput Loader");
                         }
                       } else {
                         FlushBarManager.showFlushBarWarning(
-                            context, "Daftar Loader", "Belum menginput Loader");
+                            context, "Daftar OPH", "Belum menginput OPH");
                       }
                     } else {
                       FlushBarManager.showFlushBarWarning(
-                          context, "Daftar OPH", "Belum menginput OPH");
+                          context, "No Kartu SPB", "Tidak sesuai");
                     }
                   } else {
-                    FlushBarManager.showFlushBarWarning(
-                        context, "No Kartu SPB", "Tidak sesuai");
+                    FlushBarManager.showFlushBarWarning(context, "No Kartu SPB",
+                        "Anda belum mengisi nomor Kartu SPB");
                   }
                 } else {
-                  FlushBarManager.showFlushBarWarning(context, "No Kartu SPB",
-                      "Anda belum mengisi nomor Kartu SPB");
+                  FlushBarManager.showFlushBarWarning(
+                      context, "No Kendaraan", "Tidak  sesuai");
                 }
               } else {
                 FlushBarManager.showFlushBarWarning(context, "No Kendaraan",
