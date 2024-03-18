@@ -328,8 +328,8 @@ class FormOPHNotifier extends ChangeNotifier {
             .selectTABWSchemaByBlock(_mBlockSchema!.blockCode!,
                 _valueMCustomer!.customerPlantCode!.substring(2));
         _ophEstimationWeight = (tabwSchema?.bunchWeight != null
-            ? tabwSchema?.bunchWeight
-            : 0.0 * int.parse(_bunchesTotal.text));
+            ? tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text)
+            : 0.0);
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -338,8 +338,8 @@ class FormOPHNotifier extends ChangeNotifier {
             .selectTABWSchemaByBlock(
                 _mBlockSchema!.blockCode!, _mConfigSchema!.estateCode!);
         _ophEstimationWeight = (tabwSchema?.bunchWeight != null
-            ? tabwSchema?.bunchWeight
-            : 0.0 * int.parse(_bunchesTotal.text));
+            ? tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text)
+            : 0.0);
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -364,6 +364,7 @@ class FormOPHNotifier extends ChangeNotifier {
             FlushBarManager.showFlushBarWarning(
                 context, "Kode TPH", "Tidak sesuai");
       }
+      getEstimationTonnage();
     }
     notifyListeners();
   }
@@ -385,6 +386,7 @@ class FormOPHNotifier extends ChangeNotifier {
             FlushBarManager.showFlushBarWarning(
                 context, "Kode Blok", "Tidak sesuai dengan estate");
       }
+      getEstimationTonnage();
     } else {
       _mBlockSchema = null;
     }
@@ -606,6 +608,7 @@ class FormOPHNotifier extends ChangeNotifier {
           employeeName: _supervisor?.mandorName);
       _valueMandorKontrak = mandorKontrak;
     }
+    getEstimationTonnage();
     notifyListeners();
   }
 
@@ -640,6 +643,7 @@ class FormOPHNotifier extends ChangeNotifier {
       _valueDivision = null;
       onSetListDivision(value.customerPlantCode!.substring(2));
     }
+    getEstimationTonnage();
     notifyListeners();
   }
 
