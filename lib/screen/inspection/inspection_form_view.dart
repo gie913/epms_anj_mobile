@@ -229,14 +229,22 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   }
 
   Future<void> getLocation() async {
-    var position = await LocationService.getGPSLocation();
-    if (position != null) {
-      longitude = position.longitude;
-      latitude = position.latitude;
-      gpsLocation = "${position.longitude}, ${position.latitude}";
+    // var position = await LocationService.getGPSLocation();
+    // if (position != null) {
+    //   longitude = position.longitude;
+    //   latitude = position.latitude;
+    //   gpsLocation = "${position.longitude}, ${position.latitude}";
+    // }
+    // log('cek inspection location : $gpsLocation');
+    // setState(() {});
+    while (gpsLocation.isEmpty) {
+      final position = await LocationService.getGPSLocation();
+      if (position != null) {
+        gpsLocation = "${position.longitude}, ${position.latitude}";
+        log('cek inspection location : $gpsLocation');
+        setState(() {});
+      }
     }
-    log('cek inspection location : $gpsLocation');
-    setState(() {});
   }
 
   Future<void> getUser() async {
