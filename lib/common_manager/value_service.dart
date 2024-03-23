@@ -204,34 +204,141 @@ class ValueService {
     */
     //test_ari
 
-    int fgh = 0;
-    int temp = 0;
-    int temp2 = 0;
-    List<SPBDetCombine> obj = [];
-    for (int i = 0; i < list.length; i++) {
-      fgh =
-          obj.indexWhere((asd) => (asd.ophBlockCode == list[i].ophBlockCode!));
-      if (fgh == -1) {
-        SPBDetCombine ob = new SPBDetCombine();
-        ob.tbsType = plasmaValidator(list[i].ophEstateCode!);
-        ob.ophEstateCode = list[i].ophEstateCode!;
-        ob.ophBlockCode = list[i].ophBlockCode!;
-        ob.ophLooseFruitDelivered = list[i].ophLooseFruitDelivered!;
-        ob.ophBunchesDelivered = list[i].ophBunchesDelivered!;
-        obj.add(ob);
-      } else {
-        temp = 0;
-        temp2 = 0;
-        temp = list[i].ophBunchesDelivered!;
-        temp2 = obj[fgh].ophBunchesDelivered!;
-        obj[fgh].ophBunchesDelivered = temp + temp2;
-        temp = 0;
-        temp2 = 0;
-        temp = list[i].ophLooseFruitDelivered!;
-        temp2 = obj[fgh].ophLooseFruitDelivered!;
-        obj[fgh].ophLooseFruitDelivered = temp + temp2;
-        //blockFormat.add(list[i].ophBlockCode!.toString() + list[i].ophBunchesDelivered!.toString()+list[i].ophLooseFruitDelivered.toString());
+    // int fgh = 0;
+    // int temp = 0;
+    // int temp2 = 0;
+    // List<SPBDetCombine> obj = [];
+    // for (int i = 0; i < list.length; i++) {
+    //   fgh =
+    //       obj.indexWhere((asd) => (asd.ophBlockCode == list[i].ophBlockCode!));
+    //   if (fgh == -1) {
+    //     SPBDetCombine ob = new SPBDetCombine();
+    //     ob.tbsType = plasmaValidator(list[i].ophEstateCode!);
+    //     ob.ophEstateCode = list[i].ophEstateCode!;
+    //     ob.ophBlockCode = list[i].ophBlockCode!;
+    //     ob.ophLooseFruitDelivered = list[i].ophLooseFruitDelivered!;
+    //     ob.ophBunchesDelivered = list[i].ophBunchesDelivered!;
+    //     obj.add(ob);
+    //   } else {
+    //     temp = 0;
+    //     temp2 = 0;
+    //     temp = list[i].ophBunchesDelivered!;
+    //     temp2 = obj[fgh].ophBunchesDelivered!;
+    //     obj[fgh].ophBunchesDelivered = temp + temp2;
+    //     temp = 0;
+    //     temp2 = 0;
+    //     temp = list[i].ophLooseFruitDelivered!;
+    //     temp2 = obj[fgh].ophLooseFruitDelivered!;
+    //     obj[fgh].ophLooseFruitDelivered = temp + temp2;
+    //     //blockFormat.add(list[i].ophBlockCode!.toString() + list[i].ophBunchesDelivered!.toString()+list[i].ophLooseFruitDelivered.toString());
+    //   }
+    // }
+
+    if (typeTBS == 3) {
+      int fghInti = 0;
+      int tempInti = 0;
+      int temp2Inti = 0;
+      List<SPBDetCombine> objInti = [];
+      for (int i = 0; i < listSPBDetailInti.length; i++) {
+        fghInti = objInti.indexWhere(
+            (asd) => (asd.ophBlockCode == listSPBDetailInti[i].ophBlockCode!));
+        if (fghInti == -1) {
+          SPBDetCombine ob = new SPBDetCombine();
+          ob.tbsType = plasmaValidator(listSPBDetailInti[i].ophEstateCode!);
+          ob.ophEstateCode = listSPBDetailInti[i].ophEstateCode!;
+          ob.ophBlockCode = listSPBDetailInti[i].ophBlockCode!;
+          ob.ophLooseFruitDelivered =
+              listSPBDetailInti[i].ophLooseFruitDelivered!;
+          ob.ophBunchesDelivered = listSPBDetailInti[i].ophBunchesDelivered!;
+          objInti.add(ob);
+        } else {
+          tempInti = 0;
+          temp2Inti = 0;
+          tempInti = listSPBDetailInti[i].ophBunchesDelivered!;
+          temp2Inti = objInti[fghInti].ophBunchesDelivered!;
+          objInti[fghInti].ophBunchesDelivered = tempInti + temp2Inti;
+          tempInti = 0;
+          temp2Inti = 0;
+          tempInti = listSPBDetailInti[i].ophLooseFruitDelivered!;
+          temp2Inti = objInti[fghInti].ophLooseFruitDelivered!;
+          objInti[fghInti].ophLooseFruitDelivered = tempInti + temp2Inti;
+          //blockFormat.add(list[i].ophBlockCode!.toString() + list[i].ophBunchesDelivered!.toString()+list[i].ophLooseFruitDelivered.toString());
+        }
       }
+      objInti.forEach((element) {
+        blockFormatInti.add(
+            "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+      });
+
+      int fghPlasma = 0;
+      int tempPlasma = 0;
+      int temp2Plasma = 0;
+      List<SPBDetCombine> objPlasma = [];
+      for (int i = 0; i < listSPBDetailPlasma.length; i++) {
+        fghPlasma = objPlasma.indexWhere((asd) =>
+            (asd.ophBlockCode == listSPBDetailPlasma[i].ophBlockCode!));
+        if (fghPlasma == -1) {
+          SPBDetCombine ob = new SPBDetCombine();
+          ob.tbsType = plasmaValidator(listSPBDetailPlasma[i].ophEstateCode!);
+          ob.ophEstateCode = listSPBDetailPlasma[i].ophEstateCode!;
+          ob.ophBlockCode = listSPBDetailPlasma[i].ophBlockCode!;
+          ob.ophLooseFruitDelivered =
+              listSPBDetailPlasma[i].ophLooseFruitDelivered!;
+          ob.ophBunchesDelivered = listSPBDetailPlasma[i].ophBunchesDelivered!;
+          objPlasma.add(ob);
+        } else {
+          tempPlasma = 0;
+          temp2Plasma = 0;
+          tempPlasma = listSPBDetailPlasma[i].ophBunchesDelivered!;
+          temp2Plasma = objPlasma[fghPlasma].ophBunchesDelivered!;
+          objPlasma[fghPlasma].ophBunchesDelivered = tempPlasma + temp2Plasma;
+          tempPlasma = 0;
+          temp2Plasma = 0;
+          tempPlasma = listSPBDetailPlasma[i].ophLooseFruitDelivered!;
+          temp2Plasma = objPlasma[fghPlasma].ophLooseFruitDelivered!;
+          objPlasma[fghPlasma].ophLooseFruitDelivered =
+              tempPlasma + temp2Plasma;
+          //blockFormat.add(list[i].ophBlockCode!.toString() + list[i].ophBunchesDelivered!.toString()+list[i].ophLooseFruitDelivered.toString());
+        }
+      }
+      objPlasma.forEach((element) {
+        blockFormatPlasma.add(
+            "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+      });
+    } else {
+      int fgh = 0;
+      int temp = 0;
+      int temp2 = 0;
+      List<SPBDetCombine> obj = [];
+      for (int i = 0; i < list.length; i++) {
+        fgh = obj
+            .indexWhere((asd) => (asd.ophBlockCode == list[i].ophBlockCode!));
+        if (fgh == -1) {
+          SPBDetCombine ob = new SPBDetCombine();
+          ob.tbsType = plasmaValidator(list[i].ophEstateCode!);
+          ob.ophEstateCode = list[i].ophEstateCode!;
+          ob.ophBlockCode = list[i].ophBlockCode!;
+          ob.ophLooseFruitDelivered = list[i].ophLooseFruitDelivered!;
+          ob.ophBunchesDelivered = list[i].ophBunchesDelivered!;
+          obj.add(ob);
+        } else {
+          temp = 0;
+          temp2 = 0;
+          temp = list[i].ophBunchesDelivered!;
+          temp2 = obj[fgh].ophBunchesDelivered!;
+          obj[fgh].ophBunchesDelivered = temp + temp2;
+          temp = 0;
+          temp2 = 0;
+          temp = list[i].ophLooseFruitDelivered!;
+          temp2 = obj[fgh].ophLooseFruitDelivered!;
+          obj[fgh].ophLooseFruitDelivered = temp + temp2;
+          //blockFormat.add(list[i].ophBlockCode!.toString() + list[i].ophBunchesDelivered!.toString()+list[i].ophLooseFruitDelivered.toString());
+        }
+      }
+      obj.forEach((element) {
+        blockFormatIntiOrPlasma.add(
+            "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+      });
     }
 
     String spbTag = "";
@@ -252,25 +359,29 @@ class ValueService {
     //     "${spb.createdDate}," +
     //     "${spb.createdTime}";
 
-    obj.sort((a, b) => b.tbsType!.compareTo(a.tbsType!));
-    obj.forEach((element) {
-      if (typeTBS == 3) {
-        if (plasmaValidator(element.ophEstateCode!) == 1) {
-          // spbTagCampuran =
-          //     '$spbTagCampuran,${mEstateSchemaInti?.estateVendorCode},$typeTBS,${mEstateSchemaInti?.estateVendorCode?.substring(4)}[${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}]';
-          blockFormatInti.add(
-              "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
-        } else if (plasmaValidator(element.ophEstateCode!) == 2) {
-          // spbTagCampuran =
-          //     '$spbTagCampuran,${mEstateSchemaPlasma?.estateVendorCode},$typeTBS,${mEstateSchemaPlasma?.estateVendorCode?.substring(4)}[${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}]';
-          blockFormatPlasma.add(
-              "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
-        }
-      } else {
-        blockFormatIntiOrPlasma.add(
-            "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
-      }
-    });
+    // obj.sort((a, b) => b.tbsType!.compareTo(a.tbsType!));
+    // obj.forEach((element) {
+    //   if (typeTBS == 3) {
+    //     if (plasmaValidator(element.ophEstateCode!) == 1) {
+    //       print(
+    //           'cek blockFormatInti : ${plasmaValidator(element.ophEstateCode!)}');
+    //       // spbTagCampuran =
+    //       //     '$spbTagCampuran,${mEstateSchemaInti?.estateVendorCode},$typeTBS,${mEstateSchemaInti?.estateVendorCode?.substring(4)}[${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}]';
+    //       blockFormatInti.add(
+    //           "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+    //     } else if (plasmaValidator(element.ophEstateCode!) == 2) {
+    //       print(
+    //           'cek blockFormatPlasma : ${plasmaValidator(element.ophEstateCode!)}');
+    //       // spbTagCampuran =
+    //       //     '$spbTagCampuran,${mEstateSchemaPlasma?.estateVendorCode},$typeTBS,${mEstateSchemaPlasma?.estateVendorCode?.substring(4)}[${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}]';
+    //       blockFormatPlasma.add(
+    //           "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+    //     }
+    //   } else {
+    //     blockFormatIntiOrPlasma.add(
+    //         "${element.ophBlockCode},${element.ophBunchesDelivered},${element.ophLooseFruitDelivered}");
+    //   }
+    // });
 
     //test
 /*remark test
