@@ -609,6 +609,10 @@ class FormOPHNotifier extends ChangeNotifier {
   onSetEmployeeType(String value) {
     _employeeType = value;
     _valueEmployee = null;
+    _mBlockSchema = null;
+    _mtphSchema = null;
+    blockNumber.clear();
+    tphNumber.clear();
     if (_employeeType == "Kontrak") {
       MEmployeeSchema mandorKontrak = MEmployeeSchema(
           employeeCode: _supervisor?.mandorCode,

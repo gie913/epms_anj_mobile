@@ -36,39 +36,39 @@ class OPHSupervise {
 
   OPHSupervise(
       {this.ophSupervisiId,
-        this.supervisiEstateCode,
-        this.supervisiBlockCode,
-        this.supervisiTphCode,
-        this.ophId,
-        this.supervisiEmployeeCode,
-        this.supervisiEmployeeName,
-        this.supervisiLat,
-        this.supervisiLong,
-        this.supervisiMandorEmployeeCode,
-        this.supervisiMandorEmployeeName,
-        this.supervisiKeraniPanenEmployeeCode,
-        this.supervisiKeraniPanenEmployeeName,
-        this.supervisiPemanenEmployeeName,
-        this.supervisiPemanenEmployeeCode,
-        this.supervisiPhoto,
-        this.supervisiDivisionCode,
-        this.bunchesRipe,
-        this.bunchesOverripe,
-        this.bunchesHalfripe,
-        this.bunchesUnripe,
-        this.bunchesAbnormal,
-        this.bunchesEmpty,
-        this.looseFruits,
-        this.bunchesTotal,
-        this.bunchesNotSent,
-        this.supervisiNotes,
-        this.createdBy,
-        this.supervisiDate,
-        this.createdDate,
-        this.createdTime,
-        this.updatedBy,
-        this.updatedDate,
-        this.updatedTime});
+      this.supervisiEstateCode,
+      this.supervisiBlockCode,
+      this.supervisiTphCode,
+      this.ophId,
+      this.supervisiEmployeeCode,
+      this.supervisiEmployeeName,
+      this.supervisiLat,
+      this.supervisiLong,
+      this.supervisiMandorEmployeeCode,
+      this.supervisiMandorEmployeeName,
+      this.supervisiKeraniPanenEmployeeCode,
+      this.supervisiKeraniPanenEmployeeName,
+      this.supervisiPemanenEmployeeName,
+      this.supervisiPemanenEmployeeCode,
+      this.supervisiPhoto,
+      this.supervisiDivisionCode,
+      this.bunchesRipe,
+      this.bunchesOverripe,
+      this.bunchesHalfripe,
+      this.bunchesUnripe,
+      this.bunchesAbnormal,
+      this.bunchesEmpty,
+      this.looseFruits,
+      this.bunchesTotal,
+      this.bunchesNotSent,
+      this.supervisiNotes,
+      this.createdBy,
+      this.supervisiDate,
+      this.createdDate,
+      this.createdTime,
+      this.updatedBy,
+      this.updatedDate,
+      this.updatedTime});
 
   OPHSupervise.fromJson(Map<String, dynamic> json) {
     ophSupervisiId = json['oph_supervisi_id'];
@@ -83,11 +83,11 @@ class OPHSupervise {
     supervisiMandorEmployeeCode = json['supervisi_mandor_employee_code'];
     supervisiMandorEmployeeName = json['supervisi_mandor_employee_name'];
     supervisiKeraniPanenEmployeeCode =
-    json['supervisi_kerani_panen_employee_code'];
+        json['supervisi_kerani_panen_employee_code'];
     supervisiKeraniPanenEmployeeName =
-    json['supervisi_kerani_panen_employee_name'];
+        json['supervisi_kerani_panen_employee_name'];
     supervisiPemanenEmployeeName = json['supervisi_pemanen_employee_name'];
-    supervisiKeraniPanenEmployeeCode = json['supervisi_pemanen_employee_code'];
+    supervisiPemanenEmployeeCode = json['supervisi_pemanen_employee_code'];
     supervisiPhoto = json['supervisi_photo'];
     supervisiDivisionCode = json['supervisi_division_code'];
     bunchesRipe = json['bunches_ripe'];
@@ -148,5 +148,10 @@ class OPHSupervise {
     data['updated_date'] = this.updatedDate;
     data['updated_time'] = this.updatedTime;
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'OPHSupervise(supervisi_pemanen_employee_name: $supervisiPemanenEmployeeName, supervisi_pemanen_employee_code: $supervisiPemanenEmployeeCode, created_by: $createdBy)';
   }
 }

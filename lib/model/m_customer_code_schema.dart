@@ -51,4 +51,9 @@ class MCustomerCodeSchema extends Equatable {
 
   @override
   List<Object?> get props => [customerCode];
+
+  @override
+  String toString() {
+    return 'MCustomerCodeSchema(customer_code_id: $customerCodeId, customer_plant_code: $customerPlantCode, customer_code: $customerCode)';
+  }
 }

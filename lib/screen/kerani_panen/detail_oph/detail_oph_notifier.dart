@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
@@ -9,12 +10,15 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/oph_card_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/validation_service.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
+import 'package:epms/database/service/database_m_customer_code.dart';
 import 'package:epms/database/service/database_m_employee.dart';
 import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/model/laporan_panen_kemarin.dart';
 import 'package:epms/model/m_block_schema.dart';
+import 'package:epms/model/m_customer_code_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/t_abw_schema.dart';
@@ -230,9 +234,24 @@ class DetailOPHNotifier extends ChangeNotifier {
           .selectMEmployeeSchemaByCode(oph.mandorEmployeeCode!);
       List<MEmployeeSchema> pekerja = await DatabaseMEmployeeSchema()
           .selectMEmployeeSchemaByCode(oph.employeeCode!);
+      List<MCustomerCodeSchema> listMCustomer =
+          await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
+
       if (kemandoran.isNotEmpty && pekerja.isNotEmpty) {
         _oph.mandorEmployeeName = kemandoran[0].employeeName;
         _oph.employeeName = pekerja[0].employeeName;
+      }
+
+      if (ValueService.typeOfFormToText(_oph.ophHarvestingType ?? 1) ==
+          'Pinjam') {
+        if (listMCustomer.isNotEmpty) {
+          log('listMCustomer : $listMCustomer');
+          final listMCustomerCode =
+              listMCustomer.map((e) => e.customerCode ?? '').toList();
+          final mCustomerCode = listMCustomerCode
+              .firstWhere((element) => element.contains(_oph.ophEstateCode!));
+          _oph.ophCustomerCode = mCustomerCode;
+        }
       }
     }
     _dialogService.popDialog();

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/camera_service.dart';
@@ -90,6 +92,7 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     _pemanen = MEmployeeSchema(
         employeeName: _ophSupervise?.supervisiPemanenEmployeeName,
         employeeCode: _ophSupervise?.supervisiPemanenEmployeeCode);
+    log('pemanen_code : ${_ophSupervise?.supervisiPemanenEmployeeCode}');
     notesOPH.text = _ophSupervise?.supervisiNotes ?? "";
     bunchesRipe.text = _ophSupervise!.bunchesRipe!.toString();
     bunchesOverRipe.text = _ophSupervise!.bunchesOverripe.toString();
@@ -122,8 +125,8 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  countBunches(BuildContext context,
-      TextEditingController textEditingController) {
+  countBunches(
+      BuildContext context, TextEditingController textEditingController) {
     if (textEditingController.text.isEmpty ||
         textEditingController.text == "0") {
       textEditingController.value = TextEditingValue(text: "0");
@@ -137,11 +140,11 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     }
     try {
       bunchesTotal.text = (int.parse(bunchesRipe.text) +
-          int.parse(bunchesOverRipe.text) +
-          int.parse(bunchesHalfRipe.text) +
-          int.parse(bunchesUnRipe.text) +
-          int.parse(bunchesAbnormal.text) +
-          int.parse(bunchesEmpty.text))
+              int.parse(bunchesOverRipe.text) +
+              int.parse(bunchesHalfRipe.text) +
+              int.parse(bunchesUnRipe.text) +
+              int.parse(bunchesAbnormal.text) +
+              int.parse(bunchesEmpty.text))
           .toString();
     } catch (e) {
       print(e);
@@ -171,28 +174,30 @@ class DetailSuperviseHarvestNotifier extends ChangeNotifier {
     _ophSupervise?.bunchesTotal = int.parse(bunchesTotal.text);
     _ophSupervise?.bunchesNotSent = int.parse(bunchesNotSent.text);
     int count =
-    await DatabaseOPHSupervise().updateOPHSuperviseByID(_ophSupervise!);
+        await DatabaseOPHSupervise().updateOPHSuperviseByID(_ophSupervise!);
     if (count > 0) {
       _navigationService.push(Routes.HOME_PAGE);
       FlushBarManager.showFlushBarSuccess(
           _navigationService.navigatorKey.currentContext!,
-          "Simpan Supervisi", "Berhasil menyimpan");
+          "Simpan Supervisi",
+          "Berhasil menyimpan");
     } else {
       FlushBarManager.showFlushBarError(
           _navigationService.navigatorKey.currentContext!,
-          "Simpan Supervisi", "Gagal menyimpan");
+          "Simpan Supervisi",
+          "Gagal menyimpan");
     }
   }
 
   showDialogQuestion(BuildContext context) {
-    _dialogService.showOptionDialog(title: "Simpan Supervisi Ancak",
+    _dialogService.showOptionDialog(
+        title: "Simpan Supervisi Ancak",
         subtitle: "Anda yakin ingin menyimpan?",
         buttonTextYes: "Iya",
         buttonTextNo: "Tidak",
         onPressYes: onUpdateOPHSupervise,
         onPressNo: _dialogService.popDialog);
   }
-
 
   Future getCamera(BuildContext context) async {
     String? picked = await CameraService.getImageByCamera(context);

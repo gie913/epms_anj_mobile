@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epms/database/entity/oph_supervise_entity.dart';
 import 'package:epms/database/helper/database_helper.dart';
 import 'package:epms/database/helper/database_table.dart';
@@ -47,6 +49,7 @@ class DatabaseOPHSupervise {
 
   Future<int> insertOPHSupervise(OPHSupervise object) async {
     Database db = await DatabaseHelper().database;
+    log('check object OPHSupervise Insert To Database : $object');
     int saved = await db.insert(tOPHSuperviseSchemaListTable, object.toJson());
     return saved;
   }
@@ -58,6 +61,7 @@ class DatabaseOPHSupervise {
     List<OPHSupervise> list = [];
     for (int i = 0; i < mapList.length; i++) {
       OPHSupervise oph = OPHSupervise.fromJson(mapList[i]);
+      log('check object OPHSupervise Select From Database : $oph');
       list.add(oph);
     }
     return list.reversed.toList();

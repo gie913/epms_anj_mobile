@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -80,6 +81,8 @@ class SupervisorNotifier extends ChangeNotifier {
     } else {
       listSPB = "Null";
     }
+    log('check listSPBDetail : $listSPBDetail');
+    log('check listSPB : $listSPB');
     _dialogService.showLoadingDialog(title: "Upload Supervisi");
     UploadSupervisiRepository().doPostUploadSupervisi(
         _navigationService.navigatorKey.currentContext!,
