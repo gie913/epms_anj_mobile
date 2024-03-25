@@ -323,9 +323,9 @@ class FormOPHNotifier extends ChangeNotifier {
       final _position = await LocationService.getGPSLocation();
       if (_position != null) {
         _gpsLocation = "${_position.longitude}, ${_position.latitude}";
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   getEstimationTonnage() async {
@@ -440,8 +440,10 @@ class FormOPHNotifier extends ChangeNotifier {
       oph.ophId = _ophID;
       oph.createdDate = _date;
       oph.createdTime = _time;
-      oph.ophLat = _position?.latitude.toString();
-      oph.ophLong = _position?.longitude.toString();
+      // oph.ophLat = _position?.latitude.toString();
+      // oph.ophLong = _position?.longitude.toString();
+      oph.ophLat = _gpsLocation.split(',')[1].replaceAll(' ', '');
+      oph.ophLong = _gpsLocation.split(',')[0];
       oph.ophHarvestingType = ValueService.typeOfFormToInt(_employeeType);
       oph.ophHarvestingMethod = isChecked ? 2 : 1;
       if (_listHarvestingPlan

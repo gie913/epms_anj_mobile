@@ -217,4 +217,9 @@ class OPH {
     data['oph_is_closed'] = this.ophIsClosed;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'OPH(oph_lat: $ophLat, oph_long: $ophLong)';
+  }
 }

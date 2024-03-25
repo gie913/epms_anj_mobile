@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -93,7 +94,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
   }
 
   onSuccessUploadOPH(response) {
-    uploadImage(_navigationService.navigatorKey.currentContext!);
+    // uploadImage(_navigationService.navigatorKey.currentContext!);
+    uploadImageNew(_navigationService.navigatorKey.currentContext!);
   }
 
   uploadImage(BuildContext context) async {
@@ -114,12 +116,56 @@ class KeraniPanenNotifier extends ChangeNotifier {
     // SynchNotifier().doSynchMasterDataBackground(context);
   }
 
+  uploadImageNew(BuildContext context) async {
+    log('start upload foto');
+    List<OPH> listOPH = await DatabaseOPH().selectOPH();
+    log('total listOPH : ${listOPH.length}');
+
+    await Future.forEach(listOPH, (element) async {
+      if (element.ophPhoto != null) {
+        log('Upload Image OPH_ID : ${element.ophId}');
+        await UploadImageOPHRepository().doUploadPhoto(
+          context,
+          element.ophPhoto!,
+          element.ophId!,
+          "oph",
+          (context, successMessage) {
+            DatabaseOPH().deleteOPHById(element);
+            log("Success Upload Image OPH_ID : ${element.ophId}");
+          },
+          (context, errorMessage) {
+            _dialogService.popDialog();
+            log("Error Upload Image OPH_ID : ${element.ophId}");
+            FlushBarManager.showFlushBarWarning(
+              _navigationService.navigatorKey.currentContext!,
+              "Upload Foto",
+              "Gagal mengupload foto OPH_ID : ${element.ophId}\n$errorMessage",
+            );
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    });
+
+    _dialogService.popDialog();
+    FlushBarManager.showFlushBarSuccess(
+      _navigationService.navigatorKey.currentContext!,
+      "Upload Data",
+      "Berhasil mengupload data",
+    );
+    // DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+    // SynchNotifier().doSynchMasterDataBackground(context);
+  }
+
   onErrorUploadOPH(String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarWarning(
-        _navigationService.navigatorKey.currentContext!,
-        "Upload Data",
-        "Gagal mengupload data");
+      _navigationService.navigatorKey.currentContext!,
+      "Upload Data",
+      "Gagal mengupload data\n$response",
+    );
+    log('Gagal Upload Data\n$response');
   }
 
   onSuccessUploadImage(BuildContext context, response) {
@@ -174,6 +220,18 @@ class KeraniPanenNotifier extends ChangeNotifier {
         break;
       case "BUAT FORM OPH":
         if (dateLogin == dateNow) {
+          // final List hubla = [1, 3, 2, 2, 2];
+          // for (int i = 0; i < hubla.length;) {
+          //   var res = hubla[i] + 1;
+
+          //   while (res != 2) {
+          //     print('reupload');
+          //     res = res - 1;
+          //   }
+
+          //   print('success upload');
+          //   i++;
+          // }
           _navigationService.push(Routes.OPH_FORM_PAGE);
         } else if (dateLoginParse.year != now.year) {
           dialogSettingDateTime();

@@ -306,9 +306,9 @@ class FormSPBNotifier extends ChangeNotifier {
       final _position = await LocationService.getGPSLocation();
       if (_position != null) {
         _gpsLocation = "${_position.longitude}, ${_position.latitude}";
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   /*on Change Variable*/
@@ -753,9 +753,14 @@ class FormSPBNotifier extends ChangeNotifier {
     spbTemp.spbId = spbID;
     spbTemp.createdTime = _time;
     spbTemp.createdDate = _date;
-    spbTemp.spbLat = _position != null ? _position!.latitude.toString() : null;
+    // spbTemp.spbLat = _position != null ? _position!.latitude.toString() : null;
+    // spbTemp.spbLong =
+    //     _position != null ? _position!.longitude.toString() : null;
+    spbTemp.spbLat = _gpsLocation.isNotEmpty
+        ? _gpsLocation.split(',')[1].replaceAll(' ', '')
+        : null;
     spbTemp.spbLong =
-        _position != null ? _position!.longitude.toString() : null;
+        _gpsLocation.isNotEmpty ? _gpsLocation.split(',')[0] : null;
     spbTemp.spbType = typeDeliverValue == "Internal" ? 1 : 3;
     spbTemp.spbDeliverToCode = _destinationValue?.destinationCode;
     spbTemp.spbDeliverToName = _destinationValue?.destinationName;
@@ -786,8 +791,10 @@ class FormSPBNotifier extends ChangeNotifier {
     spbTemp.spbDeliverToCode = _destinationValue?.destinationCode;
     spbTemp.spbDeliverToName = _destinationValue?.destinationName;
     spbTemp.spbDeliveryNote = _notesSPB.text;
-    spbTemp.spbLat = _position?.latitude.toString();
-    spbTemp.spbLong = _position?.longitude.toString();
+    // spbTemp.spbLat = _position?.latitude.toString();
+    // spbTemp.spbLong = _position?.longitude.toString();
+    spbTemp.spbLat = _gpsLocation.split(',')[1].replaceAll(' ', '');
+    spbTemp.spbLong = _gpsLocation.split(',')[0];
     spbTemp.spbPhoto = _pickedFile;
     spbTemp.spbKeraniTransportEmployeeCode = _mConfigSchema?.employeeCode;
     spbTemp.spbKeraniTransportEmployeeName = _mConfigSchema?.employeeName;
