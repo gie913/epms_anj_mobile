@@ -134,26 +134,40 @@ class KeraniPanenNotifier extends ChangeNotifier {
             log("Success Upload Image OPH_ID : ${element.ophId}");
           },
           (context, errorMessage) {
-            _dialogService.popDialog();
+            // _dialogService.popDialog();
             log("Error Upload Image OPH_ID : ${element.ophId}");
-            FlushBarManager.showFlushBarWarning(
-              _navigationService.navigatorKey.currentContext!,
-              "Upload Foto",
-              "Gagal mengupload foto OPH_ID : ${element.ophId}\n$errorMessage",
-            );
+            // FlushBarManager.showFlushBarWarning(
+            //   _navigationService.navigatorKey.currentContext!,
+            //   "Upload Foto",
+            //   "Gagal mengupload foto OPH_ID : ${element.ophId}\n$errorMessage",
+            // );
           },
         );
 
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 1));
       }
     });
 
-    _dialogService.popDialog();
-    FlushBarManager.showFlushBarSuccess(
-      _navigationService.navigatorKey.currentContext!,
-      "Upload Data",
-      "Berhasil mengupload data",
-    );
+    await Future.delayed(const Duration(seconds: 1));
+
+    List<OPH> listOPHUnUploaded = await DatabaseOPH().selectOPH();
+    if (listOPHUnUploaded.isNotEmpty) {
+      _dialogService.popDialog();
+      _dialogService.showNoOptionDialog(
+        title: "Upload Data",
+        subtitle:
+            "Masih terdapat data belum terupload.\nMohon melakukan upload ulang.",
+        onPress: _dialogService.popDialog,
+      );
+    } else {
+      _dialogService.popDialog();
+      FlushBarManager.showFlushBarSuccess(
+        _navigationService.navigatorKey.currentContext!,
+        "Upload Data",
+        "Berhasil mengupload data",
+      );
+    }
+
     // DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
     // SynchNotifier().doSynchMasterDataBackground(context);
   }
@@ -220,18 +234,6 @@ class KeraniPanenNotifier extends ChangeNotifier {
         break;
       case "BUAT FORM OPH":
         if (dateLogin == dateNow) {
-          // final List hubla = [1, 3, 2, 2, 2];
-          // for (int i = 0; i < hubla.length;) {
-          //   var res = hubla[i] + 1;
-
-          //   while (res != 2) {
-          //     print('reupload');
-          //     res = res - 1;
-          //   }
-
-          //   print('success upload');
-          //   i++;
-          // }
           _navigationService.push(Routes.OPH_FORM_PAGE);
         } else if (dateLoginParse.year != now.year) {
           dialogSettingDateTime();
