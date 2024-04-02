@@ -4,19 +4,19 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/model/attachment_inspection_model.dart';
-import 'package:epms/model/history_inspection_model.dart';
+import 'package:epms/model/response_inspection_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CardHistoryInspection extends StatefulWidget {
   const CardHistoryInspection({
     super.key,
-    this.data = const HistoryInspectionModel(),
+    this.data = const ResponseInspectionModel(),
     this.listResponseAttachment = const [],
     required this.onPreviewPhoto,
   });
 
-  final HistoryInspectionModel data;
+  final ResponseInspectionModel data;
   final List<AttachmentInspectionModel> listResponseAttachment;
   final ValueSetter<Uint8List> onPreviewPhoto;
 

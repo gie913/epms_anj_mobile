@@ -6,7 +6,9 @@ import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_attachment_inspection.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/model/attachment_inspection_model.dart';
+import 'package:epms/model/response_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/card_history_inspection.dart';
 import 'package:epms/screen/inspection/components/input_primary.dart';
@@ -28,10 +30,11 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
 
   bool isPreviewPhoto = false;
 
-  List<AttachmentInspectionModel> listInspectionAttachment =
-      <AttachmentInspectionModel>[];
-  Map<String, List<AttachmentInspectionModel>> listResponseAttachment =
-      <String, List<AttachmentInspectionModel>>{};
+  List<ResponseInspectionModel> listResponseInspection = [];
+  Map<String, List<AttachmentInspectionModel>> listResponseAttachment = {};
+  List<AttachmentInspectionModel> listInspectionAttachment = [];
+  // Map<String, List<AttachmentInspectionModel>> listResponseAttachment =
+  //     <String, List<AttachmentInspectionModel>>{};
 
   bool isLoading = false;
 
@@ -51,33 +54,61 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
   Future<void> initData() async {
     isLoading = true;
 
-    for (final attachment in widget.data.attachments) {
-      final indexAttachment = widget.data.attachments.indexOf(attachment);
-      final code = '${widget.data.code}$indexAttachment';
+    // for (final attachment in widget.data.attachments) {
+    //   final indexAttachment = widget.data.attachments.indexOf(attachment);
+    //   final code = '${widget.data.code}$indexAttachment';
 
-      final inspectionAttachment =
-          await DatabaseAttachmentInspection.selectData(code);
-      listInspectionAttachment.add(inspectionAttachment);
-    }
+    //   final inspectionAttachment =
+    //       await DatabaseAttachmentInspection.selectData(code);
+    //   listInspectionAttachment.add(inspectionAttachment);
+    // }
 
-    for (final response in widget.data.responses) {
-      final listResponseAttachmentTemp = <AttachmentInspectionModel>[];
+    // for (final response in widget.data.responses) {
+    //   final listResponseAttachmentTemp = <AttachmentInspectionModel>[];
 
-      for (final attachment in response.attachments) {
-        final indexAttachment = response.attachments.indexOf(attachment);
-        final code = '${response.code}$indexAttachment';
+    //   for (final attachment in response.attachments) {
+    //     final indexAttachment = response.attachments.indexOf(attachment);
+    //     final code = '${response.code}$indexAttachment';
 
-        final inspectionAttachment =
-            await DatabaseAttachmentInspection.selectData(code);
-        listResponseAttachmentTemp.add(inspectionAttachment);
-      }
+    //     final inspectionAttachment =
+    //         await DatabaseAttachmentInspection.selectData(code);
+    //     listResponseAttachmentTemp.add(inspectionAttachment);
+    //   }
 
-      listResponseAttachment[response.code] = listResponseAttachmentTemp;
-    }
+    //   listResponseAttachment[response.code] = listResponseAttachmentTemp;
+    // }
+
+    await getInspectionAttachment();
+
+    await getResponseInspection();
 
     await Future.delayed(const Duration(milliseconds: 300));
 
     isLoading = false;
+
+    setState(() {});
+  }
+
+  Future<void> getInspectionAttachment() async {
+    final listInspectionAttachmentData =
+        await DatabaseAttachmentInspection.selectDataByCode(widget.data.code);
+    listInspectionAttachment = listInspectionAttachmentData;
+    setState(() {});
+  }
+
+  Future<void> getResponseInspection() async {
+    final listResponseInspectionData =
+        await DatabaseResponseInspection.selectDataByInspectionId(
+      widget.data.id,
+    );
+
+    listResponseInspection = listResponseInspectionData;
+
+    await Future.forEach(listResponseInspectionData, (response) async {
+      final listResponseAttachmentData =
+          await DatabaseAttachmentInspection.selectDataByCode(response.code);
+      listResponseAttachment[response.code] = listResponseAttachmentData;
+    });
 
     setState(() {});
   }
@@ -347,10 +378,11 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                           readOnly: true,
                         ),
                         Text('Riwayat Tindakan :'),
-                        if (widget.data.responses.isNotEmpty)
-                          ...widget.data.responses.map((item) {
+                        if (listResponseInspection.isNotEmpty)
+                          ...listResponseInspection.map((item) {
                             final responseAttachment =
                                 listResponseAttachment[item.code];
+
                             return CardHistoryInspection(
                               data: item,
                               listResponseAttachment: responseAttachment ?? [],
@@ -377,6 +409,36 @@ class _InspectionDetailViewState extends State<InspectionDetailView> {
                                 child:
                                     const Text('Belum Ada Riwayat Tindakan')),
                           ),
+                        // if (widget.data.responses.isNotEmpty)
+                        //   ...widget.data.responses.map((item) {
+                        //     final responseAttachment =
+                        //         listResponseAttachment[item.code];
+                        //     return CardHistoryInspection(
+                        //       data: item,
+                        //       listResponseAttachment: responseAttachment ?? [],
+                        //       onPreviewPhoto: (value) {
+                        //         setState(() {
+                        //           isPreviewPhoto = true;
+                        //         });
+                        //         _dialogService.showDialogPreviewPhotoOffline(
+                        //           image: value,
+                        //           onTapClose: () {
+                        //             setState(() {
+                        //               isPreviewPhoto = false;
+                        //             });
+                        //             _dialogService.popDialog();
+                        //           },
+                        //         );
+                        //       },
+                        //     );
+                        //   }).toList()
+                        // else
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(top: 16),
+                        //     child: Center(
+                        //         child:
+                        //             const Text('Belum Ada Riwayat Tindakan')),
+                        //   ),
                       ],
                     ),
                   ),

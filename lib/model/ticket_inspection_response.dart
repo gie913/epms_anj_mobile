@@ -1,14 +1,14 @@
 import 'package:epms/model/ticket_inspection_data_model.dart';
 
-class MyInspectionResponse {
-  const MyInspectionResponse({
+class TicketInspectionResponse {
+  const TicketInspectionResponse({
     this.success = false,
     this.message = '',
     this.data = const TicketInspectionDataModel(),
   });
 
-  factory MyInspectionResponse.fromJson(Map<String, dynamic> json) =>
-      MyInspectionResponse(
+  factory TicketInspectionResponse.fromJson(Map<String, dynamic> json) =>
+      TicketInspectionResponse(
         success: json['success'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] != null
@@ -32,6 +32,6 @@ class MyInspectionResponse {
 
   @override
   String toString() {
-    return 'MyInspectionResponse(success: $success, message: $message, data: $data)';
+    return 'TicketInspectionResponse(success: $success, message: $message, data: $data)';
   }
 }

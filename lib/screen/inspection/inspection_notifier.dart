@@ -6,6 +6,7 @@ import 'package:epms/common_manager/flushbar_manager.dart';
 import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/service/database_attachment_inspection.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
@@ -94,53 +95,63 @@ class InspectionNotifier extends ChangeNotifier {
   Future<void> getDataInspection(BuildContext context) async {
     final isInternetExist = await InspectionService.isInternetConnectionExist();
     if (isInternetExist) {
-      await DatabaseSubordinateInspection.deleteTable();
       _dialogService.showLoadingDialog(title: "Sync Data");
 
       await InspectionRepository().getMyInspectionClose(
         context,
         (context, data) async {
-          await DatabaseTicketInspection.addAllData(data);
-          await DatabaseSubordinateInspection.addAllData(data);
-          await DatabaseAttachmentInspection.addAllDataNew(data);
+          await DatabaseResponseInspection.addAllData(data.responses);
+          await DatabaseTicketInspection.addAllDataNew(data.inspection);
+          await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+          await DatabaseAttachmentInspection.addAllData(data);
           await updateMyInspectionFromLocal();
 
           await InspectionRepository().getMyInspectionNotClose(
             context,
             (context, data) async {
-              await DatabaseTicketInspection.addAllData(data);
-              await DatabaseSubordinateInspection.addAllData(data);
-              await DatabaseAttachmentInspection.addAllDataNew(data);
+              await DatabaseResponseInspection.addAllData(data.responses);
+              await DatabaseTicketInspection.addAllDataNew(data.inspection);
+              await DatabaseSubordinateInspection.addAllDataNew(
+                  data.inspection);
+              await DatabaseAttachmentInspection.addAllData(data);
               await updateMyInspectionFromLocal();
 
               await InspectionRepository().getToDoInspection(
                 context,
                 (context, data) async {
-                  await DatabaseTodoInspection.addAllData(data);
-                  await DatabaseAttachmentInspection.addAllDataNew(data);
+                  await DatabaseResponseInspection.addAllData(data.responses);
+                  await DatabaseTodoInspection.addAllDataNew(data.inspection);
+                  await DatabaseAttachmentInspection.addAllData(data);
                   await updateTodoInspectionFromLocal();
 
                   await InspectionRepository().getOnGoingInspectionClose(
                     context,
                     (context, data) async {
-                      await DatabaseSubordinateInspection.addAllData(data);
-                      await DatabaseAttachmentInspection.addAllDataNew(data);
+                      await DatabaseResponseInspection.addAllData(
+                          data.responses);
+                      await DatabaseSubordinateInspection.addAllDataNew(
+                          data.inspection);
+                      await DatabaseAttachmentInspection.addAllData(data);
                       await updateSubordinateInspectionFromLocal();
 
                       await InspectionRepository().getOnGoingInspectionNotClose(
                         context,
                         (context, data) async {
-                          await DatabaseSubordinateInspection.addAllData(data);
-                          await DatabaseAttachmentInspection.addAllDataNew(
-                              data);
+                          await DatabaseResponseInspection.addAllData(
+                              data.responses);
+                          await DatabaseSubordinateInspection.addAllDataNew(
+                              data.inspection);
+                          await DatabaseAttachmentInspection.addAllData(data);
                           await updateSubordinateInspectionFromLocal();
 
                           await InspectionRepository().getToDoInspectionClose(
                             context,
                             (context, data) async {
-                              await DatabaseSubordinateInspection.addAllData(
-                                  data);
-                              await DatabaseAttachmentInspection.addAllDataNew(
+                              await DatabaseResponseInspection.addAllData(
+                                  data.responses);
+                              await DatabaseSubordinateInspection.addAllDataNew(
+                                  data.inspection);
+                              await DatabaseAttachmentInspection.addAllData(
                                   data);
                               await updateSubordinateInspectionFromLocal();
 
@@ -148,10 +159,12 @@ class InspectionNotifier extends ChangeNotifier {
                                   .getToDoInspectionNotClose(
                                 context,
                                 (context, data) async {
+                                  await DatabaseResponseInspection.addAllData(
+                                      data.responses);
                                   await DatabaseSubordinateInspection
-                                      .addAllData(data);
-                                  await DatabaseAttachmentInspection
-                                      .addAllDataNew(data);
+                                      .addAllDataNew(data.inspection);
+                                  await DatabaseAttachmentInspection.addAllData(
+                                      data);
                                   await updateSubordinateInspectionFromLocal();
 
                                   updateTotalInspection();
@@ -371,7 +384,7 @@ class InspectionNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> uploadAndSynch(BuildContext context) async {
+  Future<void> uploadAndSynchNew(BuildContext context) async {
     final dataMyInspection =
         await DatabaseTicketInspection.selectDataNeedUpload();
     final dataToDoInspection =
@@ -383,49 +396,85 @@ class InspectionNotifier extends ChangeNotifier {
     if (isInternetExist) {
       _dialogService.showLoadingDialog(title: "Upload Data");
       if (dataMyInspection.isNotEmpty) {
-        for (final ticketInspection in dataMyInspection) {
+        await Future.forEach(dataMyInspection, (inspection) async {
           await InspectionRepository().createInspection(
             context,
-            ticketInspection,
+            inspection,
             (context, successMessage) async {
-              await DatabaseTicketInspection.deleteTicketByCode(
-                  ticketInspection);
-              // await DatabaseAttachmentInspection.deleteInspectionByCode(
-              //     ticketInspection);
+              log('Ticket Inspection Code : ${inspection.code} $successMessage');
+              await DatabaseTicketInspection.deleteTicketByCode(inspection);
+              // await DatabaseAttachmentInspection.deleteDataByCode(
+              //     inspection.code);
+
+              final listResponseInspection =
+                  await DatabaseResponseInspection.selectDataByInspectionId(
+                inspection.id,
+              );
+
+              if (listResponseInspection.isNotEmpty) {
+                await Future.forEach(listResponseInspection,
+                    (responseInspection) async {
+                  await InspectionRepository().createResponseInspection(
+                    context,
+                    responseInspection,
+                    (context, successMessage) async {
+                      log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                      await DatabaseResponseInspection.deleteResponseByCode(
+                          responseInspection.code);
+                      // await DatabaseAttachmentInspection.deleteDataByCode(
+                      //     responseInspection.code);
+
+                      await Future.delayed(const Duration(seconds: 1));
+                    },
+                    (context, errorMessage) async {
+                      log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                      await Future.delayed(const Duration(seconds: 1));
+                    },
+                  );
+                });
+              }
+
               await Future.delayed(const Duration(seconds: 1));
-              log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
             (context, errorMessage) async {
               await Future.delayed(const Duration(seconds: 1));
-              log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
+              log('Ticket Inspection Code : ${inspection.code} $errorMessage');
             },
           );
-        }
+        });
 
         if (dataToDoInspection.isNotEmpty) {
-          for (final toDoInspection in dataToDoInspection) {
-            if (toDoInspection.responses.isNotEmpty) {
-              final responseInspection = toDoInspection.responses.last;
+          await Future.forEach(dataToDoInspection, (inspection) async {
+            await DatabaseTodoInspection.deleteTodoByCode(inspection);
 
-              await InspectionRepository().createResponseInspection(
-                context,
-                toDoInspection,
-                responseInspection,
-                (context, successMessage) async {
-                  await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  //   toDoInspection,
-                  // );
-                  await Future.delayed(const Duration(seconds: 1));
-                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
-                },
-                (context, errorMessage) async {
-                  await Future.delayed(const Duration(seconds: 1));
-                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-                },
-              );
+            final listResponseInspection =
+                await DatabaseResponseInspection.selectDataByInspectionId(
+              inspection.id,
+            );
+
+            if (listResponseInspection.isNotEmpty) {
+              await Future.forEach(listResponseInspection,
+                  (responseInspection) async {
+                await InspectionRepository().createResponseInspection(
+                  context,
+                  responseInspection,
+                  (context, successMessage) async {
+                    log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                    await DatabaseResponseInspection.deleteResponseByCode(
+                        responseInspection.code);
+                    // await DatabaseAttachmentInspection.deleteDataByCode(
+                    //     responseInspection.code);
+
+                    await Future.delayed(const Duration(seconds: 1));
+                  },
+                  (context, errorMessage) async {
+                    await Future.delayed(const Duration(seconds: 1));
+                    log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                  },
+                );
+              });
             }
-          }
+          });
 
           _dialogService.popDialog();
           notifyListeners();
@@ -436,29 +485,37 @@ class InspectionNotifier extends ChangeNotifier {
           await getDataInspection(context);
         }
       } else if (dataToDoInspection.isNotEmpty) {
-        for (final toDoInspection in dataToDoInspection) {
-          if (toDoInspection.responses.isNotEmpty) {
-            final responseInspection = toDoInspection.responses.last;
+        await Future.forEach(dataToDoInspection, (inspection) async {
+          await DatabaseTodoInspection.deleteTodoByCode(inspection);
 
-            await InspectionRepository().createResponseInspection(
-              context,
-              toDoInspection,
-              responseInspection,
-              (context, successMessage) async {
-                await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                // await DatabaseAttachmentInspection.deleteInspectionByCode(
-                //   toDoInspection,
-                // );
-                await Future.delayed(const Duration(seconds: 1));
-                log('Response Inspection Code : ${responseInspection.code} $successMessage');
-              },
-              (context, errorMessage) async {
-                await Future.delayed(const Duration(seconds: 1));
-                log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-              },
-            );
+          final listResponseInspection =
+              await DatabaseResponseInspection.selectDataByInspectionId(
+            inspection.id,
+          );
+
+          if (listResponseInspection.isNotEmpty) {
+            await Future.forEach(listResponseInspection,
+                (responseInspection) async {
+              await InspectionRepository().createResponseInspection(
+                context,
+                responseInspection,
+                (context, successMessage) async {
+                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                  await DatabaseResponseInspection.deleteResponseByCode(
+                      responseInspection.code);
+                  // await DatabaseAttachmentInspection.deleteDataByCode(
+                  //     responseInspection.code);
+
+                  await Future.delayed(const Duration(seconds: 1));
+                },
+                (context, errorMessage) async {
+                  await Future.delayed(const Duration(seconds: 1));
+                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                },
+              );
+            });
           }
-        }
+        });
 
         _dialogService.popDialog();
         notifyListeners();
@@ -477,6 +534,112 @@ class InspectionNotifier extends ChangeNotifier {
     }
   }
 
+  // Future<void> uploadAndSynch(BuildContext context) async {
+  //   final dataMyInspection =
+  //       await DatabaseTicketInspection.selectDataNeedUpload();
+  //   final dataToDoInspection =
+  //       await DatabaseTodoInspection.selectDataNeedUpload();
+  //   log('data my inspection unupload : $dataMyInspection');
+  //   log('data todo inspection unupload : $dataToDoInspection');
+  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
+
+  //   if (isInternetExist) {
+  //     _dialogService.showLoadingDialog(title: "Upload Data");
+  //     if (dataMyInspection.isNotEmpty) {
+  //       for (final ticketInspection in dataMyInspection) {
+  //         await InspectionRepository().createInspection(
+  //           context,
+  //           ticketInspection,
+  //           (context, successMessage) async {
+  //             await DatabaseTicketInspection.deleteTicketByCode(
+  //                 ticketInspection);
+  //             // await DatabaseAttachmentInspection.deleteInspectionByCode(
+  //             //     ticketInspection);
+  //             await Future.delayed(const Duration(seconds: 1));
+  //             log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
+  //           },
+  //           (context, errorMessage) async {
+  //             await Future.delayed(const Duration(seconds: 1));
+  //             log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
+  //           },
+  //         );
+  //       }
+
+  //       if (dataToDoInspection.isNotEmpty) {
+  //         for (final toDoInspection in dataToDoInspection) {
+  //           if (toDoInspection.responses.isNotEmpty) {
+  //             final responseInspection = toDoInspection.responses.last;
+
+  //             await InspectionRepository().createResponseInspection(
+  //               context,
+  //               toDoInspection,
+  //               responseInspection,
+  //               (context, successMessage) async {
+  //                 await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+  //                 // await DatabaseAttachmentInspection.deleteInspectionByCode(
+  //                 //   toDoInspection,
+  //                 // );
+  //                 await Future.delayed(const Duration(seconds: 1));
+  //                 log('Response Inspection Code : ${responseInspection.code} $successMessage');
+  //               },
+  //               (context, errorMessage) async {
+  //                 await Future.delayed(const Duration(seconds: 1));
+  //                 log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+  //               },
+  //             );
+  //           }
+  //         }
+
+  //         _dialogService.popDialog();
+  //         notifyListeners();
+  //         await getDataInspection(context);
+  //       } else {
+  //         _dialogService.popDialog();
+  //         notifyListeners();
+  //         await getDataInspection(context);
+  //       }
+  //     } else if (dataToDoInspection.isNotEmpty) {
+  //       for (final toDoInspection in dataToDoInspection) {
+  //         if (toDoInspection.responses.isNotEmpty) {
+  //           final responseInspection = toDoInspection.responses.last;
+
+  //           await InspectionRepository().createResponseInspection(
+  //             context,
+  //             toDoInspection,
+  //             responseInspection,
+  //             (context, successMessage) async {
+  //               await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
+  //               // await DatabaseAttachmentInspection.deleteInspectionByCode(
+  //               //   toDoInspection,
+  //               // );
+  //               await Future.delayed(const Duration(seconds: 1));
+  //               log('Response Inspection Code : ${responseInspection.code} $successMessage');
+  //             },
+  //             (context, errorMessage) async {
+  //               await Future.delayed(const Duration(seconds: 1));
+  //               log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+  //             },
+  //           );
+  //         }
+  //       }
+
+  //       _dialogService.popDialog();
+  //       notifyListeners();
+  //       await getDataInspection(context);
+  //     } else {
+  //       _dialogService.popDialog();
+  //       notifyListeners();
+  //       await getDataInspection(context);
+  //     }
+  //   } else {
+  //     FlushBarManager.showFlushBarWarning(
+  //       context,
+  //       "Gagal Upload",
+  //       "Anda tidak memiliki akses internet",
+  //     );
+  //   }
+  // }
+
   Future<void> initUploadAndSynch(BuildContext context) async {
     final dataMyInspection =
         await DatabaseTicketInspection.selectDataNeedUpload();
@@ -489,49 +652,85 @@ class InspectionNotifier extends ChangeNotifier {
     if (isInternetExist) {
       _dialogService.showLoadingDialog(title: "Upload Data");
       if (dataMyInspection.isNotEmpty) {
-        for (final ticketInspection in dataMyInspection) {
+        await Future.forEach(dataMyInspection, (inspection) async {
           await InspectionRepository().createInspection(
             context,
-            ticketInspection,
+            inspection,
             (context, successMessage) async {
-              await DatabaseTicketInspection.deleteTicketByCode(
-                  ticketInspection);
-              // await DatabaseAttachmentInspection.deleteInspectionByCode(
-              //     ticketInspection);
+              log('Ticket Inspection Code : ${inspection.code} $successMessage');
+              await DatabaseTicketInspection.deleteTicketByCode(inspection);
+              // await DatabaseAttachmentInspection.deleteDataByCode(
+              //     inspection.code);
+
+              final listResponseInspection =
+                  await DatabaseResponseInspection.selectDataByInspectionId(
+                inspection.id,
+              );
+
+              if (listResponseInspection.isNotEmpty) {
+                await Future.forEach(listResponseInspection,
+                    (responseInspection) async {
+                  await InspectionRepository().createResponseInspection(
+                    context,
+                    responseInspection,
+                    (context, successMessage) async {
+                      log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                      await DatabaseResponseInspection.deleteResponseByCode(
+                          responseInspection.code);
+                      // await DatabaseAttachmentInspection.deleteDataByCode(
+                      //     responseInspection.code);
+
+                      await Future.delayed(const Duration(seconds: 1));
+                    },
+                    (context, errorMessage) async {
+                      log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                      await Future.delayed(const Duration(seconds: 1));
+                    },
+                  );
+                });
+              }
+
               await Future.delayed(const Duration(seconds: 1));
-              log('Ticket Inspection Code : ${ticketInspection.code} $successMessage');
             },
             (context, errorMessage) async {
               await Future.delayed(const Duration(seconds: 1));
-              log('Ticket Inspection Code : ${ticketInspection.code} $errorMessage');
+              log('Ticket Inspection Code : ${inspection.code} $errorMessage');
             },
           );
-        }
+        });
 
         if (dataToDoInspection.isNotEmpty) {
-          for (final toDoInspection in dataToDoInspection) {
-            if (toDoInspection.responses.isNotEmpty) {
-              final responseInspection = toDoInspection.responses.last;
+          await Future.forEach(dataToDoInspection, (inspection) async {
+            await DatabaseTodoInspection.deleteTodoByCode(inspection);
 
-              await InspectionRepository().createResponseInspection(
-                context,
-                toDoInspection,
-                responseInspection,
-                (context, successMessage) async {
-                  await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                  // await DatabaseAttachmentInspection.deleteInspectionByCode(
-                  //   toDoInspection,
-                  // );
-                  await Future.delayed(const Duration(seconds: 1));
-                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
-                },
-                (context, errorMessage) async {
-                  await Future.delayed(const Duration(seconds: 1));
-                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-                },
-              );
+            final listResponseInspection =
+                await DatabaseResponseInspection.selectDataByInspectionId(
+              inspection.id,
+            );
+
+            if (listResponseInspection.isNotEmpty) {
+              await Future.forEach(listResponseInspection,
+                  (responseInspection) async {
+                await InspectionRepository().createResponseInspection(
+                  context,
+                  responseInspection,
+                  (context, successMessage) async {
+                    log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                    await DatabaseResponseInspection.deleteResponseByCode(
+                        responseInspection.code);
+                    // await DatabaseAttachmentInspection.deleteDataByCode(
+                    //     responseInspection.code);
+
+                    await Future.delayed(const Duration(seconds: 1));
+                  },
+                  (context, errorMessage) async {
+                    await Future.delayed(const Duration(seconds: 1));
+                    log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                  },
+                );
+              });
             }
-          }
+          });
 
           _dialogService.popDialog();
           notifyListeners();
@@ -542,29 +741,37 @@ class InspectionNotifier extends ChangeNotifier {
           await getDataInspection(context);
         }
       } else if (dataToDoInspection.isNotEmpty) {
-        for (final toDoInspection in dataToDoInspection) {
-          if (toDoInspection.responses.isNotEmpty) {
-            final responseInspection = toDoInspection.responses.last;
+        await Future.forEach(dataToDoInspection, (inspection) async {
+          await DatabaseTodoInspection.deleteTodoByCode(inspection);
 
-            await InspectionRepository().createResponseInspection(
-              context,
-              toDoInspection,
-              responseInspection,
-              (context, successMessage) async {
-                await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-                // await DatabaseAttachmentInspection.deleteInspectionByCode(
-                //   toDoInspection,
-                // );
-                await Future.delayed(const Duration(seconds: 1));
-                log('Response Inspection Code : ${responseInspection.code} $successMessage');
-              },
-              (context, errorMessage) async {
-                await Future.delayed(const Duration(seconds: 1));
-                log('Response Inspection Code : ${responseInspection.code} $errorMessage');
-              },
-            );
+          final listResponseInspection =
+              await DatabaseResponseInspection.selectDataByInspectionId(
+            inspection.id,
+          );
+
+          if (listResponseInspection.isNotEmpty) {
+            await Future.forEach(listResponseInspection,
+                (responseInspection) async {
+              await InspectionRepository().createResponseInspection(
+                context,
+                responseInspection,
+                (context, successMessage) async {
+                  log('Response Inspection Code : ${responseInspection.code} $successMessage');
+                  await DatabaseResponseInspection.deleteResponseByCode(
+                      responseInspection.code);
+                  await DatabaseAttachmentInspection.deleteDataByCode(
+                      responseInspection.code);
+
+                  await Future.delayed(const Duration(seconds: 1));
+                },
+                (context, errorMessage) async {
+                  await Future.delayed(const Duration(seconds: 1));
+                  log('Response Inspection Code : ${responseInspection.code} $errorMessage');
+                },
+              );
+            });
           }
-        }
+        });
 
         _dialogService.popDialog();
         notifyListeners();

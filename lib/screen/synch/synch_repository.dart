@@ -33,7 +33,7 @@ import 'package:epms/model/synch_inspection_response.dart';
 import 'package:flutter/material.dart';
 
 class SynchRepository extends APIConfiguration {
-  void doPostSynch(
+  void synchEpms(
       BuildContext context, String estateCode, onSuccess, onError) async {
     String baseUrl = await StorageManager.readData("apiServer");
     String userToken = await StorageManager.readData("userToken");
@@ -102,13 +102,15 @@ class SynchRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlSynchInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/synch';
-      var urlSynchInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/synch';
-      var responseSynchInspection = await ioClient!
-          .get(Uri.parse(urlSynchInspectionProd), headers: headers);
-      log('cek url : $urlSynchInspectionProd');
+      var urlInspectionDev =
+          'http://10.10.10.91/inspection/public/index.php/api/v1/synch';
+      // var urlInspectionProd =
+      //     'https://inspection.anj-group.co.id/public/index.php/api/v1/synch';
+      var responseSynchInspection =
+          await ioClient!.get(Uri.parse(urlInspectionDev), headers: headers);
+      log('cek url : $urlInspectionDev');
       log('cek response synch inspection : ${responseSynchInspection.body}');
       SynchInspectionResponse res = SynchInspectionResponse.fromJson(
           jsonDecode(responseSynchInspection.body));

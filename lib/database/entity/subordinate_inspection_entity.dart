@@ -27,5 +27,4 @@ class SubordinateInspectionEntity {
   static String usingGps = 'using_gps';
   static String isClosed = 'is_closed';
   static String attachments = 'attachments';
-  static String responses = 'responses';
 }

@@ -33,6 +33,7 @@ import 'package:epms/database/service/database_member_inspection.dart';
 import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/database/service/database_oph_supervise.dart';
 import 'package:epms/database/service/database_oph_supervise_ancak.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_spb.dart';
 import 'package:epms/database/service/database_spb_detail.dart';
 import 'package:epms/database/service/database_spb_loader.dart';
@@ -113,6 +114,7 @@ class DatabaseHelper {
     DatabaseTAuth().createTableTAuth(db);
     // Inspection
     DatabaseTicketInspection().createTable(db);
+    DatabaseResponseInspection().createTable(db);
     DatabaseTodoInspection().createTable(db);
     DatabaseSubordinateInspection().createTable(db);
     DatabaseUserInspectionConfig().createTable(db);
@@ -135,9 +137,11 @@ class DatabaseHelper {
   }
 
   void deleteMasterDataInspection() {
-    DatabaseTicketInspection.deleteTable();
-    DatabaseTodoInspection.deleteTable();
-    DatabaseSubordinateInspection.deleteTable();
+    // DatabaseTicketInspection.deleteTable();
+    // DatabaseResponseInspection.deleteTable();
+    // DatabaseTodoInspection.deleteTable();
+    // DatabaseSubordinateInspection.deleteTable();
+    // DatabaseAttachmentInspection.deleteTable();
     DatabaseUserInspectionConfig.deleteTable();
     DatabaseUserInspection.deleteTable();
     DatabaseTeamInspection.deleteTable();
@@ -146,21 +150,31 @@ class DatabaseHelper {
     DatabaseActionInspection.deleteTable();
     DatabaseCompanyInspection.deleteTable();
     DatabaseDivisionInspection.deleteTable();
-    DatabaseAttachmentInspection.deleteTable();
     DatabaseEstateInspection.deleteTable();
   }
 
-  void deleteMasterDataInspectionReSynch() {
+  void deleteActivityDataInspection() {
     DatabaseTicketInspection.deleteTable();
+    DatabaseResponseInspection.deleteTable();
     DatabaseTodoInspection.deleteTable();
     DatabaseSubordinateInspection.deleteTable();
+    DatabaseAttachmentInspection.deleteTable();
+  }
+
+  void deleteMasterDataInspectionReSynch() {
+    // DatabaseTicketInspection.deleteTable();
+    // DatabaseResponseInspection.deleteTable();
+    // DatabaseTodoInspection.deleteTable();
+    // DatabaseSubordinateInspection.deleteTable();
+    // DatabaseAttachmentInspection.deleteTable();
+    DatabaseUserInspectionConfig.deleteTable();
     DatabaseUserInspection.deleteTable();
     DatabaseTeamInspection.deleteTable();
     DatabaseMemberInspection.deleteTable();
+    DatabaseAccessInspection.deleteTable();
     DatabaseActionInspection.deleteTable();
     DatabaseCompanyInspection.deleteTable();
     DatabaseDivisionInspection.deleteTable();
-    DatabaseAttachmentInspection.deleteTable();
     DatabaseEstateInspection.deleteTable();
   }
 }

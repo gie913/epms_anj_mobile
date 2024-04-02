@@ -18,6 +18,7 @@ import 'package:epms/database/service/database_company_inspection.dart';
 import 'package:epms/database/service/database_division_inspection.dart';
 import 'package:epms/database/service/database_estate_inspection.dart';
 import 'package:epms/database/service/database_member_inspection.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_team_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
@@ -229,11 +230,13 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   }
 
   Future<void> getLocation() async {
-    var position = await LocationService.getGPSLocation();
-    if (position != null) {
-      longitude = position.longitude;
-      latitude = position.latitude;
-      gpsLocation = "${position.longitude}, ${position.latitude}";
+    while (gpsLocation.isEmpty) {
+      final _position = await LocationService.getGPSLocation();
+      if (_position != null) {
+        longitude = _position.longitude;
+        latitude = _position.latitude;
+        gpsLocation = "${_position.longitude}, ${_position.latitude}";
+      }
     }
     log('cek inspection location : $gpsLocation');
     setState(() {});
@@ -314,55 +317,65 @@ class _InspectionFormViewState extends State<InspectionFormView> {
   }
 
   Future<void> getDataInspection(BuildContext context) async {
-    await DatabaseSubordinateInspection.deleteTable();
     await InspectionRepository().getMyInspectionClose(
       context,
       (context, data) async {
-        await DatabaseTicketInspection.addAllData(data);
-        await DatabaseSubordinateInspection.addAllData(data);
-        await DatabaseAttachmentInspection.addAllDataNew(data);
+        await DatabaseResponseInspection.addAllData(data.responses);
+        await DatabaseTicketInspection.addAllDataNew(data.inspection);
+        await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+        await DatabaseAttachmentInspection.addAllData(data);
 
         await InspectionRepository().getMyInspectionNotClose(
           context,
           (context, data) async {
-            await DatabaseTicketInspection.addAllData(data);
-            await DatabaseSubordinateInspection.addAllData(data);
-            await DatabaseAttachmentInspection.addAllDataNew(data);
+            await DatabaseResponseInspection.addAllData(data.responses);
+            await DatabaseTicketInspection.addAllDataNew(data.inspection);
+            await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+            await DatabaseAttachmentInspection.addAllData(data);
 
             await InspectionRepository().getToDoInspection(
               context,
               (context, data) async {
-                await DatabaseTodoInspection.addAllData(data);
-                await DatabaseAttachmentInspection.addAllDataNew(data);
+                await DatabaseResponseInspection.addAllData(data.responses);
+                await DatabaseTodoInspection.addAllDataNew(data.inspection);
+                await DatabaseAttachmentInspection.addAllData(data);
 
                 await InspectionRepository().getOnGoingInspectionClose(
                   context,
                   (context, data) async {
-                    await DatabaseSubordinateInspection.addAllData(data);
-                    await DatabaseAttachmentInspection.addAllDataNew(data);
+                    await DatabaseResponseInspection.addAllData(data.responses);
+                    await DatabaseSubordinateInspection.addAllDataNew(
+                        data.inspection);
+                    await DatabaseAttachmentInspection.addAllData(data);
 
                     await InspectionRepository().getOnGoingInspectionNotClose(
                       context,
                       (context, data) async {
-                        await DatabaseSubordinateInspection.addAllData(data);
-                        await DatabaseAttachmentInspection.addAllDataNew(data);
+                        await DatabaseResponseInspection.addAllData(
+                            data.responses);
+                        await DatabaseSubordinateInspection.addAllDataNew(
+                            data.inspection);
+                        await DatabaseAttachmentInspection.addAllData(data);
 
                         await InspectionRepository().getToDoInspectionClose(
                           context,
                           (context, data) async {
-                            await DatabaseSubordinateInspection.addAllData(
-                                data);
-                            await DatabaseAttachmentInspection.addAllDataNew(
-                                data);
+                            await DatabaseResponseInspection.addAllData(
+                                data.responses);
+                            await DatabaseSubordinateInspection.addAllDataNew(
+                                data.inspection);
+                            await DatabaseAttachmentInspection.addAllData(data);
 
                             await InspectionRepository()
                                 .getToDoInspectionNotClose(
                               context,
                               (context, data) async {
-                                await DatabaseSubordinateInspection.addAllData(
+                                await DatabaseResponseInspection.addAllData(
+                                    data.responses);
+                                await DatabaseSubordinateInspection
+                                    .addAllDataNew(data.inspection);
+                                await DatabaseAttachmentInspection.addAllData(
                                     data);
-                                await DatabaseAttachmentInspection
-                                    .addAllDataNew(data);
                                 _dialogService.popDialog();
                                 _navigationService.pop();
                                 FlushBarManager.showFlushBarSuccess(
@@ -596,7 +609,6 @@ class _InspectionFormViewState extends State<InspectionFormView> {
         isSynchronize: 0,
         usingGps: usingGps ? 1 : 0,
         attachments: listInspectionPhoto,
-        responses: [],
       );
 
       await DatabaseAttachmentInspection.insertInspection(ticketInspection);

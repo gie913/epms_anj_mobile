@@ -122,7 +122,6 @@ class _TabOnGoingState extends State<TabOnGoing> {
                             mDivisionName: data.mDivisionName,
                             mTeamId: data.mTeamId,
                             mTeamName: data.mTeamName,
-                            responses: data.responses,
                             status: data.status,
                             submittedAt: data.submittedAt,
                             submittedBy: data.submittedBy,

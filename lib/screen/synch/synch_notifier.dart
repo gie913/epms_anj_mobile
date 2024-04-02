@@ -38,6 +38,7 @@ import 'package:epms/database/service/database_material.dart';
 import 'package:epms/database/service/database_mc_oph.dart';
 import 'package:epms/database/service/database_mc_spb.dart';
 import 'package:epms/database/service/database_member_inspection.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_supervisor.dart';
 import 'package:epms/database/service/database_t_abw.dart';
@@ -85,439 +86,56 @@ class SynchNotifier extends ChangeNotifier {
 
       if (isLoginEpmsSuccess == true && isLoginInspectionSuccess == false) {
         MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
-        SynchRepository().doPostSynch(
-            context, mConfigSchema.estateCode!, onSuccessSynch, onErrorSynch);
+        SynchRepository().synchEpms(context, mConfigSchema.estateCode!,
+            onSuccessSynchEpms, onErrorSynchEpms);
       } else if (isLoginEpmsSuccess == false &&
           isLoginInspectionSuccess == true) {
         SynchRepository().synchInspection(
           context,
-          onSuccessSynchInspection,
-          onErrorSynchEpmsInspection,
+          onSuccessSynchInspectionWhenEpmsFailed,
+          onErrorSynchInspection,
         );
       } else if (isLoginEpmsSuccess == true &&
           isLoginInspectionSuccess == true) {
         SynchRepository().synchInspection(
           context,
-          onSuccessSynchInspectionNew,
-          onErrorSynch,
+          onSuccessSynchInspectionWhenEpmsSuccess,
+          onErrorSynchEpms,
         );
       }
     } else {
       log('Synch Inspection');
       SynchRepository().synchInspection(
         context,
-        onSuccessSynchInspection,
-        onErrorSynchEpmsInspection,
+        onSuccessSynchInspectionWhenEpmsFailed,
+        onErrorSynchInspection,
       );
     }
   }
 
-  onSuccessSynch(BuildContext context, SynchResponse synchResponse) {
-    saveDatabase(context, synchResponse);
-  }
-
-  onSuccessSynchNew(BuildContext context, SynchResponse synchResponse) {}
-
-  onSuccessSynchInspection(
-      BuildContext context, SynchInspectionData data) async {
-    await saveDatabaseSynchInspection(context, data);
-    await DatabaseSubordinateInspection.deleteTable();
-    await InspectionRepository().getMyInspectionClose(
-      context,
-      (context, data) async {
-        _dataText = "Sync data my inspection";
-        notifyListeners();
-        await DatabaseTicketInspection.addAllData(data);
-        await DatabaseSubordinateInspection.addAllData(data);
-        await DatabaseAttachmentInspection.addAllDataNew(data);
-
-        await InspectionRepository().getMyInspectionNotClose(
-          context,
-          (context, data) async {
-            _dataText = "Sync data my inspection";
-            notifyListeners();
-            await DatabaseTicketInspection.addAllData(data);
-            await DatabaseSubordinateInspection.addAllData(data);
-            await DatabaseAttachmentInspection.addAllDataNew(data);
-
-            await InspectionRepository().getToDoInspection(
-              context,
-              (context, data) async {
-                _dataText = "Sync data todo inspection";
-                notifyListeners();
-                await DatabaseTodoInspection.addAllData(data);
-                await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                await InspectionRepository().getOnGoingInspectionClose(
-                  context,
-                  (context, data) async {
-                    _dataText = "Sync data on going inspection";
-                    notifyListeners();
-                    await DatabaseSubordinateInspection.addAllData(data);
-                    await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                    await InspectionRepository().getOnGoingInspectionNotClose(
-                      context,
-                      (context, data) async {
-                        _dataText = "Sync data on going inspection";
-                        notifyListeners();
-                        await DatabaseSubordinateInspection.addAllData(data);
-                        await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                        await InspectionRepository().getToDoInspectionClose(
-                          context,
-                          (context, data) async {
-                            _dataText = "Sync data on going inspection";
-                            notifyListeners();
-                            await DatabaseSubordinateInspection.addAllData(
-                                data);
-                            await DatabaseAttachmentInspection.addAllDataNew(
-                                data);
-
-                            await InspectionRepository()
-                                .getToDoInspectionNotClose(
-                              context,
-                              (context, data) async {
-                                _dataText = "Sync data on going inspection";
-                                notifyListeners();
-                                await DatabaseSubordinateInspection.addAllData(
-                                    data);
-                                await DatabaseAttachmentInspection
-                                    .addAllDataNew(data);
-
-                                _navigationService
-                                    .push(Routes.HOME_INSPECTION_PAGE);
-                              },
-                              (context, errorMessage) {
-                                onErrorSynchEpmsInspection(
-                                  context,
-                                  errorMessage,
-                                );
-                              },
-                            );
-                          },
-                          (context, errorMessage) {
-                            onErrorSynchEpmsInspection(context, errorMessage);
-                          },
-                        );
-                      },
-                      (context, errorMessage) {
-                        onErrorSynchEpmsInspection(context, errorMessage);
-                      },
-                    );
-                  },
-                  (context, errorMessage) {
-                    onErrorSynchEpmsInspection(context, errorMessage);
-                  },
-                );
-              },
-              (context, errorMessage) {
-                onErrorSynchEpmsInspection(context, errorMessage);
-              },
-            );
-          },
-          (context, errorMessage) {
-            onErrorSynchEpmsInspection(context, errorMessage);
-          },
-        );
-      },
-      (context, errorMessage) {
-        onErrorSynchEpmsInspection(context, errorMessage);
-      },
-    );
-
-    // await InspectionRepository().getMyInspection(
-    //   context,
-    //   (context, data) async {
-    //     _dataText = "Sync data my inspection";
-    //     notifyListeners();
-    //     await DatabaseTicketInspection.addAllData(data);
-    //     await DatabaseAttachmentInspection.addAllDataNew(data);
-
-    //     await InspectionRepository().getToDoInspection(
-    //       context,
-    //       (context, data) async {
-    //         _dataText = "Sync data todo inspection";
-    //         notifyListeners();
-    //         await DatabaseTodoInspection.addAllData(data);
-    //         await DatabaseAttachmentInspection.addAllDataNew(data);
-
-    //         await InspectionRepository().getMySubordinate(
-    //           context,
-    //           (context, data) async {
-    //             _dataText = "Sync data subordinate inspection";
-    //             notifyListeners();
-    //             await DatabaseSubordinateInspection.addAllData(data);
-    //             await DatabaseAttachmentInspection.addAllDataNew(data);
-
-    //             _navigationService.push(Routes.HOME_INSPECTION_PAGE);
-    //           },
-    //           (context, errorMessage) {
-    //             onErrorSynchEpmsInspection(context, errorMessage);
-    //           },
-    //         );
-    //       },
-    //       (context, errorMessage) {
-    //         onErrorSynchEpmsInspection(context, errorMessage);
-    //       },
-    //     );
-    //   },
-    //   (context, errorMessage) {
-    //     onErrorSynchEpmsInspection(context, errorMessage);
-    //   },
-    // );
-  }
-
-  onSuccessSynchInspectionNew(
-      BuildContext context, SynchInspectionData data) async {
-    await saveDatabaseSynchInspection(context, data);
-    await DatabaseSubordinateInspection.deleteTable();
-    await InspectionRepository().getMyInspectionClose(
-      context,
-      (context, data) async {
-        _dataText = "Sync data my inspection";
-        notifyListeners();
-        await DatabaseTicketInspection.addAllData(data);
-        await DatabaseSubordinateInspection.addAllData(data);
-        await DatabaseAttachmentInspection.addAllDataNew(data);
-
-        await InspectionRepository().getMyInspectionNotClose(
-          context,
-          (context, data) async {
-            _dataText = "Sync data my inspection";
-            notifyListeners();
-            await DatabaseTicketInspection.addAllData(data);
-            await DatabaseSubordinateInspection.addAllData(data);
-            await DatabaseAttachmentInspection.addAllDataNew(data);
-
-            await InspectionRepository().getToDoInspection(
-              context,
-              (context, data) async {
-                _dataText = "Sync data todo inspection";
-                notifyListeners();
-                await DatabaseTodoInspection.addAllData(data);
-                await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                await InspectionRepository().getOnGoingInspectionClose(
-                  context,
-                  (context, data) async {
-                    _dataText = "Sync data on going inspection";
-                    notifyListeners();
-                    await DatabaseSubordinateInspection.addAllData(data);
-                    await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                    await InspectionRepository().getOnGoingInspectionNotClose(
-                      context,
-                      (context, data) async {
-                        _dataText = "Sync data on going inspection";
-                        notifyListeners();
-                        await DatabaseSubordinateInspection.addAllData(data);
-                        await DatabaseAttachmentInspection.addAllDataNew(data);
-
-                        await InspectionRepository().getToDoInspectionClose(
-                          context,
-                          (context, data) async {
-                            _dataText = "Sync data on going inspection";
-                            notifyListeners();
-                            await DatabaseSubordinateInspection.addAllData(
-                                data);
-                            await DatabaseAttachmentInspection.addAllDataNew(
-                                data);
-
-                            await InspectionRepository()
-                                .getToDoInspectionNotClose(
-                              context,
-                              (context, data) async {
-                                _dataText = "Sync data on going inspection";
-                                notifyListeners();
-                                await DatabaseSubordinateInspection.addAllData(
-                                    data);
-                                await DatabaseAttachmentInspection
-                                    .addAllDataNew(data);
-
-                                MConfigSchema mConfigSchema =
-                                    await DatabaseMConfig().selectMConfig();
-                                SynchRepository().doPostSynch(
-                                  context,
-                                  mConfigSchema.estateCode!,
-                                  onSuccessSynch,
-                                  onErrorSynch,
-                                );
-                              },
-                              (context, errorMessage) {
-                                onErrorSynch(
-                                  context,
-                                  errorMessage,
-                                );
-                              },
-                            );
-                          },
-                          (context, errorMessage) {
-                            onErrorSynch(context, errorMessage);
-                          },
-                        );
-                      },
-                      (context, errorMessage) {
-                        onErrorSynch(context, errorMessage);
-                      },
-                    );
-                  },
-                  (context, errorMessage) {
-                    onErrorSynch(context, errorMessage);
-                  },
-                );
-              },
-              (context, errorMessage) {
-                onErrorSynch(context, errorMessage);
-              },
-            );
-          },
-          (context, errorMessage) {
-            onErrorSynch(context, errorMessage);
-          },
-        );
-      },
-      (context, errorMessage) {
-        onErrorSynch(context, errorMessage);
-      },
-    );
-
-    // await InspectionRepository().getMyInspection(
-    //   context,
-    //   (context, data) async {
-    //     _dataText = "Sync data my inspection";
-    //     notifyListeners();
-    //     await DatabaseTicketInspection.addAllData(data);
-
-    //     await InspectionRepository().getToDoInspection(
-    //       context,
-    //       (context, data) async {
-    //         _dataText = "Sync data todo inspection";
-    //         notifyListeners();
-    //         await DatabaseTodoInspection.addAllData(data);
-
-    //         await InspectionRepository().getMySubordinate(
-    //           context,
-    //           (context, data) async {
-    //             _dataText = "Sync data subordinate inspection";
-    //             notifyListeners();
-    //             await DatabaseSubordinateInspection.addAllData(data);
-
-    //             MConfigSchema mConfigSchema =
-    //                 await DatabaseMConfig().selectMConfig();
-    //             SynchRepository().doPostSynch(
-    //               context,
-    //               mConfigSchema.estateCode!,
-    //               onSuccessSynch,
-    //               onErrorSynch,
-    //             );
-    //           },
-    //           (context, errorMessage) {
-    //             onErrorSynch(context, errorMessage);
-    //           },
-    //         );
-    //       },
-    //       (context, errorMessage) {
-    //         onErrorSynch(context, errorMessage);
-    //       },
-    //     );
-    //   },
-    //   (context, errorMessage) {
-    //     onErrorSynch(context, errorMessage);
-    //   },
-    // );
-  }
-
-  onErrorSynch(BuildContext context, String message) {
-    print(message);
-    _dialogService.showOptionDialog(
-        title: "Gagal Sync",
-        subtitle: "$message",
-        buttonTextYes: "Ulang",
-        buttonTextNo: "Log Out",
-        onPressYes: onClickReSynch,
-        onPressNo: HomeNotifier().doLogOut);
-  }
-
-  onErrorSynchEpmsInspection(BuildContext context, String message) {
-    print(message);
+  onErrorSynchEpms(BuildContext context, String message) {
+    log("Error Gagal Sync : $message");
     _dialogService.showOptionDialog(
       title: "Gagal Sync",
       subtitle: "$message",
       buttonTextYes: "Ulang",
       buttonTextNo: "Log Out",
       onPressYes: onClickReSynch,
-      onPressNo: () {
-        HomeInspectionNotifier().logOut();
-      },
+      onPressNo: HomeNotifier().doLogOut,
     );
   }
 
-  onClickReSynch() {
-    _dialogService.popDialog();
-    _navigationService.push(Routes.SYNCH_PAGE);
+  onSuccessSynchEpms(BuildContext context, SynchResponse synchResponse) {
+    saveSynchEpmsToDatabase(context, synchResponse);
   }
 
-  saveDatabaseSynchInspection(
-      BuildContext context, SynchInspectionData data) async {
-    try {
-      _dataText = "Sync data user inspection";
-      notifyListeners();
-      await DatabaseUserInspection.insetData(data.user);
-
-      _dataText = "Sync data team inspection";
-      notifyListeners();
-      await DatabaseTeamInspection.insetData(data.team);
-
-      _dataText = "Sync data member inspection";
-      notifyListeners();
-      await DatabaseMemberInspection.insetData(data.team);
-
-      _dataText = "Sync data action inspection";
-      notifyListeners();
-      await DatabaseActionInspection.insetData(data.action);
-
-      _dataText = "Sync data company inspection";
-      notifyListeners();
-      await DatabaseCompanyInspection.insetData(data.company);
-
-      _dataText = "Sync data division inspection";
-      notifyListeners();
-      await DatabaseDivisionInspection.insetData(data.division);
-
-      _dataText = "Sync data estate inspection";
-      notifyListeners();
-      await DatabaseEstateInspection.insetData(data.estate);
-    } catch (e) {
-      print(e);
-      _dialogService.showOptionDialog(
-        title: "Gagal Sync",
-        subtitle: "$e",
-        buttonTextYes: "Ulang",
-        buttonTextNo: "Log Out",
-        onPressYes: onClickReSynch,
-        onPressNo: () {
-          HomeInspectionNotifier().logOut();
-        },
-      );
-    }
-  }
-
-  saveDatabase(BuildContext context, SynchResponse synchResponse) async {
+  saveSynchEpmsToDatabase(
+      BuildContext context, SynchResponse synchResponse) async {
     StorageManager.saveData(
-        "userRoles", synchResponse.global!.rolesSchema![0].userRoles);
+      "userRoles",
+      synchResponse.global!.rolesSchema![0].userRoles,
+    );
     globals.globalRevamp = synchResponse.global!;
-    // DatabaseMVendorSchema().insertMVendorSchema(globals.globalRevamp.mVendorSchema ?? []);
-    // DatabaseMEstateSchema().insertMEstateSchema(globals.globalRevamp.mEstateSchema ?? []);
-    // DatabaseMEmployeeSchema().insertMEmployeeSchema(globals.globalRevamp.mEmployeeSchema ?? []);
-    // DatabaseMActivitySchema().insertMActivitySchema(globals.globalRevamp.mActivitySchema ?? []);
-    // DatabaseMCostControlSchema().insertMCostControlSchema(globals.globalRevamp.mCostControlSchema ?? []);
-    // DatabaseMCustomerCodeSchema().insertMCustomerCodeSchema(globals.globalRevamp.mCustomerCodeSchema ?? []);
-    // DatabaseMDivisionSchema().insertMDivisionSchema(globals.globalRevamp.mDivisionSchema ?? []);
-    // DatabaseMMaterialSchema().insertMMaterialSchema(globals.globalRevamp.mMaterialSchema ?? []);
-    // DatabaseMBlockSchema().insertMBlockSchema(globals.globalRevamp.mBlockSchema ?? []);
-    // DatabaseMCOPHSchema().insertMCOPHSchema(globals.globalRevamp.mCOPHCardSchema ?? []);
-    // DatabaseMCSPBCardSchema().insertMCSPBCardSchema(globals.globalRevamp.mCSPBCardSchema ?? []);
     try {
       _dataText = "Synch data vendor";
       notifyListeners();
@@ -770,7 +388,7 @@ class SynchNotifier extends ChangeNotifier {
                                                           .supervisi3rdParty ??
                                                       []);
                                         }
-                                        onSuccessSaveLocal(
+                                        onSuccessSaveSynchEpms(
                                             context, synchResponse);
                                       });
                                     });
@@ -790,18 +408,19 @@ class SynchNotifier extends ChangeNotifier {
         });
       });
     } catch (e) {
-      print(e);
+      log('Gagal Synch Epms catch : $e');
       _dialogService.showOptionDialog(
-          title: "Gagal Sync",
-          subtitle: "$e",
-          buttonTextYes: "Ulang",
-          buttonTextNo: "Log Out",
-          onPressYes: onClickReSynch,
-          onPressNo: HomeNotifier().doLogOut);
+        title: "Gagal Sync",
+        subtitle: "$e",
+        buttonTextYes: "Ulang",
+        buttonTextNo: "Log Out",
+        onPressYes: onClickReSynch,
+        onPressNo: HomeNotifier().doLogOut,
+      );
     }
   }
 
-  onSuccessSaveLocal(BuildContext context, SynchResponse synchResponse) {
+  onSuccessSaveSynchEpms(BuildContext context, SynchResponse synchResponse) {
     final serverDateParse = DateTime.parse(synchResponse.serverDate!);
     final serverTimeParse = DateTime.parse(
         '${synchResponse.serverDate!} ${synchResponse.serverTime!}');
@@ -819,11 +438,6 @@ class SynchNotifier extends ChangeNotifier {
       synchResponse.ophHistory,
     );
 
-    // using data dummy
-    // saveOphHistory(
-    //   synchResponse.global!.rolesSchema![0].userRoles!,
-    //   ophHistoryDummy,
-    // );
     if (diff.inMinutes > 30) {
       LogOutRepository().doPostLogOut(onSuccessLogOut, onErrorLogOut);
       _dialogService.showNoOptionDialog(
@@ -837,6 +451,326 @@ class SynchNotifier extends ChangeNotifier {
     } else {
       _navigationService.push(ValueService.getMenuFirst(
           synchResponse.global!.rolesSchema![0].userRoles!));
+    }
+  }
+
+  onClickReSynch() {
+    _dialogService.popDialog();
+    _navigationService.push(Routes.SYNCH_PAGE);
+  }
+
+  onSuccessSynchInspectionWhenEpmsFailed(
+      BuildContext context, SynchInspectionData data) async {
+    await saveDatabaseSynchInspection(context, data);
+
+    await InspectionRepository().getMyInspectionClose(
+      context,
+      (context, data) async {
+        _dataText = "Sync data my inspection";
+        notifyListeners();
+        await DatabaseResponseInspection.addAllData(data.responses);
+        await DatabaseTicketInspection.addAllDataNew(data.inspection);
+        await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+        await DatabaseAttachmentInspection.addAllData(data);
+
+        await InspectionRepository().getMyInspectionNotClose(
+          context,
+          (context, data) async {
+            _dataText = "Sync data my inspection";
+            notifyListeners();
+            await DatabaseResponseInspection.addAllData(data.responses);
+            await DatabaseTicketInspection.addAllDataNew(data.inspection);
+            await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+            await DatabaseAttachmentInspection.addAllData(data);
+
+            await InspectionRepository().getToDoInspection(
+              context,
+              (context, data) async {
+                _dataText = "Sync data todo inspection";
+                notifyListeners();
+                await DatabaseResponseInspection.addAllData(data.responses);
+                await DatabaseTodoInspection.addAllDataNew(data.inspection);
+                await DatabaseAttachmentInspection.addAllData(data);
+
+                await InspectionRepository().getOnGoingInspectionClose(
+                  context,
+                  (context, data) async {
+                    _dataText = "Sync data on going inspection";
+                    notifyListeners();
+                    await DatabaseResponseInspection.addAllData(data.responses);
+                    await DatabaseSubordinateInspection.addAllDataNew(
+                        data.inspection);
+                    await DatabaseAttachmentInspection.addAllData(data);
+
+                    await InspectionRepository().getOnGoingInspectionNotClose(
+                      context,
+                      (context, data) async {
+                        _dataText = "Sync data on going inspection";
+                        notifyListeners();
+                        await DatabaseResponseInspection.addAllData(
+                            data.responses);
+                        await DatabaseSubordinateInspection.addAllDataNew(
+                            data.inspection);
+                        await DatabaseAttachmentInspection.addAllData(data);
+
+                        await InspectionRepository().getToDoInspectionClose(
+                          context,
+                          (context, data) async {
+                            _dataText = "Sync data on going inspection";
+                            notifyListeners();
+                            await DatabaseResponseInspection.addAllData(
+                                data.responses);
+                            await DatabaseSubordinateInspection.addAllDataNew(
+                                data.inspection);
+                            await DatabaseAttachmentInspection.addAllData(data);
+
+                            await InspectionRepository()
+                                .getToDoInspectionNotClose(
+                              context,
+                              (context, data) async {
+                                _dataText = "Sync data on going inspection";
+                                notifyListeners();
+                                await DatabaseResponseInspection.addAllData(
+                                    data.responses);
+                                await DatabaseSubordinateInspection
+                                    .addAllDataNew(data.inspection);
+                                await DatabaseAttachmentInspection.addAllData(
+                                    data);
+
+                                final now = DateTime.now();
+                                await StorageManager.saveData(
+                                    "lastSynchTimeInspection",
+                                    TimeManager.timeWithColon(now));
+                                await StorageManager.saveData(
+                                    "lastSynchDateInspection",
+                                    TimeManager.dateWithDash(now));
+
+                                _navigationService
+                                    .push(Routes.HOME_INSPECTION_PAGE);
+                              },
+                              (context, errorMessage) {
+                                onErrorSynchInspection(context, errorMessage);
+                              },
+                            );
+                          },
+                          (context, errorMessage) {
+                            onErrorSynchInspection(context, errorMessage);
+                          },
+                        );
+                      },
+                      (context, errorMessage) {
+                        onErrorSynchInspection(context, errorMessage);
+                      },
+                    );
+                  },
+                  (context, errorMessage) {
+                    onErrorSynchInspection(context, errorMessage);
+                  },
+                );
+              },
+              (context, errorMessage) {
+                onErrorSynchInspection(context, errorMessage);
+              },
+            );
+          },
+          (context, errorMessage) {
+            onErrorSynchInspection(context, errorMessage);
+          },
+        );
+      },
+      (context, errorMessage) {
+        onErrorSynchInspection(context, errorMessage);
+      },
+    );
+  }
+
+  onErrorSynchInspection(BuildContext context, String message) {
+    log("Gagal Sync Inspection : $message");
+    _dialogService.showOptionDialog(
+      title: "Gagal Sync",
+      subtitle: "$message",
+      buttonTextYes: "Ulang",
+      buttonTextNo: "Log Out",
+      onPressYes: onClickReSynch,
+      onPressNo: () {
+        HomeInspectionNotifier().logOut();
+      },
+    );
+  }
+
+  onSuccessSynchInspectionWhenEpmsSuccess(
+      BuildContext context, SynchInspectionData data) async {
+    await saveDatabaseSynchInspection(context, data);
+
+    await InspectionRepository().getMyInspectionClose(
+      context,
+      (context, data) async {
+        _dataText = "Sync data my inspection";
+        notifyListeners();
+        await DatabaseResponseInspection.addAllData(data.responses);
+        await DatabaseTicketInspection.addAllDataNew(data.inspection);
+        await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+        await DatabaseAttachmentInspection.addAllData(data);
+
+        await InspectionRepository().getMyInspectionNotClose(
+          context,
+          (context, data) async {
+            _dataText = "Sync data my inspection";
+            notifyListeners();
+            await DatabaseResponseInspection.addAllData(data.responses);
+            await DatabaseTicketInspection.addAllDataNew(data.inspection);
+            await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+            await DatabaseAttachmentInspection.addAllData(data);
+
+            await InspectionRepository().getToDoInspection(
+              context,
+              (context, data) async {
+                _dataText = "Sync data todo inspection";
+                notifyListeners();
+                await DatabaseResponseInspection.addAllData(data.responses);
+                await DatabaseTodoInspection.addAllDataNew(data.inspection);
+                await DatabaseAttachmentInspection.addAllData(data);
+
+                await InspectionRepository().getOnGoingInspectionClose(
+                  context,
+                  (context, data) async {
+                    _dataText = "Sync data on going inspection";
+                    notifyListeners();
+                    await DatabaseResponseInspection.addAllData(data.responses);
+                    await DatabaseSubordinateInspection.addAllDataNew(
+                        data.inspection);
+                    await DatabaseAttachmentInspection.addAllData(data);
+
+                    await InspectionRepository().getOnGoingInspectionNotClose(
+                      context,
+                      (context, data) async {
+                        _dataText = "Sync data on going inspection";
+                        notifyListeners();
+                        await DatabaseResponseInspection.addAllData(
+                            data.responses);
+                        await DatabaseSubordinateInspection.addAllDataNew(
+                            data.inspection);
+                        await DatabaseAttachmentInspection.addAllData(data);
+
+                        await InspectionRepository().getToDoInspectionClose(
+                          context,
+                          (context, data) async {
+                            _dataText = "Sync data on going inspection";
+                            notifyListeners();
+                            await DatabaseResponseInspection.addAllData(
+                                data.responses);
+                            await DatabaseSubordinateInspection.addAllDataNew(
+                                data.inspection);
+                            await DatabaseAttachmentInspection.addAllData(data);
+
+                            await InspectionRepository()
+                                .getToDoInspectionNotClose(
+                              context,
+                              (context, data) async {
+                                _dataText = "Sync data on going inspection";
+                                notifyListeners();
+                                await DatabaseResponseInspection.addAllData(
+                                    data.responses);
+                                await DatabaseSubordinateInspection
+                                    .addAllDataNew(data.inspection);
+                                await DatabaseAttachmentInspection.addAllData(
+                                    data);
+
+                                final now = DateTime.now();
+                                await StorageManager.saveData(
+                                    "lastSynchTimeInspection",
+                                    TimeManager.timeWithColon(now));
+                                await StorageManager.saveData(
+                                    "lastSynchDateInspection",
+                                    TimeManager.dateWithDash(now));
+
+                                MConfigSchema mConfigSchema =
+                                    await DatabaseMConfig().selectMConfig();
+                                SynchRepository().synchEpms(
+                                  context,
+                                  mConfigSchema.estateCode!,
+                                  onSuccessSynchEpms,
+                                  onErrorSynchEpms,
+                                );
+                              },
+                              (context, errorMessage) {
+                                onErrorSynchEpms(context, errorMessage);
+                              },
+                            );
+                          },
+                          (context, errorMessage) {
+                            onErrorSynchEpms(context, errorMessage);
+                          },
+                        );
+                      },
+                      (context, errorMessage) {
+                        onErrorSynchEpms(context, errorMessage);
+                      },
+                    );
+                  },
+                  (context, errorMessage) {
+                    onErrorSynchEpms(context, errorMessage);
+                  },
+                );
+              },
+              (context, errorMessage) {
+                onErrorSynchEpms(context, errorMessage);
+              },
+            );
+          },
+          (context, errorMessage) {
+            onErrorSynchEpms(context, errorMessage);
+          },
+        );
+      },
+      (context, errorMessage) {
+        onErrorSynchEpms(context, errorMessage);
+      },
+    );
+  }
+
+  saveDatabaseSynchInspection(
+      BuildContext context, SynchInspectionData data) async {
+    try {
+      _dataText = "Sync data user inspection";
+      notifyListeners();
+      await DatabaseUserInspection.insetData(data.user);
+
+      _dataText = "Sync data team inspection";
+      notifyListeners();
+      await DatabaseTeamInspection.insetData(data.team);
+
+      _dataText = "Sync data member inspection";
+      notifyListeners();
+      await DatabaseMemberInspection.insetData(data.team);
+
+      _dataText = "Sync data action inspection";
+      notifyListeners();
+      await DatabaseActionInspection.insetData(data.action);
+
+      _dataText = "Sync data company inspection";
+      notifyListeners();
+      await DatabaseCompanyInspection.insetData(data.company);
+
+      _dataText = "Sync data division inspection";
+      notifyListeners();
+      await DatabaseDivisionInspection.insetData(data.division);
+
+      _dataText = "Sync data estate inspection";
+      notifyListeners();
+      await DatabaseEstateInspection.insetData(data.estate);
+    } catch (e) {
+      log('Gagal Synch Inspection : $e');
+      _dialogService.showOptionDialog(
+        title: "Gagal Sync",
+        subtitle: "$e",
+        buttonTextYes: "Ulang",
+        buttonTextNo: "Log Out",
+        onPressYes: onClickReSynch,
+        onPressNo: () {
+          HomeInspectionNotifier().logOut();
+        },
+      );
     }
   }
 
@@ -868,9 +802,10 @@ class SynchNotifier extends ChangeNotifier {
   onErrorLogOut(String response) {
     _dialogService.popDialog();
     _dialogService.showNoOptionDialog(
-        title: "Gagal Log Out",
-        subtitle: "$response",
-        onPress: _dialogService.popDialog);
+      title: "Gagal Log Out",
+      subtitle: "$response",
+      onPress: _dialogService.popDialog,
+    );
   }
 
   Future<void> saveOphHistory(String role, List? ophHistory) async {
@@ -896,7 +831,7 @@ class SynchNotifier extends ChangeNotifier {
   doSynchMasterDataBackground(BuildContext context) async {
     _dialogService.showLoadingDialog(title: "Synch Data");
     MConfigSchema mConfigSchema = await DatabaseMConfig().selectMConfig();
-    SynchRepository().doPostSynch(context, mConfigSchema.estateCode!,
+    SynchRepository().synchEpms(context, mConfigSchema.estateCode!,
         onSuccessSynchBackground, onErrorSynchBackground);
   }
 
@@ -907,12 +842,13 @@ class SynchNotifier extends ChangeNotifier {
   onErrorSynchBackground(BuildContext context, String message) {
     _dialogService.popDialog();
     _dialogService.showOptionDialog(
-        title: "Gagal Sync",
-        subtitle: "Gagal pada saat sinkronisasi $message",
-        buttonTextYes: "Ulang",
-        buttonTextNo: "Log Out",
-        onPressYes: onClickReSynchBackground,
-        onPressNo: HomeNotifier().doLogOut);
+      title: "Gagal Sync",
+      subtitle: "Gagal pada saat sinkronisasi $message",
+      buttonTextYes: "Ulang",
+      buttonTextNo: "Log Out",
+      onPressYes: onClickReSynchBackground,
+      onPressNo: HomeNotifier().doLogOut,
+    );
   }
 
   saveDatabaseBackground(
@@ -944,12 +880,13 @@ class SynchNotifier extends ChangeNotifier {
     } catch (e) {
       print(e);
       _dialogService.showOptionDialog(
-          title: "Gagal Sync",
-          subtitle: "Gagal pada saat sinkronisasi $e",
-          buttonTextYes: "Ulang",
-          buttonTextNo: "Log Out",
-          onPressYes: onClickReSynch,
-          onPressNo: HomeNotifier().doLogOut);
+        title: "Gagal Sync",
+        subtitle: "Gagal pada saat sinkronisasi $e",
+        buttonTextYes: "Ulang",
+        buttonTextNo: "Log Out",
+        onPressYes: onClickReSynch,
+        onPressNo: HomeNotifier().doLogOut,
+      );
     }
   }
 

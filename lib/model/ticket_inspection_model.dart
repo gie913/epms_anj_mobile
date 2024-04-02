@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:epms/database/helper/convert_helper.dart';
-import 'package:epms/model/history_inspection_model.dart';
+import 'package:equatable/equatable.dart';
 
-class TicketInspectionModel {
+class TicketInspectionModel extends Equatable {
   const TicketInspectionModel({
     this.id = '',
     this.code = '',
@@ -33,7 +33,6 @@ class TicketInspectionModel {
     this.usingGps = 0,
     this.isClosed = 0,
     this.attachments = const [],
-    this.responses = const <HistoryInspectionModel>[],
   });
 
   factory TicketInspectionModel.fromJson(Map<String, dynamic> json) =>
@@ -68,13 +67,6 @@ class TicketInspectionModel {
         attachments: json['attachments'] != null
             ? List.from((json['attachments'] as List).map((e) => e))
             : [],
-        responses: json['responses'] != null
-            ? List<HistoryInspectionModel>.from(
-                (json['responses'] as List).map((e) {
-                  return HistoryInspectionModel.fromJson(e);
-                }),
-              )
-            : <HistoryInspectionModel>[],
       );
 
   factory TicketInspectionModel.fromDatabase(Map<String, dynamic> json) =>
@@ -111,13 +103,6 @@ class TicketInspectionModel {
                 (jsonDecode(json['attachments']) as List).map((e) => e),
               )
             : [],
-        responses: json['responses'] != null
-            ? List<HistoryInspectionModel>.from(
-                (jsonDecode(json['responses']) as List).map((e) {
-                  return HistoryInspectionModel.fromJson(e);
-                }),
-              )
-            : <HistoryInspectionModel>[],
       );
 
   final String id;
@@ -148,7 +133,6 @@ class TicketInspectionModel {
   final int usingGps;
   final int isClosed;
   final List attachments;
-  final List<HistoryInspectionModel> responses;
 
   Map<String, dynamic> toJson() {
     final tempData = <String, dynamic>{};
@@ -181,7 +165,6 @@ class TicketInspectionModel {
     tempData['using_gps'] = usingGps;
     tempData['is_closed'] = isClosed;
     tempData['attachments'] = List.from(attachments.map((e) => e));
-    tempData['responses'] = List.from(responses.map((e) => e.toJson()));
 
     return tempData;
   }
@@ -217,14 +200,44 @@ class TicketInspectionModel {
     tempData['using_gps'] = usingGps;
     tempData['is_closed'] = isClosed;
     tempData['attachments'] = jsonEncode(List.from(attachments.map((e) => e)));
-    tempData['responses'] =
-        jsonEncode(List.from(responses.map((e) => e.toJson())));
 
     return tempData;
   }
 
   @override
   String toString() {
-    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, using_gps: $usingGps, is_new_response: $isNewResponse, is_closed: $isClosed, attachments: $attachments, responses: $responses)';
+    return 'TicketInspectionModel(id: $id, code: $code, tr_time: $trTime, m_company_id: $mCompanyId, m_company_name: $mCompanyName, m_company_alias: $mCompanyAlias, m_team_id: $mTeamId, m_team_name: $mTeamName, m_division_id: $mDivisionId, m_division_name: $mDivisionName, m_division_estate_code: $mDivisionEstateCode, gps_lng: $gpsLng, gps_lat: $gpsLat, submitted_at: $submittedAt, submitted_by: $submittedBy, submitted_by_name: $submittedByName, assignee: $assignee, assignee_id: $assigneeId, status: $status, description: $description, closed_at: $closedAt, closed_by: $closedBy, closed_by_name: $closedByName, is_synchronize: $isSynchronize, using_gps: $usingGps, is_new_response: $isNewResponse, is_closed: $isClosed, attachments: $attachments)';
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        code,
+        trTime,
+        mCompanyId,
+        mCompanyName,
+        mCompanyAlias,
+        mTeamId,
+        mTeamName,
+        mDivisionId,
+        mDivisionName,
+        mDivisionEstateCode,
+        gpsLat,
+        gpsLng,
+        submittedAt,
+        submittedBy,
+        submittedByName,
+        assignee,
+        assigneeId,
+        status,
+        description,
+        closedAt,
+        closedBy,
+        closedByName,
+        isSynchronize,
+        isNewResponse,
+        usingGps,
+        isClosed,
+        attachments
+      ];
 }

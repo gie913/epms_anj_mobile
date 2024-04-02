@@ -151,7 +151,7 @@ class _InspectionViewState extends State<InspectionView> {
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                     child: InkWell(
                       onTap: () {
-                        provider.uploadAndSynch(context);
+                        provider.uploadAndSynchNew(context);
                       },
                       child: Card(
                         color: Colors.green,

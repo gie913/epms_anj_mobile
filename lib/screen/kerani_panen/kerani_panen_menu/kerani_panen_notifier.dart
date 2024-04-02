@@ -351,7 +351,7 @@ class KeraniPanenNotifier extends ChangeNotifier {
       } else {
         DatabaseMConfig().selectMConfig().then((value) {
           _dialogService.showLoadingDialog(title: "Mohon tunggu");
-          SynchRepository().doPostSynch(
+          SynchRepository().synchEpms(
               _navigationService.navigatorKey.currentContext!,
               value.estateCode!,
               onSuccessSynch,

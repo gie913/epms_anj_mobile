@@ -4,7 +4,6 @@ import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/common_manager/dialog_services.dart';
 import 'package:epms/common_manager/flushbar_manager.dart';
-import 'package:epms/common_manager/inspection_service.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/storage_manager.dart';
 import 'package:epms/database/helper/database_helper.dart';
@@ -34,7 +33,6 @@ import 'package:epms/model/m_config_schema.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/user_inspection_config_model.dart';
 import 'package:epms/screen/home/logout_repository.dart';
-import 'package:epms/screen/inspection/inspection_repository.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:open_settings/open_settings.dart';
@@ -454,8 +452,8 @@ class HomeNotifier extends ChangeNotifier {
 
   Future<void> initDataInspection(BuildContext context) async {
     await getDataUser();
-    await DatabaseTicketInspection.deleteTicketThreeMonthAgo();
-    await DatabaseSubordinateInspection.deleteSubordinateThreeMonthAgo();
+    await DatabaseTicketInspection.deleteTicketOneWeekAgo();
+    await DatabaseSubordinateInspection.deleteSubordinateOneWeekAgo();
     // await getDataInspection(context);
     await updateCountInspection();
   }
@@ -490,145 +488,149 @@ class HomeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getDataInspection(BuildContext context) async {
-    final isInternetExist = await InspectionService.isInternetConnectionExist();
-    if (isInternetExist) {
-      await InspectionRepository().getMyInspection(
-        context,
-        (context, data) async {
-          await DatabaseTicketInspection.addAllData(data);
-          await updateMyInspectionFromLocal();
-          await InspectionRepository().getToDoInspection(
-            context,
-            (context, data) async {
-              await DatabaseTodoInspection.addAllData(data);
-              await updateTodoInspectionFromLocal();
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-            (context, errorMessage) async {
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-          );
-        },
-        (context, errorMessage) async {
-          await InspectionRepository().getToDoInspection(
-            context,
-            (context, data) async {
-              await DatabaseTodoInspection.addAllData(data);
-              await updateTodoInspectionFromLocal();
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-            (context, errorMessage) async {
-              await InspectionRepository().getMySubordinate(
-                context,
-                (context, data) async {
-                  await DatabaseSubordinateInspection.addAllData(data);
-                  await updateSubordinateInspectionFromLocal();
-                  FlushBarManager.showFlushBarSuccess(
-                    context,
-                    "Berhasil Synchronize",
-                    "Data Inspection Berhasil Diperbaharui",
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-                (context, errorMessage) {
-                  FlushBarManager.showFlushBarError(
-                    context,
-                    "Gagal Synchronize",
-                    errorMessage,
-                  );
-                  log('list My Inspection : $_listMyInspection');
-                  log('list Todo Inspection : $_listTodoInspection');
-                  log('list Subordinate Inspection : $_listSubordinateInspection');
-                },
-              );
-            },
-          );
-        },
-      );
-    } else {
-      await updateMyInspectionFromLocal();
-      await updateTodoInspectionFromLocal();
-      await updateSubordinateInspectionFromLocal();
-      log('list My Inspection : $_listMyInspection');
-      log('list Todo Inspection : $_listTodoInspection');
-      log('list Subordinate Inspection : $_listSubordinateInspection');
-    }
-  }
+  // Future<void> getDataInspection(BuildContext context) async {
+  //   final isInternetExist = await InspectionService.isInternetConnectionExist();
+  //   if (isInternetExist) {
+  //     await InspectionRepository().getMyInspection(
+  //       context,
+  //       (context, data) async {
+  //         await DatabaseTicketInspection.addAllDataNew(data.inspection);
+  //         await updateMyInspectionFromLocal();
+  //         await InspectionRepository().getToDoInspection(
+  //           context,
+  //           (context, data) async {
+  //             await DatabaseTodoInspection.addAllData(data.inspection);
+  //             await updateTodoInspectionFromLocal();
+  //             await InspectionRepository().getMySubordinate(
+  //               context,
+  //               (context, data) async {
+  //                 await DatabaseSubordinateInspection.addAllData(
+  //                     data.inspection);
+  //                 await updateSubordinateInspectionFromLocal();
+  //                 FlushBarManager.showFlushBarSuccess(
+  //                   context,
+  //                   "Berhasil Synchronize",
+  //                   "Data Inspection Berhasil Diperbaharui",
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //               (context, errorMessage) {
+  //                 FlushBarManager.showFlushBarError(
+  //                   context,
+  //                   "Gagal Synchronize",
+  //                   errorMessage,
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //             );
+  //           },
+  //           (context, errorMessage) async {
+  //             await InspectionRepository().getMySubordinate(
+  //               context,
+  //               (context, data) async {
+  //                 await DatabaseSubordinateInspection.addAllData(
+  //                     data.inspection);
+  //                 await updateSubordinateInspectionFromLocal();
+  //                 FlushBarManager.showFlushBarSuccess(
+  //                   context,
+  //                   "Berhasil Synchronize",
+  //                   "Data Inspection Berhasil Diperbaharui",
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //               (context, errorMessage) {
+  //                 FlushBarManager.showFlushBarError(
+  //                   context,
+  //                   "Gagal Synchronize",
+  //                   errorMessage,
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //             );
+  //           },
+  //         );
+  //       },
+  //       (context, errorMessage) async {
+  //         await InspectionRepository().getToDoInspection(
+  //           context,
+  //           (context, data) async {
+  //             await DatabaseTodoInspection.addAllData(data.inspection);
+  //             await updateTodoInspectionFromLocal();
+  //             await InspectionRepository().getMySubordinate(
+  //               context,
+  //               (context, data) async {
+  //                 await DatabaseSubordinateInspection.addAllData(
+  //                     data.inspection);
+  //                 await updateSubordinateInspectionFromLocal();
+  //                 FlushBarManager.showFlushBarSuccess(
+  //                   context,
+  //                   "Berhasil Synchronize",
+  //                   "Data Inspection Berhasil Diperbaharui",
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //               (context, errorMessage) {
+  //                 FlushBarManager.showFlushBarError(
+  //                   context,
+  //                   "Gagal Synchronize",
+  //                   errorMessage,
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //             );
+  //           },
+  //           (context, errorMessage) async {
+  //             await InspectionRepository().getMySubordinate(
+  //               context,
+  //               (context, data) async {
+  //                 await DatabaseSubordinateInspection.addAllData(
+  //                     data.inspection);
+  //                 await updateSubordinateInspectionFromLocal();
+  //                 FlushBarManager.showFlushBarSuccess(
+  //                   context,
+  //                   "Berhasil Synchronize",
+  //                   "Data Inspection Berhasil Diperbaharui",
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //               (context, errorMessage) {
+  //                 FlushBarManager.showFlushBarError(
+  //                   context,
+  //                   "Gagal Synchronize",
+  //                   errorMessage,
+  //                 );
+  //                 log('list My Inspection : $_listMyInspection');
+  //                 log('list Todo Inspection : $_listTodoInspection');
+  //                 log('list Subordinate Inspection : $_listSubordinateInspection');
+  //               },
+  //             );
+  //           },
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     await updateMyInspectionFromLocal();
+  //     await updateTodoInspectionFromLocal();
+  //     await updateSubordinateInspectionFromLocal();
+  //     log('list My Inspection : $_listMyInspection');
+  //     log('list Todo Inspection : $_listTodoInspection');
+  //     log('list Subordinate Inspection : $_listSubordinateInspection');
+  //   }
+  // }
 
   checkTime() async {
     var setTime = await StorageManager.readData("setTime");

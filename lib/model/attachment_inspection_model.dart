@@ -1,4 +1,6 @@
-class AttachmentInspectionModel {
+import 'package:equatable/equatable.dart';
+
+class AttachmentInspectionModel extends Equatable {
   const AttachmentInspectionModel({
     this.id = '',
     this.code = '',
@@ -34,4 +36,7 @@ class AttachmentInspectionModel {
   String toString() {
     return 'AttachmentInspectionModel(id: $id, code: $code, image_url: $imageUrl)';
   }
+
+  @override
+  List<Object?> get props => [id, code, image, imageUrl];
 }

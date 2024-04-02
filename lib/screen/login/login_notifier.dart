@@ -105,6 +105,8 @@ class LoginNotifier extends ChangeNotifier {
           _password.text,
           onSuccessLogin,
           (context, errorMessage) async {
+            log('Error Login Epms');
+            final errorLoginEpms = errorMessage;
             StorageManager.saveData('is_login_epms_success', false);
             await LoginRepository().loginInspection(
               context,
@@ -114,7 +116,10 @@ class LoginNotifier extends ChangeNotifier {
               onSuccessLoginInspection,
               (context, errorMessage) async {
                 StorageManager.saveData('is_login_inspection_success', false);
-                onErrorLogin(context, errorMessage);
+                onErrorLogin(
+                  context,
+                  'Error Login Epms : $errorLoginEpms\nError Login Inspection : $errorMessage',
+                );
                 _loading = false;
                 notifyListeners();
               },
@@ -137,9 +142,10 @@ class LoginNotifier extends ChangeNotifier {
             StorageManager.saveData('is_login_inspection_success', false);
             _loading = false;
             _dialogService.showNoOptionDialog(
-                subtitle: "$errorMessage",
-                title: 'Gagal Login',
-                onPress: _dialogService.popDialog);
+              subtitle: "Error Login Inspection : $errorMessage",
+              title: 'Gagal Login',
+              onPress: _dialogService.popDialog,
+            );
             notifyListeners();
           },
         );
@@ -188,6 +194,14 @@ class LoginNotifier extends ChangeNotifier {
       BuildContext context, LoginInspectionData data) async {
     StorageManager.saveData('is_login_inspection_success', true);
     _loading = false;
+    final username = await StorageManager.readData("userName");
+
+    if (username != data.user.username) {
+      DatabaseHelper().deleteActivityDataInspection();
+      StorageManager.deleteData("lastSynchDateInspection");
+      StorageManager.deleteData("lastSynchTimeInspection");
+    }
+
     await saveDatabaseInspection(context, _username.text, data);
     FlushBarManager.showFlushBarSuccess(
         context, "Login Berhasil", "Anda berhasil login");
@@ -198,9 +212,10 @@ class LoginNotifier extends ChangeNotifier {
   onErrorLogin(BuildContext context, String response) {
     _loading = false;
     _dialogService.showNoOptionDialog(
-        subtitle: "$response",
-        title: 'Gagal Login',
-        onPress: _dialogService.popDialog);
+      subtitle: "$response",
+      title: 'Gagal Login',
+      onPress: _dialogService.popDialog,
+    );
     notifyListeners();
   }
 
@@ -221,6 +236,7 @@ class LoginNotifier extends ChangeNotifier {
     StorageManager.saveData('inspectionTokenExpired', data.tokenExpiredAt);
     StorageManager.saveData("userName", username);
     StorageManager.saveData('topic', 'development_user_${data.user.username}');
+    DatabaseHelper().deleteMasterDataInspection();
     await DatabaseUserInspectionConfig.insetData(data.user);
     await DatabaseAccessInspection.insetData(data.access);
     await FirebaseMessaging.instance
@@ -229,12 +245,13 @@ class LoginNotifier extends ChangeNotifier {
 
   onPressResetData(BuildContext context) {
     _dialogService.showOptionDialog(
-        title: "Reset Data",
-        subtitle: "Anda yakin ingin mereset data?",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Batal",
-        onPressYes: deleteMasterData,
-        onPressNo: _dialogService.popDialog);
+      title: "Reset Data",
+      subtitle: "Anda yakin ingin mereset data?",
+      buttonTextYes: "Ya",
+      buttonTextNo: "Batal",
+      onPressYes: deleteMasterData,
+      onPressNo: _dialogService.popDialog,
+    );
   }
 
   onPressConfiguration(BuildContext context) {
@@ -282,15 +299,17 @@ class LoginNotifier extends ChangeNotifier {
       DatabaseHelper().deleteMasterDataInspection();
       _dialogService.popDialog();
       FlushBarManager.showFlushBarSuccess(
-          _navigationService.navigatorKey.currentContext!,
-          "Reset Data",
-          "Berhasil mereset data");
+        _navigationService.navigatorKey.currentContext!,
+        "Reset Data",
+        "Berhasil mereset data",
+      );
     } catch (e) {
       _dialogService.popDialog();
       _dialogService.showNoOptionDialog(
-          title: "Reset Data",
-          subtitle: "Gagal melakukan reset data",
-          onPress: _dialogService.popDialog);
+        title: "Reset Data",
+        subtitle: "Gagal melakukan reset data",
+        onPress: _dialogService.popDialog,
+      );
     }
   }
 }
