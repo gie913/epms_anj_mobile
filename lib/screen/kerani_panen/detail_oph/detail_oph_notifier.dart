@@ -162,6 +162,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
       _blockNumber.text = _oph.ophBlockCode!;
+      blockNumberCheck(context, _oph.ophBlockCode!);
     } else {
       _oph = oph;
       notesOPH.text = _oph.ophNotes ?? "";
@@ -175,6 +176,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
       _blockNumber.text = _oph.ophBlockCode!;
+      blockNumberCheck(context, _oph.ophBlockCode!);
       _isExist = true;
     }
   }
@@ -289,18 +291,30 @@ class DetailOPHNotifier extends ChangeNotifier {
 
   onSaveChangeCard(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_oph.ophCardId != ophNumber.text) {
-      print('cek kebenaran 1 : ${_oph.ophCardId != ophNumber.text}');
-      if (_restan) {
-        print('doWriteRestanDialog');
-        doWriteRestanDialog();
+    if (_blockNumber.text.isNotEmpty) {
+      if (_mBlockSchema != null) {
+        if (_oph.ophCardId != ophNumber.text) {
+          print('cek onSaveChangeCard');
+          print(
+              'cek kebenaran 1 : ${_oph.ophCardId} != ${ophNumber.text} ${_oph.ophCardId != ophNumber.text}');
+          if (_restan) {
+            print('doWriteRestanDialog');
+            doWriteRestanDialog();
+          } else {
+            print('onUpdateOPHClicked');
+            onUpdateOPHClicked(context);
+          }
+        } else {
+          FlushBarManager.showFlushBarWarning(
+              context, "Kartu OPH", "Kartu OPH belum diganti");
+        }
       } else {
-        print('onUpdateOPHClicked');
-        onUpdateOPHClicked(context);
+        FlushBarManager.showFlushBarWarning(
+            context, "Kode Blok", "Kode Blok tidak sesuai");
       }
     } else {
       FlushBarManager.showFlushBarWarning(
-          context, "Kartu OPH", "Kartu OPH belum diganti");
+          context, "Kode Blok", "Anda belum memasukkan block");
     }
   }
 
