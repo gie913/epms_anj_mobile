@@ -295,11 +295,18 @@ class FormSPBNotifier extends ChangeNotifier {
   }
 
   getLocation() async {
-    _position = await LocationService.getGPSLocation();
-    if (_position != null) {
-      _gpsLocation = "${_position?.longitude}, ${_position?.latitude}";
-    } else {
-      _gpsLocation = "";
+    // _position = await LocationService.getGPSLocation();
+    // if (_position != null) {
+    //   _gpsLocation = "${_position?.longitude}, ${_position?.latitude}";
+    // } else {
+    //   _gpsLocation = "";
+    // }
+    // notifyListeners();
+    while (_gpsLocation.isEmpty) {
+      final _position = await LocationService.getGPSLocation();
+      if (_position != null) {
+        _gpsLocation = "${_position.longitude}, ${_position.latitude}";
+      }
     }
     notifyListeners();
   }
