@@ -188,8 +188,11 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
 
   void tPHNumberCheck(BuildContext context, String tphCodeOph) async {
     if (tphCodeOph.isNotEmpty) {
-      _mtphSchema = await ValidationService.checkMTPHSchema(tphCodeOph, _mConfigSchema!.estateCode!, blockCode.text);
-      _mtphSchema ?? FlushBarManager.showFlushBarWarning(context, "Kode TPH", "Tidak sesuai");
+      _mtphSchema = await ValidationService.checkMTPHSchema(
+          tphCodeOph, _mConfigSchema!.estateCode!, blockCode.text);
+      _mtphSchema ??
+          FlushBarManager.showFlushBarWarning(
+              context, "Kode TPH", "Tidak sesuai");
       tphCode.text = _mtphSchema!.tphCode!;
       notifyListeners();
     }
@@ -198,10 +201,14 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
   void blockNumberCheck(BuildContext context, String block) async {
     if (block.isNotEmpty) {
       block.toUpperCase();
-      _mBlockSchema = await ValidationService.checkBlockSchema(block, _mConfigSchema!.estateCode!);
-      _mBlockSchema ?? FlushBarManager.showFlushBarWarning(context, "Kode Blok", "Tidak sesuai");
+      _mBlockSchema = await ValidationService.checkBlockSchema(
+          block, _mConfigSchema!.estateCode!);
+      _mBlockSchema ??
+          FlushBarManager.showFlushBarWarning(
+              context, "Kode Blok", "Tidak sesuai");
       blockCode.text = _mBlockSchema!.blockCode!;
-      blockCode.selection = TextSelection.fromPosition(TextPosition(offset: blockCode.text.length));
+      blockCode.selection = TextSelection.fromPosition(
+          TextPosition(offset: blockCode.text.length));
       notifyListeners();
     }
   }
@@ -345,8 +352,9 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
   }
 
   checkOPHExist(BuildContext context, OPH oph) async {
-    List ophList = await DatabaseOPHSupervise().selectOPHSuperviseByID(oph.ophId!);
-    if(ophList.isEmpty) {
+    List ophList =
+        await DatabaseOPHSupervise().selectOPHSuperviseByID(oph.ophId!);
+    if (ophList.isEmpty) {
       ophID.text = oph.ophId!;
       blockNumberCheck(context, oph.ophBlockCode!);
       tPHNumberCheck(context, oph.ophTphCode!);
@@ -355,7 +363,9 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
     } else {
       _dialogService.popDialog();
       FlushBarManager.showFlushBarWarning(
-          _navigationService.navigatorKey.currentContext!, "Scan OPH", "OPH ini sudah pernah discan");
+          _navigationService.navigatorKey.currentContext!,
+          "Scan OPH",
+          "OPH ini sudah pernah discan");
     }
     Future.delayed(Duration(seconds: 1), () {
       NfcManager.instance.stopSession();
@@ -363,8 +373,12 @@ class SupervisorHarvestFormNotifier extends ChangeNotifier {
   }
 
   setEmployee(OPH oph) {
-    _pemanen = _listEmployee.where((element) => element.employeeCode == oph.employeeCode).last;
-    _kemandoran = _listEmployee.where((element) => element.employeeCode == oph.mandorEmployeeCode).last;
+    _pemanen = _listEmployee
+        .where((element) => element.employeeCode == oph.employeeCode)
+        .last;
+    _kemandoran = _listEmployee
+        .where((element) => element.employeeCode == oph.mandorEmployeeCode)
+        .last;
   }
 
   onErrorRead(BuildContext context, String message) {

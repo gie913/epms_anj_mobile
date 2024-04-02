@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:epms/base/common/locator.dart';
 import 'package:epms/base/common/routes.dart';
@@ -9,12 +10,15 @@ import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/common_manager/oph_card_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/validation_service.dart';
+import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
+import 'package:epms/database/service/database_m_customer_code.dart';
 import 'package:epms/database/service/database_m_employee.dart';
 import 'package:epms/database/service/database_oph.dart';
 import 'package:epms/database/service/database_t_abw.dart';
 import 'package:epms/model/laporan_panen_kemarin.dart';
 import 'package:epms/model/m_block_schema.dart';
+import 'package:epms/model/m_customer_code_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/t_abw_schema.dart';
@@ -158,6 +162,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
       _blockNumber.text = _oph.ophBlockCode!;
+      blockNumberCheck(context, _oph.ophBlockCode!);
     } else {
       _oph = oph;
       notesOPH.text = _oph.ophNotes ?? "";
@@ -171,6 +176,7 @@ class DetailOPHNotifier extends ChangeNotifier {
       bunchesTotal.text = _oph.bunchesTotal.toString();
       bunchesNotSent.text = _oph.bunchesNotSent.toString();
       _blockNumber.text = _oph.ophBlockCode!;
+      blockNumberCheck(context, _oph.ophBlockCode!);
       _isExist = true;
     }
   }
@@ -230,9 +236,24 @@ class DetailOPHNotifier extends ChangeNotifier {
           .selectMEmployeeSchemaByCode(oph.mandorEmployeeCode!);
       List<MEmployeeSchema> pekerja = await DatabaseMEmployeeSchema()
           .selectMEmployeeSchemaByCode(oph.employeeCode!);
+      List<MCustomerCodeSchema> listMCustomer =
+          await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
+
       if (kemandoran.isNotEmpty && pekerja.isNotEmpty) {
         _oph.mandorEmployeeName = kemandoran[0].employeeName;
         _oph.employeeName = pekerja[0].employeeName;
+      }
+
+      if (ValueService.typeOfFormToText(_oph.ophHarvestingType ?? 1) ==
+          'Pinjam') {
+        if (listMCustomer.isNotEmpty) {
+          log('listMCustomer : $listMCustomer');
+          final listMCustomerCode =
+              listMCustomer.map((e) => e.customerCode ?? '').toList();
+          final mCustomerCode = listMCustomerCode
+              .firstWhere((element) => element.contains(_oph.ophEstateCode!));
+          _oph.ophCustomerCode = mCustomerCode;
+        }
       }
     }
     _dialogService.popDialog();
@@ -270,18 +291,30 @@ class DetailOPHNotifier extends ChangeNotifier {
 
   onSaveChangeCard(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_oph.ophCardId != ophNumber.text) {
-      print('cek kebenaran 1 : ${_oph.ophCardId != ophNumber.text}');
-      if (_restan) {
-        print('doWriteRestanDialog');
-        doWriteRestanDialog();
+    if (_blockNumber.text.isNotEmpty) {
+      if (_mBlockSchema != null) {
+        if (_oph.ophCardId != ophNumber.text) {
+          print('cek onSaveChangeCard');
+          print(
+              'cek kebenaran 1 : ${_oph.ophCardId} != ${ophNumber.text} ${_oph.ophCardId != ophNumber.text}');
+          if (_restan) {
+            print('doWriteRestanDialog');
+            doWriteRestanDialog();
+          } else {
+            print('onUpdateOPHClicked');
+            onUpdateOPHClicked(context);
+          }
+        } else {
+          FlushBarManager.showFlushBarWarning(
+              context, "Kartu OPH", "Kartu OPH belum diganti");
+        }
       } else {
-        print('onUpdateOPHClicked');
-        onUpdateOPHClicked(context);
+        FlushBarManager.showFlushBarWarning(
+            context, "Kode Blok", "Kode Blok tidak sesuai");
       }
     } else {
       FlushBarManager.showFlushBarWarning(
-          context, "Kartu OPH", "Kartu OPH belum diganti");
+          context, "Kode Blok", "Anda belum memasukkan block");
     }
   }
 
