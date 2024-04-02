@@ -84,7 +84,8 @@ class DatabaseOPH {
 
   Future<List<OPH>> selectOPHPhoto() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.rawQuery("SELECT * From $tOPHSchemaListTable WHERE ${OPHEntity.ophPhoto} IS NULL ORDER BY ${OPHEntity.createdTime}");
+    var mapList = await db.rawQuery(
+        "SELECT * From $tOPHSchemaListTable WHERE ${OPHEntity.ophPhoto} IS NULL ORDER BY ${OPHEntity.createdTime}");
     List<OPH> list = [];
     for (int i = 0; i < mapList.length; i++) {
       OPH oph = OPH.fromJson(mapList[i]);
@@ -147,6 +148,12 @@ class DatabaseOPH {
     int count = await db.update(tOPHSchemaListTable, object.toJson(),
         where: '${OPHEntity.ophId}=?', whereArgs: [object.ophId]);
     return count;
+  }
+
+  void deleteOPHById(OPH object) async {
+    Database db = await DatabaseHelper().database;
+    db.delete(tOPHSchemaListTable,
+        where: '${OPHEntity.ophId}=?', whereArgs: [object.ophId]);
   }
 
   void deleteOPH() async {

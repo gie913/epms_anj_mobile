@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -93,7 +94,8 @@ class KeraniPanenNotifier extends ChangeNotifier {
   }
 
   onSuccessUploadOPH(response) {
-    uploadImage(_navigationService.navigatorKey.currentContext!);
+    // uploadImage(_navigationService.navigatorKey.currentContext!);
+    uploadImageNew(_navigationService.navigatorKey.currentContext!);
   }
 
   uploadImage(BuildContext context) async {
@@ -114,12 +116,70 @@ class KeraniPanenNotifier extends ChangeNotifier {
     // SynchNotifier().doSynchMasterDataBackground(context);
   }
 
+  uploadImageNew(BuildContext context) async {
+    log('start upload foto');
+    List<OPH> listOPH = await DatabaseOPH().selectOPH();
+    log('total listOPH : ${listOPH.length}');
+
+    await Future.forEach(listOPH, (element) async {
+      if (element.ophPhoto != null) {
+        log('Upload Image OPH_ID : ${element.ophId}');
+        await UploadImageOPHRepository().doUploadPhoto(
+          context,
+          element.ophPhoto!,
+          element.ophId!,
+          "oph",
+          (context, successMessage) {
+            DatabaseOPH().deleteOPHById(element);
+            log("Success Upload Image OPH_ID : ${element.ophId}");
+          },
+          (context, errorMessage) {
+            // _dialogService.popDialog();
+            log("Error Upload Image OPH_ID : ${element.ophId}");
+            // FlushBarManager.showFlushBarWarning(
+            //   _navigationService.navigatorKey.currentContext!,
+            //   "Upload Foto",
+            //   "Gagal mengupload foto OPH_ID : ${element.ophId}\n$errorMessage",
+            // );
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    });
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    List<OPH> listOPHUnUploaded = await DatabaseOPH().selectOPH();
+    if (listOPHUnUploaded.isNotEmpty) {
+      _dialogService.popDialog();
+      _dialogService.showNoOptionDialog(
+        title: "Upload Data",
+        subtitle:
+            "Masih terdapat data belum terupload.\nMohon melakukan upload ulang.",
+        onPress: _dialogService.popDialog,
+      );
+    } else {
+      _dialogService.popDialog();
+      FlushBarManager.showFlushBarSuccess(
+        _navigationService.navigatorKey.currentContext!,
+        "Upload Data",
+        "Berhasil mengupload data",
+      );
+    }
+
+    // DatabaseLaporanPanenKemarin().deleteLaporanPanenKemarin();
+    // SynchNotifier().doSynchMasterDataBackground(context);
+  }
+
   onErrorUploadOPH(String response) {
     _dialogService.popDialog();
     FlushBarManager.showFlushBarWarning(
-        _navigationService.navigatorKey.currentContext!,
-        "Upload Data",
-        "Gagal mengupload data");
+      _navigationService.navigatorKey.currentContext!,
+      "Upload Data",
+      "Gagal mengupload data\n$response",
+    );
+    log('Gagal Upload Data\n$response');
   }
 
   onSuccessUploadImage(BuildContext context, response) {

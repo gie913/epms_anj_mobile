@@ -12,8 +12,8 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
 class UploadImageOPHRepository extends APIConfiguration {
-  void doUploadPhoto(BuildContext context, String image, String moduleId,
-      String module, onSuccess, onError) async {
+  Future<void> doUploadPhoto(BuildContext context, String image,
+      String moduleId, String module, onSuccess, onError) async {
     String token = await StorageManager.readData("userToken");
     String baseUrl = await StorageManager.readData("apiServer");
 
