@@ -335,8 +335,8 @@ class FormOPHNotifier extends ChangeNotifier {
             .selectTABWSchemaByBlock(_mBlockSchema!.blockCode!,
                 _valueMCustomer!.customerPlantCode!.substring(2));
         _ophEstimationWeight = (tabwSchema?.bunchWeight != null
-            ? tabwSchema?.bunchWeight
-            : 0.0 * int.parse(_bunchesTotal.text));
+            ? tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text)
+            : 0.0);
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -345,8 +345,8 @@ class FormOPHNotifier extends ChangeNotifier {
             .selectTABWSchemaByBlock(
                 _mBlockSchema!.blockCode!, _mConfigSchema!.estateCode!);
         _ophEstimationWeight = (tabwSchema?.bunchWeight != null
-            ? tabwSchema?.bunchWeight
-            : 0.0 * int.parse(_bunchesTotal.text));
+            ? tabwSchema?.bunchWeight * int.parse(_bunchesTotal.text)
+            : 0.0);
         _ophEstimationWeight =
             double.parse(_ophEstimationWeight!.toStringAsFixed(3));
         notifyListeners();
@@ -371,6 +371,7 @@ class FormOPHNotifier extends ChangeNotifier {
             FlushBarManager.showFlushBarWarning(
                 context, "Kode TPH", "Tidak sesuai");
       }
+      getEstimationTonnage();
     }
     notifyListeners();
   }
@@ -392,6 +393,7 @@ class FormOPHNotifier extends ChangeNotifier {
             FlushBarManager.showFlushBarWarning(
                 context, "Kode Blok", "Tidak sesuai dengan estate");
       }
+      getEstimationTonnage();
     } else {
       _mBlockSchema = null;
     }
@@ -438,8 +440,10 @@ class FormOPHNotifier extends ChangeNotifier {
       oph.ophId = _ophID;
       oph.createdDate = _date;
       oph.createdTime = _time;
-      oph.ophLat = _position?.latitude.toString();
-      oph.ophLong = _position?.longitude.toString();
+      // oph.ophLat = _position?.latitude.toString();
+      // oph.ophLong = _position?.longitude.toString();
+      oph.ophLat = _gpsLocation.split(',')[1].replaceAll(' ', '');
+      oph.ophLong = _gpsLocation.split(',')[0];
       oph.ophHarvestingType = ValueService.typeOfFormToInt(_employeeType);
       oph.ophHarvestingMethod = isChecked ? 2 : 1;
       if (_listHarvestingPlan
@@ -607,12 +611,17 @@ class FormOPHNotifier extends ChangeNotifier {
   onSetEmployeeType(String value) {
     _employeeType = value;
     _valueEmployee = null;
+    _mBlockSchema = null;
+    _mtphSchema = null;
+    blockNumber.clear();
+    tphNumber.clear();
     if (_employeeType == "Kontrak") {
       MEmployeeSchema mandorKontrak = MEmployeeSchema(
           employeeCode: _supervisor?.mandorCode,
           employeeName: _supervisor?.mandorName);
       _valueMandorKontrak = mandorKontrak;
     }
+    getEstimationTonnage();
     notifyListeners();
   }
 
@@ -647,6 +656,7 @@ class FormOPHNotifier extends ChangeNotifier {
       _valueDivision = null;
       onSetListDivision(value.customerPlantCode!.substring(2));
     }
+    getEstimationTonnage();
     notifyListeners();
   }
 
