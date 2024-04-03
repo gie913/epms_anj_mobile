@@ -335,13 +335,35 @@ class DatabaseSubordinateInspection {
 
   static Future<List<TicketInspectionModel>> selectData() async {
     Database db = await DatabaseHelper().database;
-    var mapList = await db.query(subordinateInspectionTable);
-    var data = List<TicketInspectionModel>.from(mapList.map((e) {
+
+    final List<TicketInspectionModel> data = [];
+
+    var mapListClosed = await db.query(
+      subordinateInspectionTable,
+      where: '${SubordinateInspectionEntity.isClosed}=?',
+      whereArgs: [1],
+    );
+    var dataClosed = List<TicketInspectionModel>.from(mapListClosed.map((e) {
       return TicketInspectionModel.fromDatabase(e);
     }));
-    data.sort((a, b) =>
+    dataClosed.sort((a, b) =>
         DateTime.parse(b.submittedAt).compareTo(DateTime.parse(a.submittedAt)));
-    data.sort((a, b) => a.isClosed.compareTo(b.isClosed));
+
+    var mapListNotClosed = await db.query(
+      subordinateInspectionTable,
+      where: '${SubordinateInspectionEntity.isClosed}=?',
+      whereArgs: [0],
+    );
+    var dataNotClosed =
+        List<TicketInspectionModel>.from(mapListNotClosed.map((e) {
+      return TicketInspectionModel.fromDatabase(e);
+    }));
+    dataNotClosed.sort((a, b) =>
+        DateTime.parse(b.submittedAt).compareTo(DateTime.parse(a.submittedAt)));
+
+    data.addAll(dataNotClosed);
+    data.addAll(dataClosed);
+
     return data;
   }
 
