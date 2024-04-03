@@ -53,14 +53,14 @@ class LogOutRepository extends APIConfiguration {
       };
       // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signout';
-      var urlInspectionDev =
-          'http://10.10.10.91/inspection/public/index.php/api/v1/signout';
-      // var urlInspectionProd =
-      //     'https://inspection.anj-group.co.id/public/index.php/api/v1/signout';
-      var uri = Uri.parse(urlInspectionDev);
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/signout';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/signout';
+      var uri = Uri.parse(urlInspectionProd);
       var response = await ioClient!.get(uri, headers: headers);
       final data = jsonDecode(response.body);
-      log('cek url : $urlInspectionDev');
+      log('cek url : $urlInspectionProd');
       log('cek response logout inspection : ${response.body}');
 
       if (data['success'] == true) {
