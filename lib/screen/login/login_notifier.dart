@@ -190,16 +190,19 @@ class LoginNotifier extends ChangeNotifier {
     // notifyListeners();
   }
 
-  onSuccessLoginInspection(
+  Future<void> onSuccessLoginInspection(
       BuildContext context, LoginInspectionData data) async {
     StorageManager.saveData('is_login_inspection_success', true);
     _loading = false;
-    final username = await StorageManager.readData("userName");
+    final username = await StorageManager.readData("userNameOld");
 
     if (username != data.user.username) {
+      log('delete date time inspection');
       DatabaseHelper().deleteActivityDataInspection();
-      StorageManager.deleteData("lastSynchDateInspection");
-      StorageManager.deleteData("lastSynchTimeInspection");
+      await StorageManager.deleteData("lastSynchDateInspection");
+      await StorageManager.deleteData("lastSynchTimeInspection");
+      await StorageManager.saveData("userNameOld", data.user.username);
+      await StorageManager.saveData("userName", data.user.username);
     }
 
     await saveDatabaseInspection(context, _username.text, data);

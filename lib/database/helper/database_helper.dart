@@ -167,7 +167,7 @@ class DatabaseHelper {
     // DatabaseTodoInspection.deleteTable();
     // DatabaseSubordinateInspection.deleteTable();
     // DatabaseAttachmentInspection.deleteTable();
-    DatabaseUserInspectionConfig.deleteTable();
+    // DatabaseUserInspectionConfig.deleteTable();
     DatabaseUserInspection.deleteTable();
     DatabaseTeamInspection.deleteTable();
     DatabaseMemberInspection.deleteTable();
