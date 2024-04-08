@@ -1,10 +1,12 @@
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
+import 'package:epms/model/response_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:flutter/material.dart';
 
-class InspectionItem extends StatelessWidget {
+class InspectionItem extends StatefulWidget {
   const InspectionItem({
     super.key,
     required this.onTap,
@@ -17,11 +19,30 @@ class InspectionItem extends StatelessWidget {
   final Color? bgColor;
 
   @override
+  State<InspectionItem> createState() => _InspectionItemState();
+}
+
+class _InspectionItemState extends State<InspectionItem> {
+  List<ResponseInspectionModel> responses = [];
+
+  @override
+  void initState() {
+    getResponses();
+    super.initState();
+  }
+
+  Future<void> getResponses() async {
+    responses = await DatabaseResponseInspection.selectDataByInspectionId(
+        widget.data.id);
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Card(
-        color: bgColor ?? Palette.primaryColorProd,
+        color: widget.bgColor ?? Palette.primaryColorProd,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Stack(
@@ -30,7 +51,7 @@ class InspectionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.code,
+                    widget.data.code,
                     style: Style.whiteBold12.copyWith(
                         color: Colors.white, fontWeight: FontWeight.normal),
                   ),
@@ -46,7 +67,7 @@ class InspectionItem extends StatelessWidget {
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          data.trTime,
+                          widget.data.trTime,
                           style: Style.whiteBold12.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.normal),
@@ -67,7 +88,7 @@ class InspectionItem extends StatelessWidget {
                       Expanded(
                         child: Text(
                           ConvertHelper.titleCase(
-                            data.status
+                            widget.data.status
                                 .replaceAll(RegExp(r'_'), ' ')
                                 .replaceAll(RegExp(r'-'), ' '),
                           ),
@@ -86,7 +107,7 @@ class InspectionItem extends StatelessWidget {
                         color: Colors.white, fontWeight: FontWeight.normal),
                   ),
                   Text(
-                    data.submittedByName,
+                    widget.data.submittedByName,
                     style: Style.whiteBold12.copyWith(
                         color: Colors.white, fontWeight: FontWeight.normal),
                   ),
@@ -145,8 +166,8 @@ class InspectionItem extends StatelessWidget {
                   //       )
                   //     ],
                   //   ),
-                  if (data.responses.isNotEmpty &&
-                      data.responses.last.consultedWithName.isNotEmpty)
+                  if (responses.isNotEmpty &&
+                      responses.last.consultedWithName.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -157,7 +178,7 @@ class InspectionItem extends StatelessWidget {
                               fontWeight: FontWeight.normal),
                         ),
                         Text(
-                          data.responses.last.consultedWithName,
+                          responses.last.consultedWithName,
                           style: Style.whiteBold12.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.normal),
@@ -177,7 +198,7 @@ class InspectionItem extends StatelessWidget {
                               fontWeight: FontWeight.normal),
                         ),
                         Text(
-                          data.assignee,
+                          widget.data.assignee,
                           style: Style.whiteBold12.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.normal),
@@ -196,9 +217,7 @@ class InspectionItem extends StatelessWidget {
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          data.responses.isNotEmpty
-                              ? data.responses.last.trTime
-                              : '-',
+                          responses.isNotEmpty ? responses.last.trTime : '-',
                           style: Style.whiteBold12.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.normal),
@@ -208,7 +227,7 @@ class InspectionItem extends StatelessWidget {
                   ),
                   Divider(color: Colors.white24, height: 1),
                   SizedBox(height: 4),
-                  if (!ConvertHelper.intToBool(data.isSynchronize))
+                  if (!ConvertHelper.intToBool(widget.data.isSynchronize))
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Text(
@@ -220,7 +239,7 @@ class InspectionItem extends StatelessWidget {
                     )
                 ],
               ),
-              if (data.isNewResponse == 1)
+              if (widget.data.isNewResponse == 1)
                 Align(
                   alignment: Alignment.topRight,
                   child: Icon(

@@ -3,11 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:epms/base/api/api_configuration.dart';
 import 'package:epms/common_manager/storage_manager.dart';
-import 'package:epms/model/history_inspection_model.dart';
-import 'package:epms/model/my_inspection_response.dart';
-import 'package:epms/model/my_subordinate_response.dart';
+import 'package:epms/model/response_inspection_model.dart';
+import 'package:epms/model/ticket_inspection_data_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
-import 'package:epms/model/todo_inspection_response.dart';
+import 'package:epms/model/ticket_inspection_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -15,60 +14,16 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
 class InspectionRepository extends APIConfiguration {
-  Future<void> getMyInspection(
-    BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
-    Function(BuildContext context, String errorMessage) onError,
-  ) async {
-    String inspectionToken = await StorageManager.readData("inspectionToken");
-    log('cek ticketInspectionToken : $inspectionToken');
-
-    try {
-      var headers = {
-        'Content-type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $inspectionToken'
-      };
-
-      // var urlMyInspectionDev =
-      //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myinspection';
-      var urlMyInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/myinspection';
-      var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
-      log('cek url : $urlMyInspectionProd');
-      log('cek response get my inspection : ${responseMyInspection.body}');
-
-      MyInspectionResponse res =
-          MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
-
-      if (res.success) {
-        onSuccess(context, res.data);
-      } else {
-        onError(context, res.message);
-      }
-    } on SocketException {
-      log('cek error get my inspection : Tidak Ada Koneksi Internet');
-      onError(context, 'Tidak Ada Koneksi Internet');
-    } on HttpException {
-      log('cek error get my inspection : Tidak Ada Koneksi Internet');
-      onError(context, 'Tidak Ada Koneksi Internet');
-    } on FormatException {
-      log('cek error get my inspection : Response Format Gagal');
-      onError(context, 'Response Format Gagal');
-    } catch (exception) {
-      log('cek error get my inspection : $exception');
-      onError(context, exception.toString());
-      rethrow;
-    }
-  }
-
   Future<void> getMyInspectionNotClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getMyInspectionNotClose : $inspectionToken');
 
     try {
@@ -78,17 +33,19 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlMyInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/inspector';
-      var urlMyInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/inspector';
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/on-going/inspector?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/inspector?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
       var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
-      log('cek url : $urlMyInspectionProd');
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
       log('cek response getMyInspectionNotClose : ${responseMyInspection.body}');
 
-      MyInspectionResponse res =
-          MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
+          jsonDecode(responseMyInspection.body));
 
       if (res.success) {
         onSuccess(context, res.data);
@@ -113,10 +70,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getMyInspectionClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getMyInspectionClose : $inspectionToken');
 
     try {
@@ -126,17 +87,19 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlMyInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/inspector';
-      var urlMyInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/inspector';
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/close/inspector?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/inspector?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
       var responseMyInspection =
-          await ioClient!.get(Uri.parse(urlMyInspectionProd), headers: headers);
-      log('cek url : $urlMyInspectionProd');
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
       log('cek response getMyInspectionClose : ${responseMyInspection.body}');
 
-      MyInspectionResponse res =
-          MyInspectionResponse.fromJson(jsonDecode(responseMyInspection.body));
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
+          jsonDecode(responseMyInspection.body));
 
       if (res.success) {
         onSuccess(context, res.data);
@@ -161,9 +124,13 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getToDoInspection(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     String inspectionToken = await StorageManager.readData("inspectionToken");
     log('cek TodoInspectionToken : $inspectionToken');
 
@@ -174,16 +141,18 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlToDoInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/myduty';
-      var urlToDoInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/myduty';
-      var responseToDoInspection = await ioClient!
-          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
-      log('cek url : $urlToDoInspectionProd');
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/myduty?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/myduty?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseToDoInspection =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
       log('cek response todo inspection : ${responseToDoInspection.body}');
 
-      TodoInspectionResponse res = TodoInspectionResponse.fromJson(
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseToDoInspection.body));
 
       if (res.success) {
@@ -209,10 +178,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getToDoInspectionNotClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getToDoInspectionNotClose : $inspectionToken');
 
     try {
@@ -222,16 +195,18 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlToDoInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/assignee';
-      var urlToDoInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/assignee';
-      var responseToDoInspection = await ioClient!
-          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
-      log('cek url : $urlToDoInspectionProd');
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/on-going/assignee?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/assignee?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseToDoInspection =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
       log('cek response getToDoInspectionNotClose : ${responseToDoInspection.body}');
 
-      TodoInspectionResponse res = TodoInspectionResponse.fromJson(
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseToDoInspection.body));
 
       if (res.success) {
@@ -257,10 +232,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getToDoInspectionClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getToDoInspectionClose : $inspectionToken');
 
     try {
@@ -270,16 +249,18 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlToDoInspectionDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/assignee';
-      var urlToDoInspectionProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/assignee';
-      var responseToDoInspection = await ioClient!
-          .get(Uri.parse(urlToDoInspectionProd), headers: headers);
-      log('cek url : $urlToDoInspectionProd');
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/close/assignee?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/assignee?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseToDoInspection =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
       log('cek response getToDoInspectionClose : ${responseToDoInspection.body}');
 
-      TodoInspectionResponse res = TodoInspectionResponse.fromJson(
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseToDoInspection.body));
 
       if (res.success) {
@@ -305,10 +286,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getMySubordinate(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek mySubordinateInspectionToken : $inspectionToken');
 
     try {
@@ -318,14 +303,16 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlMySubordinateDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/mysubordinate';
-      var urlMySubordinateProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/mysubordinate';
-      var responseMySubordinate = await ioClient!
-          .get(Uri.parse(urlMySubordinateProd), headers: headers);
-      log('cek url : $urlMySubordinateProd');
-      MySubordinateResponse res = MySubordinateResponse.fromJson(
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/mysubordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/mysubordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response get my subordinate : ${res.data}');
 
@@ -352,10 +339,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getOnGoingInspectionNotClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getOnGoingInspectionNotClose : $inspectionToken');
 
     try {
@@ -365,14 +356,16 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlMySubordinateDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/on-going/subordinate';
-      var urlMySubordinateProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/subordinate';
-      var responseMySubordinate = await ioClient!
-          .get(Uri.parse(urlMySubordinateProd), headers: headers);
-      log('cek url : $urlMySubordinateProd');
-      MySubordinateResponse res = MySubordinateResponse.fromJson(
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/on-going/subordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/on-going/subordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response getOnGoingInspectionNotClose : ${res.data}');
 
@@ -399,10 +392,14 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> getOnGoingInspectionClose(
     BuildContext context,
-    Function(BuildContext context, List<TicketInspectionModel> data) onSuccess,
+    Function(BuildContext context, TicketInspectionDataModel data) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
     String inspectionToken = await StorageManager.readData("inspectionToken");
+    final lastSynchTimeInspection =
+        await StorageManager.readData('lastSynchTimeInspection');
+    final lastSynchDateInspection =
+        await StorageManager.readData('lastSynchDateInspection');
     log('cek getOnGoingInspectionClose : $inspectionToken');
 
     try {
@@ -412,14 +409,16 @@ class InspectionRepository extends APIConfiguration {
         'Authorization': 'Bearer $inspectionToken'
       };
 
-      // var urlMySubordinateDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/filter/close/subordinate';
-      var urlMySubordinateProd =
-          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/subordinate';
-      var responseMySubordinate = await ioClient!
-          .get(Uri.parse(urlMySubordinateProd), headers: headers);
-      log('cek url : $urlMySubordinateProd');
-      MySubordinateResponse res = MySubordinateResponse.fromJson(
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/filter/close/subordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var urlInspectionProd =
+          'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/filter/close/subordinate?updated_date=${lastSynchDateInspection != null ? lastSynchDateInspection : ""}&updated_time=${lastSynchTimeInspection != null ? lastSynchTimeInspection : ""}';
+      var responseMySubordinate =
+          await ioClient!.get(Uri.parse(urlInspectionProd), headers: headers);
+      log('cek url : $urlInspectionProd');
+      TicketInspectionResponse res = TicketInspectionResponse.fromJson(
           jsonDecode(responseMySubordinate.body));
       log('cek response getOnGoingInspectionClose : ${res.data}');
 
@@ -460,11 +459,13 @@ class InspectionRepository extends APIConfiguration {
     };
 
     try {
-      // var urlDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/inspection/create';
-      var urlProd =
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/inspection/create';
+      var urlInspectionProd =
           'https://inspection.anj-group.co.id/public/index.php/api/v1/inspection/create';
-      var request = http.MultipartRequest("POST", Uri.parse(urlProd));
+      var request = http.MultipartRequest("POST", Uri.parse(urlInspectionProd));
       for (final image in ticketInspection.attachments) {
         if (image.toString().contains('http')) {
           var response = await http.get(Uri.parse(image));
@@ -542,8 +543,7 @@ class InspectionRepository extends APIConfiguration {
 
   Future<void> createResponseInspection(
     BuildContext context,
-    TicketInspectionModel ticketInspection,
-    HistoryInspectionModel responseInspection,
+    ResponseInspectionModel responseInspection,
     Function(BuildContext context, dynamic successMessage) onSuccess,
     Function(BuildContext context, String errorMessage) onError,
   ) async {
@@ -557,11 +557,13 @@ class InspectionRepository extends APIConfiguration {
     };
 
     try {
-      // var urlDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/response/create';
-      var urlProd =
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/response/create';
+      var urlInspectionProd =
           'https://inspection.anj-group.co.id/public/index.php/api/v1/response/create';
-      var request = http.MultipartRequest("POST", Uri.parse(urlProd));
+      var request = http.MultipartRequest("POST", Uri.parse(urlInspectionProd));
       for (final image in responseInspection.attachments) {
         if (image.toString().contains('http')) {
           var response = await http.get(Uri.parse(image));
@@ -602,7 +604,7 @@ class InspectionRepository extends APIConfiguration {
       request.fields['reassigned_to'] = responseInspection.reassignedTo;
       request.fields['gps_lng'] = jsonEncode(responseInspection.gpsLng);
       request.fields['gps_lat'] = jsonEncode(responseInspection.gpsLat);
-      request.fields['t_inspection_id'] = ticketInspection.id;
+      request.fields['t_inspection_id'] = responseInspection.tInspectionId;
       request.fields['status'] = responseInspection.status;
       request.fields['consulted_with'] = responseInspection.consultedWith;
       request.headers.addAll(headers);

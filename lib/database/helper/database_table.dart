@@ -41,6 +41,7 @@ const String tTBSLuarOneMonth = "T_TBS_Luar_One_Month";
 const String tAuth = "T_AUTH";
 // Inspection
 const String ticketInspectionTable = 'Inspection_Ticket';
+const String responseInspectionTable = 'Response_Ticket';
 const String todoInspectionTable = 'Inspection_Todo';
 const String subordinateInspectionTable = 'Inspection_Subordinate';
 const String userInspectionConfigTable = 'User_Inspection_Config';

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:epms/base/common/routes.dart';
 import 'package:epms/base/ui/palette.dart';
 import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/screen/inspection/components/inspection_item.dart';
@@ -61,7 +62,6 @@ class _TabToDoState extends State<TabToDo> {
                           mDivisionName: data.mDivisionName,
                           mTeamId: data.mTeamId,
                           mTeamName: data.mTeamName,
-                          responses: data.responses,
                           status: data.status,
                           submittedAt: data.submittedAt,
                           submittedBy: data.submittedBy,
@@ -74,6 +74,8 @@ class _TabToDoState extends State<TabToDo> {
                           await DatabaseTodoInspection.updateData(
                             inspectionTemp,
                           );
+                          await DatabaseResponseInspection
+                              .updateResponseInspection(inspectionTemp.id);
                           await provider.updateTodoInspectionFromLocal();
 
                           await provider.navigationService.push(
@@ -88,6 +90,8 @@ class _TabToDoState extends State<TabToDo> {
                             await DatabaseTodoInspection.updateData(
                               inspectionTemp,
                             );
+                            await DatabaseResponseInspection
+                                .updateResponseInspection(inspectionTemp.id);
 
                             await provider.navigationService.push(
                               Routes.INSPECTION_ASSIGNMENT_DETAIL,
@@ -107,6 +111,8 @@ class _TabToDoState extends State<TabToDo> {
                             await DatabaseTodoInspection.updateData(
                               inspectionTemp,
                             );
+                            await DatabaseResponseInspection
+                                .updateResponseInspection(inspectionTemp.id);
 
                             await provider.navigationService.push(
                               Routes.INSPECTION_APPROVAL,

@@ -1,6 +1,6 @@
 import 'package:epms/database/entity/todo_inspection_entity.dart';
 import 'package:epms/database/helper/database_table.dart';
-import 'package:epms/database/service/database_user_inspection_config.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -42,175 +42,274 @@ class DatabaseTodoInspection {
     ''');
   }
 
-  static Future<void> addAllData(List<TicketInspectionModel> data) async {
+  static Future<void> addAllDataNew(
+      List<TicketInspectionModel> listInspectionData) async {
     Database db = await DatabaseHelper().database;
-
-    // await db.delete(todoInspectionTable);
-
-    final batchInspectionNew = db.batch();
-    final batchInspectionExisting1 = db.batch();
-    final batchInspectionExisting2 = db.batch();
-    // for (final item in data) {
-    //   batch.insert(todoInspectionTable, item.toDatabase());
-    // }
-    // await batch.commit();
-
     var mapList = await db.query(todoInspectionTable);
     var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
       return TicketInspectionModel.fromDatabase(e);
     }));
     List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
-    final user = await DatabaseUserInspectionConfig.selectData();
 
-    for (var i = 0; i < data.length; i++) {
-      if (!dataFromLocalCode.contains(data[i].code)) {
-        final inspectionTemp = TicketInspectionModel(
-          assignee: data[i].assignee,
-          assigneeId: data[i].assigneeId,
-          attachments: data[i].attachments,
-          closedAt: data[i].closedAt,
-          closedBy: data[i].closedBy,
-          closedByName: data[i].closedByName,
-          code: data[i].code,
-          description: data[i].description,
-          gpsLat: data[i].gpsLat,
-          gpsLng: data[i].gpsLng,
-          id: data[i].id,
-          isClosed: data[i].isClosed,
-          // isNewResponse: 1,
-          isNewResponse: data[i].responses.isEmpty
-              ? 1
-              : (data[i].responses.isNotEmpty &&
-                      data[i].responses.last.submittedBy != user.id)
-                  ? 1
-                  : 0,
-          isSynchronize: data[i].isSynchronize,
-          mCompanyAlias: data[i].mCompanyAlias,
-          mCompanyId: data[i].mCompanyId,
-          mCompanyName: data[i].mCompanyName,
-          mDivisionEstateCode: data[i].mDivisionEstateCode,
-          mDivisionId: data[i].mDivisionId,
-          mDivisionName: data[i].mDivisionName,
-          mTeamId: data[i].mTeamId,
-          mTeamName: data[i].mTeamName,
-          responses: data[i].responses,
-          status: data[i].status,
-          submittedAt: data[i].submittedAt,
-          submittedBy: data[i].submittedBy,
-          submittedByName: data[i].submittedByName,
-          trTime: data[i].trTime,
-          usingGps: data[i].usingGps,
+    final batchNewData = db.batch();
+    final batchExistingData = db.batch();
+
+    await Future.forEach(listInspectionData, (element) async {
+      if (!dataFromLocalCode.contains(element.code)) {
+        final ticketInspectionTemp = TicketInspectionModel(
+          id: element.id,
+          code: element.code,
+          trTime: element.trTime,
+          mCompanyId: element.mCompanyId,
+          mCompanyName: element.mCompanyName,
+          mCompanyAlias: element.mCompanyAlias,
+          mTeamId: element.mTeamId,
+          mTeamName: element.mTeamName,
+          mDivisionId: element.mDivisionId,
+          mDivisionName: element.mDivisionName,
+          mDivisionEstateCode: element.mDivisionEstateCode,
+          gpsLat: element.gpsLat,
+          gpsLng: element.gpsLng,
+          submittedAt: element.submittedAt,
+          submittedBy: element.submittedBy,
+          submittedByName: element.submittedByName,
+          assignee: element.assignee,
+          assigneeId: element.assigneeId,
+          status: element.status,
+          description: element.description,
+          closedAt: element.closedAt,
+          closedBy: element.closedBy,
+          closedByName: element.closedByName,
+          isNewResponse: 1,
+          isSynchronize: 1,
+          usingGps: element.usingGps,
+          isClosed: element.isClosed,
+          attachments: element.attachments,
         );
-        batchInspectionNew.insert(
-            todoInspectionTable, inspectionTemp.toDatabase());
-        // await db.insert(todoInspectionTable, inspectionTemp.toDatabase());
+        batchNewData.insert(
+          todoInspectionTable,
+          ticketInspectionTemp.toDatabase(),
+        );
       } else {
-        var indexDataLocal = dataFromLocalCode.indexOf(data[i].code);
-        if (dataFromLocal[indexDataLocal].responses.length !=
-            data[i].responses.length) {
-          final inspectionTemp = TicketInspectionModel(
-            assignee: data[i].assignee,
-            assigneeId: data[i].assigneeId,
-            attachments: data[i].attachments,
-            closedAt: data[i].closedAt,
-            closedBy: data[i].closedBy,
-            closedByName: data[i].closedByName,
-            code: data[i].code,
-            description: data[i].description,
-            gpsLat: data[i].gpsLat,
-            gpsLng: data[i].gpsLng,
-            id: data[i].id,
-            isClosed: data[i].isClosed,
-            // isNewResponse: 1,
-            isNewResponse: data[i].responses.isNotEmpty &&
-                    data[i].responses.last.submittedBy != user.id
-                ? 1
-                : 0,
-            isSynchronize: data[i].isSynchronize,
-            mCompanyAlias: data[i].mCompanyAlias,
-            mCompanyId: data[i].mCompanyId,
-            mCompanyName: data[i].mCompanyName,
-            mDivisionEstateCode: data[i].mDivisionEstateCode,
-            mDivisionId: data[i].mDivisionId,
-            mDivisionName: data[i].mDivisionName,
-            mTeamId: data[i].mTeamId,
-            mTeamName: data[i].mTeamName,
-            responses: data[i].responses,
-            status: data[i].status,
-            submittedAt: data[i].submittedAt,
-            submittedBy: data[i].submittedBy,
-            submittedByName: data[i].submittedByName,
-            trTime: data[i].trTime,
-            usingGps: data[i].usingGps,
-          );
-          batchInspectionExisting1.update(
-            todoInspectionTable,
-            inspectionTemp.toDatabase(),
-            where:
-                '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
-            whereArgs: [data[i].code, 1],
-          );
-          // await db.update(
-          //   todoInspectionTable,
-          //   inspectionTemp.toDatabase(),
-          //   where:
-          //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
-          //   whereArgs: [data[i].code, 1],
-          // );
-        } else {
-          final inspectionTemp = TicketInspectionModel(
-            assignee: data[i].assignee,
-            assigneeId: data[i].assigneeId,
-            attachments: data[i].attachments,
-            closedAt: data[i].closedAt,
-            closedBy: data[i].closedBy,
-            closedByName: data[i].closedByName,
-            code: data[i].code,
-            description: data[i].description,
-            gpsLat: data[i].gpsLat,
-            gpsLng: data[i].gpsLng,
-            id: data[i].id,
-            isClosed: data[i].isClosed,
-            isNewResponse: dataFromLocal[indexDataLocal].isNewResponse,
-            isSynchronize: data[i].isSynchronize,
-            mCompanyAlias: data[i].mCompanyAlias,
-            mCompanyId: data[i].mCompanyId,
-            mCompanyName: data[i].mCompanyName,
-            mDivisionEstateCode: data[i].mDivisionEstateCode,
-            mDivisionId: data[i].mDivisionId,
-            mDivisionName: data[i].mDivisionName,
-            mTeamId: data[i].mTeamId,
-            mTeamName: data[i].mTeamName,
-            responses: data[i].responses,
-            status: data[i].status,
-            submittedAt: data[i].submittedAt,
-            submittedBy: data[i].submittedBy,
-            submittedByName: data[i].submittedByName,
-            trTime: data[i].trTime,
-            usingGps: data[i].usingGps,
-          );
-          batchInspectionExisting2.update(
-            todoInspectionTable,
-            inspectionTemp.toDatabase(),
-            where:
-                '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
-            whereArgs: [data[i].code, 1],
-          );
-          // await db.update(
-          //   todoInspectionTable,
-          //   inspectionTemp.toDatabase(),
-          //   where:
-          //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
-          //   whereArgs: [data[i].code, 1],
-          // );
-        }
-      }
-    }
+        final listNewResponse =
+            await DatabaseResponseInspection.selectNewResponse(element.id);
 
-    await batchInspectionNew.commit();
-    await batchInspectionExisting1.commit();
-    await batchInspectionExisting2.commit();
+        final inspectionLocal =
+            dataFromLocal.firstWhere((item) => item.id == element.id);
+
+        final ticketInspectionTemp = TicketInspectionModel(
+          id: element.id,
+          code: element.code,
+          trTime: element.trTime,
+          mCompanyId: element.mCompanyId,
+          mCompanyName: element.mCompanyName,
+          mCompanyAlias: element.mCompanyAlias,
+          mTeamId: element.mTeamId,
+          mTeamName: element.mTeamName,
+          mDivisionId: element.mDivisionId,
+          mDivisionName: element.mDivisionName,
+          mDivisionEstateCode: element.mDivisionEstateCode,
+          gpsLat: element.gpsLat,
+          gpsLng: element.gpsLng,
+          submittedAt: element.submittedAt,
+          submittedBy: element.submittedBy,
+          submittedByName: element.submittedByName,
+          assignee: element.assignee,
+          assigneeId: element.assigneeId,
+          status: element.status,
+          description: element.description,
+          closedAt: element.closedAt,
+          closedBy: element.closedBy,
+          closedByName: element.closedByName,
+          isNewResponse:
+              listNewResponse.isNotEmpty ? 1 : inspectionLocal.isNewResponse,
+          isSynchronize: inspectionLocal.isSynchronize,
+          usingGps: element.usingGps,
+          isClosed: element.isClosed,
+          attachments: element.attachments,
+        );
+        batchExistingData.update(
+          todoInspectionTable,
+          ticketInspectionTemp.toDatabase(),
+          where: '${TodoInspectionEntity.code}=?',
+          whereArgs: [ticketInspectionTemp.code],
+        );
+      }
+    });
+
+    await batchNewData.commit();
+    await batchExistingData.commit();
   }
+
+  // static Future<void> addAllData(List<TicketInspectionModel> data) async {
+  //   Database db = await DatabaseHelper().database;
+
+  //   // await db.delete(todoInspectionTable);
+
+  //   final batchInspectionNew = db.batch();
+  //   final batchInspectionExisting1 = db.batch();
+  //   final batchInspectionExisting2 = db.batch();
+  //   // for (final item in data) {
+  //   //   batch.insert(todoInspectionTable, item.toDatabase());
+  //   // }
+  //   // await batch.commit();
+
+  //   var mapList = await db.query(todoInspectionTable);
+  //   var dataFromLocal = List<TicketInspectionModel>.from(mapList.map((e) {
+  //     return TicketInspectionModel.fromDatabase(e);
+  //   }));
+  //   List dataFromLocalCode = dataFromLocal.map((e) => e.code).toList();
+  //   final user = await DatabaseUserInspectionConfig.selectData();
+
+  //   for (var i = 0; i < data.length; i++) {
+  //     if (!dataFromLocalCode.contains(data[i].code)) {
+  //       final inspectionTemp = TicketInspectionModel(
+  //         assignee: data[i].assignee,
+  //         assigneeId: data[i].assigneeId,
+  //         attachments: data[i].attachments,
+  //         closedAt: data[i].closedAt,
+  //         closedBy: data[i].closedBy,
+  //         closedByName: data[i].closedByName,
+  //         code: data[i].code,
+  //         description: data[i].description,
+  //         gpsLat: data[i].gpsLat,
+  //         gpsLng: data[i].gpsLng,
+  //         id: data[i].id,
+  //         isClosed: data[i].isClosed,
+  //         // isNewResponse: 1,
+  //         isNewResponse: data[i].responses.isEmpty
+  //             ? 1
+  //             : (data[i].responses.isNotEmpty &&
+  //                     data[i].responses.last.submittedBy != user.id)
+  //                 ? 1
+  //                 : 0,
+  //         isSynchronize: data[i].isSynchronize,
+  //         mCompanyAlias: data[i].mCompanyAlias,
+  //         mCompanyId: data[i].mCompanyId,
+  //         mCompanyName: data[i].mCompanyName,
+  //         mDivisionEstateCode: data[i].mDivisionEstateCode,
+  //         mDivisionId: data[i].mDivisionId,
+  //         mDivisionName: data[i].mDivisionName,
+  //         mTeamId: data[i].mTeamId,
+  //         mTeamName: data[i].mTeamName,
+  //         responses: data[i].responses,
+  //         status: data[i].status,
+  //         submittedAt: data[i].submittedAt,
+  //         submittedBy: data[i].submittedBy,
+  //         submittedByName: data[i].submittedByName,
+  //         trTime: data[i].trTime,
+  //         usingGps: data[i].usingGps,
+  //       );
+  //       batchInspectionNew.insert(
+  //           todoInspectionTable, inspectionTemp.toDatabase());
+  //       // await db.insert(todoInspectionTable, inspectionTemp.toDatabase());
+  //     } else {
+  //       var indexDataLocal = dataFromLocalCode.indexOf(data[i].code);
+  //       if (dataFromLocal[indexDataLocal].responses.length !=
+  //           data[i].responses.length) {
+  //         final inspectionTemp = TicketInspectionModel(
+  //           assignee: data[i].assignee,
+  //           assigneeId: data[i].assigneeId,
+  //           attachments: data[i].attachments,
+  //           closedAt: data[i].closedAt,
+  //           closedBy: data[i].closedBy,
+  //           closedByName: data[i].closedByName,
+  //           code: data[i].code,
+  //           description: data[i].description,
+  //           gpsLat: data[i].gpsLat,
+  //           gpsLng: data[i].gpsLng,
+  //           id: data[i].id,
+  //           isClosed: data[i].isClosed,
+  //           // isNewResponse: 1,
+  //           isNewResponse: data[i].responses.isNotEmpty &&
+  //                   data[i].responses.last.submittedBy != user.id
+  //               ? 1
+  //               : 0,
+  //           isSynchronize: data[i].isSynchronize,
+  //           mCompanyAlias: data[i].mCompanyAlias,
+  //           mCompanyId: data[i].mCompanyId,
+  //           mCompanyName: data[i].mCompanyName,
+  //           mDivisionEstateCode: data[i].mDivisionEstateCode,
+  //           mDivisionId: data[i].mDivisionId,
+  //           mDivisionName: data[i].mDivisionName,
+  //           mTeamId: data[i].mTeamId,
+  //           mTeamName: data[i].mTeamName,
+  //           responses: data[i].responses,
+  //           status: data[i].status,
+  //           submittedAt: data[i].submittedAt,
+  //           submittedBy: data[i].submittedBy,
+  //           submittedByName: data[i].submittedByName,
+  //           trTime: data[i].trTime,
+  //           usingGps: data[i].usingGps,
+  //         );
+  //         batchInspectionExisting1.update(
+  //           todoInspectionTable,
+  //           inspectionTemp.toDatabase(),
+  //           where:
+  //               '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+  //           whereArgs: [data[i].code, 1],
+  //         );
+  //         // await db.update(
+  //         //   todoInspectionTable,
+  //         //   inspectionTemp.toDatabase(),
+  //         //   where:
+  //         //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+  //         //   whereArgs: [data[i].code, 1],
+  //         // );
+  //       } else {
+  //         final inspectionTemp = TicketInspectionModel(
+  //           assignee: data[i].assignee,
+  //           assigneeId: data[i].assigneeId,
+  //           attachments: data[i].attachments,
+  //           closedAt: data[i].closedAt,
+  //           closedBy: data[i].closedBy,
+  //           closedByName: data[i].closedByName,
+  //           code: data[i].code,
+  //           description: data[i].description,
+  //           gpsLat: data[i].gpsLat,
+  //           gpsLng: data[i].gpsLng,
+  //           id: data[i].id,
+  //           isClosed: data[i].isClosed,
+  //           isNewResponse: dataFromLocal[indexDataLocal].isNewResponse,
+  //           isSynchronize: data[i].isSynchronize,
+  //           mCompanyAlias: data[i].mCompanyAlias,
+  //           mCompanyId: data[i].mCompanyId,
+  //           mCompanyName: data[i].mCompanyName,
+  //           mDivisionEstateCode: data[i].mDivisionEstateCode,
+  //           mDivisionId: data[i].mDivisionId,
+  //           mDivisionName: data[i].mDivisionName,
+  //           mTeamId: data[i].mTeamId,
+  //           mTeamName: data[i].mTeamName,
+  //           responses: data[i].responses,
+  //           status: data[i].status,
+  //           submittedAt: data[i].submittedAt,
+  //           submittedBy: data[i].submittedBy,
+  //           submittedByName: data[i].submittedByName,
+  //           trTime: data[i].trTime,
+  //           usingGps: data[i].usingGps,
+  //         );
+  //         batchInspectionExisting2.update(
+  //           todoInspectionTable,
+  //           inspectionTemp.toDatabase(),
+  //           where:
+  //               '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+  //           whereArgs: [data[i].code, 1],
+  //         );
+  //         // await db.update(
+  //         //   todoInspectionTable,
+  //         //   inspectionTemp.toDatabase(),
+  //         //   where:
+  //         //       '${TodoInspectionEntity.code}=? and ${TodoInspectionEntity.isSynchronize}=?',
+  //         //   whereArgs: [data[i].code, 1],
+  //         // );
+  //       }
+  //     }
+  //   }
+
+  //   await batchInspectionNew.commit();
+  //   await batchInspectionExisting1.commit();
+  //   await batchInspectionExisting2.commit();
+  // }
 
   static Future<void> insertData(TicketInspectionModel data) async {
     Database db = await DatabaseHelper().database;

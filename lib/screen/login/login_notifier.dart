@@ -190,10 +190,21 @@ class LoginNotifier extends ChangeNotifier {
     // notifyListeners();
   }
 
-  onSuccessLoginInspection(
+  Future<void> onSuccessLoginInspection(
       BuildContext context, LoginInspectionData data) async {
     StorageManager.saveData('is_login_inspection_success', true);
     _loading = false;
+    final username = await StorageManager.readData("userNameOld");
+
+    if (username != data.user.username) {
+      log('delete date time inspection');
+      DatabaseHelper().deleteActivityDataInspection();
+      await StorageManager.deleteData("lastSynchDateInspection");
+      await StorageManager.deleteData("lastSynchTimeInspection");
+      await StorageManager.saveData("userNameOld", data.user.username);
+      await StorageManager.saveData("userName", data.user.username);
+    }
+
     await saveDatabaseInspection(context, _username.text, data);
     FlushBarManager.showFlushBarSuccess(
         context, "Login Berhasil", "Anda berhasil login");
@@ -204,9 +215,10 @@ class LoginNotifier extends ChangeNotifier {
   onErrorLogin(BuildContext context, String response) {
     _loading = false;
     _dialogService.showNoOptionDialog(
-        subtitle: "$response",
-        title: 'Gagal Login',
-        onPress: _dialogService.popDialog);
+      subtitle: "$response",
+      title: 'Gagal Login',
+      onPress: _dialogService.popDialog,
+    );
     notifyListeners();
   }
 
@@ -227,6 +239,7 @@ class LoginNotifier extends ChangeNotifier {
     StorageManager.saveData('inspectionTokenExpired', data.tokenExpiredAt);
     StorageManager.saveData("userName", username);
     StorageManager.saveData('topic', 'development_user_${data.user.username}');
+    DatabaseHelper().deleteMasterDataInspection();
     await DatabaseUserInspectionConfig.insetData(data.user);
     await DatabaseAccessInspection.insetData(data.access);
     await FirebaseMessaging.instance
@@ -235,12 +248,13 @@ class LoginNotifier extends ChangeNotifier {
 
   onPressResetData(BuildContext context) {
     _dialogService.showOptionDialog(
-        title: "Reset Data",
-        subtitle: "Anda yakin ingin mereset data?",
-        buttonTextYes: "Ya",
-        buttonTextNo: "Batal",
-        onPressYes: deleteMasterData,
-        onPressNo: _dialogService.popDialog);
+      title: "Reset Data",
+      subtitle: "Anda yakin ingin mereset data?",
+      buttonTextYes: "Ya",
+      buttonTextNo: "Batal",
+      onPressYes: deleteMasterData,
+      onPressNo: _dialogService.popDialog,
+    );
   }
 
   onPressConfiguration(BuildContext context) {
@@ -288,15 +302,17 @@ class LoginNotifier extends ChangeNotifier {
       DatabaseHelper().deleteMasterDataInspection();
       _dialogService.popDialog();
       FlushBarManager.showFlushBarSuccess(
-          _navigationService.navigatorKey.currentContext!,
-          "Reset Data",
-          "Berhasil mereset data");
+        _navigationService.navigatorKey.currentContext!,
+        "Reset Data",
+        "Berhasil mereset data",
+      );
     } catch (e) {
       _dialogService.popDialog();
       _dialogService.showNoOptionDialog(
-          title: "Reset Data",
-          subtitle: "Gagal melakukan reset data",
-          onPress: _dialogService.popDialog);
+        title: "Reset Data",
+        subtitle: "Gagal melakukan reset data",
+        onPress: _dialogService.popDialog,
+      );
     }
   }
 }

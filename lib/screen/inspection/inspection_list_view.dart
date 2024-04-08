@@ -4,6 +4,7 @@ import 'package:epms/base/ui/palette.dart';
 import 'package:epms/base/ui/style.dart';
 import 'package:epms/common_manager/navigator_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
@@ -78,7 +79,6 @@ class _InspectionListViewState extends State<InspectionListView> {
                           mDivisionName: data.mDivisionName,
                           mTeamId: data.mTeamId,
                           mTeamName: data.mTeamName,
-                          responses: data.responses,
                           status: data.status,
                           submittedAt: data.submittedAt,
                           submittedBy: data.submittedBy,
@@ -86,6 +86,8 @@ class _InspectionListViewState extends State<InspectionListView> {
                           trTime: data.trTime,
                           usingGps: data.usingGps,
                         );
+                        await DatabaseResponseInspection
+                            .updateResponseInspection(inspectionTemp.id);
                         await _navigationService.push(
                           Routes.INSPECTION_DETAIL,
                           arguments: data,

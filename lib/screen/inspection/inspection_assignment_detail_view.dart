@@ -17,12 +17,13 @@ import 'package:epms/common_manager/value_service.dart';
 import 'package:epms/database/helper/convert_helper.dart';
 import 'package:epms/database/service/database_action_inspection.dart';
 import 'package:epms/database/service/database_attachment_inspection.dart';
+import 'package:epms/database/service/database_response_inspection.dart';
 import 'package:epms/database/service/database_subordinate_inspection.dart';
 import 'package:epms/database/service/database_ticket_inspection.dart';
 import 'package:epms/database/service/database_todo_inspection.dart';
 import 'package:epms/database/service/database_user_inspection_config.dart';
 import 'package:epms/model/attachment_inspection_model.dart';
-import 'package:epms/model/history_inspection_model.dart';
+import 'package:epms/model/response_inspection_model.dart';
 import 'package:epms/model/ticket_inspection_model.dart';
 import 'package:epms/model/user_inspection_config_model.dart';
 import 'package:epms/model/user_inspection_model.dart';
@@ -60,7 +61,7 @@ class _InspectionAssignmentDetailViewState
   final descriptionController = TextEditingController();
   final actionController = TextEditingController();
 
-  List<HistoryInspectionModel> listHistoryInspection = [];
+  // List<HistoryInspectionModel> listHistoryInspection = [];
 
   UserInspectionModel? selectedUserInspection;
 
@@ -75,10 +76,9 @@ class _InspectionAssignmentDetailViewState
 
   bool isShowDialogSubmit = false;
 
-  List<AttachmentInspectionModel> listInspectionAttachment =
-      <AttachmentInspectionModel>[];
-  Map<String, List<AttachmentInspectionModel>> listResponseAttachment =
-      <String, List<AttachmentInspectionModel>>{};
+  List<ResponseInspectionModel> listResponseInspection = [];
+  Map<String, List<AttachmentInspectionModel>> listResponseAttachment = {};
+  List<AttachmentInspectionModel> listInspectionAttachment = [];
 
   bool isLoading = false;
 
@@ -90,9 +90,11 @@ class _InspectionAssignmentDetailViewState
 
   Future<void> initData() async {
     isLoading = true;
-    await initAttachment();
+    // await initAttachment();
+    await getInspectionAttachment();
+    await getResponseInspection();
     descriptionController.text = widget.data.description;
-    listHistoryInspection = widget.data.responses;
+    // listHistoryInspection = widget.data.responses;
     getResponseId();
     getOptionAction();
     getUser();
@@ -102,33 +104,57 @@ class _InspectionAssignmentDetailViewState
     setState(() {});
   }
 
-  Future<void> initAttachment() async {
-    for (final attachment in widget.data.attachments) {
-      final indexAttachment = widget.data.attachments.indexOf(attachment);
-      final code = '${widget.data.code}$indexAttachment';
+  Future<void> getInspectionAttachment() async {
+    final listInspectionAttachmentData =
+        await DatabaseAttachmentInspection.selectDataByCode(widget.data.code);
+    listInspectionAttachment = listInspectionAttachmentData;
+    setState(() {});
+  }
 
-      final inspectionAttachment =
-          await DatabaseAttachmentInspection.selectData(code);
-      listInspectionAttachment.add(inspectionAttachment);
-    }
+  Future<void> getResponseInspection() async {
+    final listResponseInspectionData =
+        await DatabaseResponseInspection.selectDataByInspectionId(
+      widget.data.id,
+    );
 
-    for (final response in widget.data.responses) {
-      final listResponseAttachmentTemp = <AttachmentInspectionModel>[];
+    listResponseInspection = listResponseInspectionData;
 
-      for (final attachment in response.attachments) {
-        final indexAttachment = response.attachments.indexOf(attachment);
-        final code = '${response.code}$indexAttachment';
-
-        final inspectionAttachment =
-            await DatabaseAttachmentInspection.selectData(code);
-        listResponseAttachmentTemp.add(inspectionAttachment);
-      }
-
-      listResponseAttachment[response.code] = listResponseAttachmentTemp;
-    }
+    await Future.forEach(listResponseInspectionData, (response) async {
+      final listResponseAttachmentData =
+          await DatabaseAttachmentInspection.selectDataByCode(response.code);
+      listResponseAttachment[response.code] = listResponseAttachmentData;
+    });
 
     setState(() {});
   }
+
+  // Future<void> initAttachment() async {
+  //   for (final attachment in widget.data.attachments) {
+  //     final indexAttachment = widget.data.attachments.indexOf(attachment);
+  //     final code = '${widget.data.code}$indexAttachment';
+
+  //     final inspectionAttachment =
+  //         await DatabaseAttachmentInspection.selectData(code);
+  //     listInspectionAttachment.add(inspectionAttachment);
+  //   }
+
+  //   for (final response in widget.data.responses) {
+  //     final listResponseAttachmentTemp = <AttachmentInspectionModel>[];
+
+  //     for (final attachment in response.attachments) {
+  //       final indexAttachment = response.attachments.indexOf(attachment);
+  //       final code = '${response.code}$indexAttachment';
+
+  //       final inspectionAttachment =
+  //           await DatabaseAttachmentInspection.selectData(code);
+  //       listResponseAttachmentTemp.add(inspectionAttachment);
+  //     }
+
+  //     listResponseAttachment[response.code] = listResponseAttachmentTemp;
+  //   }
+
+  //   setState(() {});
+  // }
 
   bool validateForm() {
     if (selectedAction == null) {
@@ -198,11 +224,13 @@ class _InspectionAssignmentDetailViewState
   }
 
   Future<void> getLocation() async {
-    var position = await LocationService.getGPSLocation();
-    if (position != null) {
-      longitude = position.longitude;
-      latitude = position.latitude;
-      gpsLocation = "${position.longitude}, ${position.latitude}";
+    while (gpsLocation.isEmpty) {
+      final _position = await LocationService.getGPSLocation();
+      if (_position != null) {
+        longitude = _position.longitude;
+        latitude = _position.latitude;
+        gpsLocation = "${_position.longitude}, ${_position.latitude}";
+      }
     }
     log('cek inspection location : $gpsLocation');
     setState(() {});
@@ -216,30 +244,33 @@ class _InspectionAssignmentDetailViewState
     setState(() {});
   }
 
-  void getResponseId() {
+  Future<void> getResponseId() async {
+    final responses = await DatabaseResponseInspection.selectDataByInspectionId(
+        widget.data.id);
     final dateNow = DateTime.now();
     final dateNowConvert = ValueService.generateIDFromDateTime(dateNow);
     math.Random random = new math.Random();
     var randomNumber = random.nextInt(100);
-    responseId =
-        'R${widget.data.responses.length + 1}$dateNowConvert$randomNumber';
+    responseId = 'R${responses.length + 1}$dateNowConvert$randomNumber';
     setState(() {});
   }
 
   Future<void> createResponse(
     BuildContext context, {
     required TicketInspectionModel toDoInspection,
-    required HistoryInspectionModel responseInspection,
+    required ResponseInspectionModel responseInspection,
   }) async {
     _dialogService.showLoadingDialog(title: "Upload Data");
     await InspectionRepository().createResponseInspection(
       context,
-      toDoInspection,
       responseInspection,
       (context, successMessage) async {
         await DatabaseTodoInspection.deleteTodoByCode(toDoInspection);
-        // await DatabaseAttachmentInspection.deleteInspectionByCode(
-        //     toDoInspection);
+        await DatabaseResponseInspection.deleteResponseByCode(
+            responseInspection.code);
+        // await DatabaseAttachmentInspection.deleteDataByCode(
+        //     responseInspection.code);
+
         await getDataInspection(context);
       },
       (context, errorMessage) async {
@@ -254,55 +285,65 @@ class _InspectionAssignmentDetailViewState
   }
 
   Future<void> getDataInspection(BuildContext context) async {
-    await DatabaseSubordinateInspection.deleteTable();
     await InspectionRepository().getMyInspectionClose(
       context,
       (context, data) async {
-        await DatabaseTicketInspection.addAllData(data);
-        await DatabaseSubordinateInspection.addAllData(data);
-        await DatabaseAttachmentInspection.addAllDataNew(data);
+        await DatabaseResponseInspection.addAllData(data.responses);
+        await DatabaseTicketInspection.addAllDataNew(data.inspection);
+        await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+        await DatabaseAttachmentInspection.addAllData(data);
 
         await InspectionRepository().getMyInspectionNotClose(
           context,
           (context, data) async {
-            await DatabaseTicketInspection.addAllData(data);
-            await DatabaseSubordinateInspection.addAllData(data);
-            await DatabaseAttachmentInspection.addAllDataNew(data);
+            await DatabaseResponseInspection.addAllData(data.responses);
+            await DatabaseTicketInspection.addAllDataNew(data.inspection);
+            await DatabaseSubordinateInspection.addAllDataNew(data.inspection);
+            await DatabaseAttachmentInspection.addAllData(data);
 
             await InspectionRepository().getToDoInspection(
               context,
               (context, data) async {
-                await DatabaseTodoInspection.addAllData(data);
-                await DatabaseAttachmentInspection.addAllDataNew(data);
+                await DatabaseResponseInspection.addAllData(data.responses);
+                await DatabaseTodoInspection.addAllDataNew(data.inspection);
+                await DatabaseAttachmentInspection.addAllData(data);
 
                 await InspectionRepository().getOnGoingInspectionClose(
                   context,
                   (context, data) async {
-                    await DatabaseSubordinateInspection.addAllData(data);
-                    await DatabaseAttachmentInspection.addAllDataNew(data);
+                    await DatabaseResponseInspection.addAllData(data.responses);
+                    await DatabaseSubordinateInspection.addAllDataNew(
+                        data.inspection);
+                    await DatabaseAttachmentInspection.addAllData(data);
 
                     await InspectionRepository().getOnGoingInspectionNotClose(
                       context,
                       (context, data) async {
-                        await DatabaseSubordinateInspection.addAllData(data);
-                        await DatabaseAttachmentInspection.addAllDataNew(data);
+                        await DatabaseResponseInspection.addAllData(
+                            data.responses);
+                        await DatabaseSubordinateInspection.addAllDataNew(
+                            data.inspection);
+                        await DatabaseAttachmentInspection.addAllData(data);
 
                         await InspectionRepository().getToDoInspectionClose(
                           context,
                           (context, data) async {
-                            await DatabaseSubordinateInspection.addAllData(
-                                data);
-                            await DatabaseAttachmentInspection.addAllDataNew(
-                                data);
+                            await DatabaseResponseInspection.addAllData(
+                                data.responses);
+                            await DatabaseSubordinateInspection.addAllDataNew(
+                                data.inspection);
+                            await DatabaseAttachmentInspection.addAllData(data);
 
                             await InspectionRepository()
                                 .getToDoInspectionNotClose(
                               context,
                               (context, data) async {
-                                await DatabaseSubordinateInspection.addAllData(
+                                await DatabaseResponseInspection.addAllData(
+                                    data.responses);
+                                await DatabaseSubordinateInspection
+                                    .addAllDataNew(data.inspection);
+                                await DatabaseAttachmentInspection.addAllData(
                                     data);
-                                await DatabaseAttachmentInspection
-                                    .addAllDataNew(data);
                                 _dialogService.popDialog();
                                 _navigationService.pop();
                                 FlushBarManager.showFlushBarSuccess(
@@ -502,8 +543,8 @@ class _InspectionAssignmentDetailViewState
 
   Future<void> submit() async {
     if (validateForm()) {
-      final dataHistory = HistoryInspectionModel(
-        id: widget.data.id,
+      final dataResponse = ResponseInspectionModel(
+        tInspectionId: widget.data.id,
         code: responseId,
         trTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         submittedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
@@ -518,8 +559,12 @@ class _InspectionAssignmentDetailViewState
         gpsLng: longitude,
         status: selectedAction ?? '',
         attachments: listInspectionPhoto,
+        isNewResponse: 0,
+        isSynchronize: 0,
       );
-      listHistoryInspection.add(dataHistory);
+
+      listResponseInspection.add(dataResponse);
+
       final dataInspection = TicketInspectionModel(
         id: widget.data.id,
         code: widget.data.code,
@@ -549,22 +594,87 @@ class _InspectionAssignmentDetailViewState
         isNewResponse: widget.data.isNewResponse,
         usingGps: widget.data.usingGps,
         attachments: widget.data.attachments,
-        responses: listHistoryInspection,
       );
 
-      await DatabaseAttachmentInspection.insertResponse(dataHistory);
+      await DatabaseAttachmentInspection.insertResponse(dataResponse);
+
       final isInternetExist =
           await InspectionService.isInternetConnectionExist();
       if (isInternetExist) {
         await createResponse(
           context,
           toDoInspection: dataInspection,
-          responseInspection: dataInspection.responses.last,
+          responseInspection: dataResponse,
         );
       } else {
-        await DatabaseTodoInspection.updateData(dataInspection);
+        await DatabaseResponseInspection.insertData(dataResponse);
+        // await DatabaseTodoInspection.updateData(dataInspection);
         _navigationService.pop();
       }
+
+      // final dataHistory = HistoryInspectionModel(
+      //   id: widget.data.id,
+      //   code: responseId,
+      //   trTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      //   submittedAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      //   submittedBy: user.id,
+      //   submittedByName: user.name,
+      //   description: actionController.text,
+      //   reassignedTo:
+      //       selectedUserInspection != null ? selectedUserInspection!.id : '',
+      //   reassignedToName:
+      //       selectedUserInspection != null ? selectedUserInspection!.name : '',
+      //   gpsLat: latitude,
+      //   gpsLng: longitude,
+      //   status: selectedAction ?? '',
+      //   attachments: listInspectionPhoto,
+      // );
+      // listHistoryInspection.add(dataHistory);
+      // final dataInspection = TicketInspectionModel(
+      //   id: widget.data.id,
+      //   code: widget.data.code,
+      //   trTime: widget.data.trTime,
+      //   mCompanyId: widget.data.mCompanyId,
+      //   mCompanyName: widget.data.mCompanyName,
+      //   mCompanyAlias: widget.data.mCompanyAlias,
+      //   mTeamId: widget.data.mTeamId,
+      //   mTeamName: widget.data.mTeamName,
+      //   mDivisionId: widget.data.mDivisionId,
+      //   mDivisionName: widget.data.mDivisionName,
+      //   mDivisionEstateCode: widget.data.mDivisionEstateCode,
+      //   gpsLng: widget.data.gpsLng,
+      //   gpsLat: widget.data.gpsLat,
+      //   submittedAt: widget.data.submittedAt,
+      //   submittedBy: widget.data.submittedBy,
+      //   submittedByName: widget.data.submittedByName,
+      //   assignee: widget.data.assignee,
+      //   assigneeId: widget.data.assigneeId,
+      //   status: selectedAction ?? '',
+      //   description: widget.data.description,
+      //   closedAt: widget.data.closedAt,
+      //   closedBy: widget.data.closedBy,
+      //   closedByName: widget.data.closedByName,
+      //   isClosed: widget.data.isClosed,
+      //   isSynchronize: 0,
+      //   isNewResponse: widget.data.isNewResponse,
+      //   usingGps: widget.data.usingGps,
+      //   attachments: widget.data.attachments,
+      //   responses: listHistoryInspection,
+      // );
+
+      // await DatabaseAttachmentInspection.insertResponse(dataHistory);
+      // final isInternetExist =
+      //     await InspectionService.isInternetConnectionExist();
+      // if (isInternetExist) {
+      //   await createResponse(
+      //     context,
+      //     toDoInspection: dataInspection,
+      //     responseInspection: dataInspection.responses.last,
+      //   );
+      // } else {
+      //   await DatabaseTodoInspection.updateData(dataInspection);
+      //   _navigationService.pop();
+      // }
     }
   }
 
@@ -889,8 +999,8 @@ class _InspectionAssignmentDetailViewState
                               ),
                             SizedBox(height: 6),
                             Text('Riwayat Tindakan :'),
-                            if (widget.data.responses.isNotEmpty)
-                              ...widget.data.responses.map((item) {
+                            if (listResponseInspection.isNotEmpty)
+                              ...listResponseInspection.map((item) {
                                 final responseAttachment =
                                     listResponseAttachment[item.code];
                                 return CardHistoryInspection(
@@ -922,6 +1032,39 @@ class _InspectionAssignmentDetailViewState
                                     child: const Text(
                                         'Belum Ada Riwayat Tindakan')),
                               ),
+                            // if (widget.data.responses.isNotEmpty)
+                            //   ...widget.data.responses.map((item) {
+                            //     final responseAttachment =
+                            //         listResponseAttachment[item.code];
+                            //     return CardHistoryInspection(
+                            //       data: item,
+                            //       listResponseAttachment:
+                            //           responseAttachment ?? [],
+                            //       onPreviewPhoto: (value) {
+                            //         setState(() {
+                            //           isPreviewPhoto = true;
+                            //         });
+                            //         _dialogService
+                            //             .showDialogPreviewPhotoOffline(
+                            //           image: value,
+                            //           onTapClose: () {
+                            //             setState(() {
+                            //               isPreviewPhoto = false;
+                            //             });
+                            //             _dialogService.popDialog();
+                            //           },
+                            //         );
+                            //       },
+                            //     );
+                            //   }).toList()
+                            // else
+                            //   Padding(
+                            //     padding:
+                            //         const EdgeInsets.symmetric(vertical: 16),
+                            //     child: Center(
+                            //         child: const Text(
+                            //             'Belum Ada Riwayat Tindakan')),
+                            //   ),
                             if (ConvertHelper.intToBool(
                                 widget.data.isSynchronize))
                               Column(

@@ -51,14 +51,16 @@ class LogOutRepository extends APIConfiguration {
         'Accept': 'application/json',
         'Authorization': 'Bearer $inspectionToken'
       };
-      // var urlDev =
+      // var urlInspectionDev =
       //     'https://etrace-dev.anj-group.co.id/inspection/public/index.php/api/v1/signout';
-      var urlProd =
+      // var urlInspectionDev =
+      //     'http://10.10.10.91/inspection/public/index.php/api/v1/signout';
+      var urlInspectionProd =
           'https://inspection.anj-group.co.id/public/index.php/api/v1/signout';
-      var uri = Uri.parse(urlProd);
+      var uri = Uri.parse(urlInspectionProd);
       var response = await ioClient!.get(uri, headers: headers);
       final data = jsonDecode(response.body);
-      log('cek url : $urlProd');
+      log('cek url : $urlInspectionProd');
       log('cek response logout inspection : ${response.body}');
 
       if (data['success'] == true) {
