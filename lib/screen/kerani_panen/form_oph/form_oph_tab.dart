@@ -383,7 +383,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                                 setState(() {
                                   notifier.tphNumber =
                                       TextEditingController(text: result);
-                                  notifier.cardOPHNumberCheck(context, result);
+                                  notifier.tPHNumberCheck(context, result);
                                 });
                               }
                             },
@@ -445,6 +445,7 @@ class _FormOPHTabState extends State<FormOPHTab> {
                                 setState(() {
                                   notifier.ophNumber =
                                       TextEditingController(text: result);
+                                  notifier.cardOPHNumberCheck(context, result);
                                 });
                               }
                             },
