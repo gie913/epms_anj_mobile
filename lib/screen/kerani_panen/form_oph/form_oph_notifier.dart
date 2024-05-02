@@ -251,8 +251,15 @@ class FormOPHNotifier extends ChangeNotifier {
     _listEstate = await DatabaseMEstateSchema().selectMEstateSchema();
     _listVendor = await DatabaseMVendorSchema().selectMVendorSchema();
     _supervisor = await DatabaseSupervisor().selectSupervisor();
-    _listMCustomer =
+    final dataMCustomer =
         await DatabaseMCustomerCodeSchema().selectMCustomerCodeSchema();
+    if (dataMCustomer.isNotEmpty) {
+      for (var data in dataMCustomer) {
+        if (data.customerCode == 'INT_PMA1') {
+          _listMCustomer.add(data);
+        }
+      }
+    }
     _listHarvestingPlan =
         await DatabaseTHarvestingPlan().selectTHarvestingPlan();
     _listEmployee.forEach((element) {

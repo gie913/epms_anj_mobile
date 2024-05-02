@@ -11,6 +11,7 @@ import 'package:epms/common_manager/oph_card_manager.dart';
 import 'package:epms/common_manager/time_manager.dart';
 import 'package:epms/common_manager/validation_service.dart';
 import 'package:epms/common_manager/value_service.dart';
+import 'package:epms/database/service/database_harvesting_plan.dart';
 import 'package:epms/database/service/database_laporan_panen_kemarin.dart';
 import 'package:epms/database/service/database_m_customer_code.dart';
 import 'package:epms/database/service/database_m_employee.dart';
@@ -22,6 +23,7 @@ import 'package:epms/model/m_customer_code_schema.dart';
 import 'package:epms/model/m_employee_schema.dart';
 import 'package:epms/model/oph.dart';
 import 'package:epms/model/t_abw_schema.dart';
+import 'package:epms/model/t_harvesting_plan_schema.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 
@@ -109,6 +111,10 @@ class DetailOPHNotifier extends ChangeNotifier {
   bool _restan = false;
 
   bool get restan => _restan;
+
+  List<THarvestingPlanSchema> _listHarvestingPlan = [];
+
+  List<THarvestingPlanSchema> get listHarvestingPlan => _listHarvestingPlan;
 
   onSuccessRead(BuildContext context, OPH oph) {
     checkOPHExist(oph);
@@ -318,7 +324,7 @@ class DetailOPHNotifier extends ChangeNotifier {
     }
   }
 
-  dialogNFCWrite() {
+  dialogNFCWrite() async {
     // _dialogService.popDialog();
     _oph.bunchesRipe = int.tryParse(bunchesRipe.text);
     _oph.bunchesOverripe = int.tryParse(bunchesOverRipe.text);
@@ -331,6 +337,17 @@ class DetailOPHNotifier extends ChangeNotifier {
     _oph.bunchesNotSent = int.tryParse(bunchesNotSent.text);
     // azis
     _oph.ophBlockCode = blockNumber.text;
+
+    final listHarvestingPlan =
+        await DatabaseTHarvestingPlan().selectTHarvestingPlan();
+
+    if (listHarvestingPlan
+        .any((item) => item.harvestingPlanBlockCode == _blockNumber.text)) {
+      _oph.isPlanned = 1;
+    } else {
+      _oph.isPlanned = 0;
+    }
+
     if (ophNumber.text.isNotEmpty) {
       _oph.ophCardId = ophNumber.text;
     }
